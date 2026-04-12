@@ -356,7 +356,7 @@ function JotGlossRailContent({
 
   return (
     <div className="desk-rail-stack">
-      <UtilityBookplate tone="sage" kicker="Writing Desk" title="Notebook">
+      <UtilityBookplate tone="sage" kicker="Pen & Paper" title="Notebook">
         <p className="rail-copy">
           {pinnedNote
             ? pinnedNote.text
@@ -372,7 +372,7 @@ function JotGlossRailContent({
         </div>
       </UtilityBookplate>
 
-      <UtilityBookplate tone="powder" kicker="The Clipboard" title={continueFile ? humanTitle(continueFile.name) : 'Pick up where you left off.'}>
+      <UtilityBookplate tone="powder" kicker="Where You Left Off" title={continueFile ? humanTitle(continueFile.name) : 'Pick up where you left off.'}>
         <p className="rail-copy">
           {continueFile ? `${continueFile.className} · ${continueFile.resourceType}` : 'Open a folio and the clipboard will hold your place.'}
         </p>
@@ -419,7 +419,7 @@ function JotGlossRailContent({
         </div>
       </UtilityBookplate>
 
-      <UtilityBookplate tone="butter" kicker="The Filing Cabinet" title="Archive and versions">
+      <UtilityBookplate tone="butter" kicker="Archive & Sundries" title="Archive and versions">
         <div className="rail-button-stack">
           <button type="button" className={`bookplate-action ${isArchiveView ? 'active' : ''}`} onClick={onOpenArchive}>
             Open Versions
