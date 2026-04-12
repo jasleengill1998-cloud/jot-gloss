@@ -1,5 +1,4 @@
 import type { StudyFile } from '../types'
-import ArchNiche from './ArchNiche'
 
 interface Props {
   className: string
@@ -9,20 +8,45 @@ interface Props {
 }
 
 const TINTS: Array<'blush' | 'powder' | 'butter' | 'lilac' | 'sage'> = ['blush', 'powder', 'butter', 'lilac', 'sage']
+const SURFACES: Record<(typeof TINTS)[number], string> = {
+  blush: 'rgba(242, 208, 204, 0.92)',
+  powder: 'rgba(214, 228, 237, 0.92)',
+  butter: 'rgba(245, 230, 184, 0.92)',
+  lilac: 'rgba(221, 212, 236, 0.92)',
+  sage: 'rgba(212, 228, 208, 0.92)',
+}
 
 export default function ClassFolder({ className, files, onClick, index = 0 }: Props) {
   const tint = TINTS[index % TINTS.length]
 
   return (
-    <ArchNiche
+    <button
+      type="button"
       onClick={onClick}
-      tint={tint}
-      variant="section"
-      shape="stationery"
-      style={{ cursor: 'pointer', minHeight: 276, transition: 'transform 0.25s ease, box-shadow 0.25s ease' }}
+      style={{
+        width: '100%',
+        minHeight: 276,
+        background: SURFACES[tint],
+        border: '1px solid rgba(169, 151, 141, 0.28)',
+        boxShadow: '0 16px 28px rgba(86, 60, 68, 0.08)',
+        cursor: 'pointer',
+        transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+        position: 'relative',
+        padding: 0,
+        textAlign: 'center',
+      }}
       className="folder-arch-card"
     >
-      <div style={{ padding: '150px 24px 24px', textAlign: 'center', maxWidth: 260, margin: '0 auto' }}>
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: '8px',
+          border: '1px solid rgba(199, 183, 157, 0.52)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div style={{ padding: '48px 24px 24px', textAlign: 'center', maxWidth: 260, margin: '0 auto', position: 'relative' }}>
         <div
           style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
@@ -62,6 +86,6 @@ export default function ClassFolder({ className, files, onClick, index = 0 }: Pr
           {files.length} {files.length === 1 ? 'entry' : 'entries'}
         </p>
       </div>
-    </ArchNiche>
+    </button>
   )
 }
