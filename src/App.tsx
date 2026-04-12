@@ -488,8 +488,8 @@ function JotGlossStudyRail({
     <div className="desk-rail-stack">
       <FocusableRailSection
         tone="sage"
-        kicker="Writing Desk"
-        title="Notebook"
+        kicker="Pen & Paper"
+        title="Writing Desk"
         objectKey="notebook"
         focusedObject={focusedObject}
         onSpineClick={() => onFocusObject('notebook')}
@@ -522,8 +522,8 @@ function JotGlossStudyRail({
 
       <FocusableRailSection
         tone="butter"
-        kicker="The Clipboard"
-        title="Pick up where you left off."
+        kicker="Where You Left Off"
+        title="The Clipboard"
         objectKey="clipboard"
         focusedObject={focusedObject}
         onSpineClick={() => {
@@ -572,7 +572,7 @@ function JotGlossStudyRail({
       <FocusableRailSection
         tone="cream"
         kicker="The Gramophone"
-        title={musicPlaying ? 'Now playing' : ''}
+        title="The Gramophone"
         objectKey="music"
         focusedObject={focusedObject}
         onSpineClick={onClearFocus}
@@ -603,8 +603,8 @@ function JotGlossStudyRail({
 
       <FocusableRailSection
         tone="lilac"
-        kicker="The Filing Cabinet"
-        title="File in the cabinet"
+        kicker="Archive & Sundries"
+        title="The Filing Cabinet"
         objectKey="cabinet"
         focusedObject={focusedObject}
         onSpineClick={() => {
