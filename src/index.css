@@ -2533,44 +2533,43 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 1;
   gap: 0;
+  line-height: 1;
 }
 
 .wordmark-jot {
-  font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
+  font-family: 'Cormorant Garamond', Georgia, serif;
   font-weight: 600;
   font-variant: small-caps;
-  font-size: 32px;
+  font-size: 1.35rem;
   letter-spacing: 0.18em;
-  color: var(--color-ink-light, #5A3E4B);
+  color: #5A3E4B;
+  text-transform: uppercase;
 }
 
 .wordmark-rule {
-  width: 76px;
+  width: 100%;
   height: 1px;
-  background: var(--color-rule, #C7B79D);
-  opacity: 0.7;
-  margin: 4px auto;
+  background: #C7B79D;
+  margin: 4px 0;
 }
 
 .wordmark-gloss {
-  font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
+  font-family: 'Cormorant Garamond', Georgia, serif;
   font-weight: 400;
   font-style: italic;
-  font-size: 19px;
+  font-size: 0.82rem;
   letter-spacing: 0.06em;
   color: rgba(90,62,75,0.68);
-  margin-top: -2px;
 }
 
-.wordmark-slogan {
-  font-family: var(--font-body, 'EB Garamond', Georgia, serif);
+.wordmark-sub {
+  font-family: 'EB Garamond', Georgia, serif;
   font-style: italic;
-  font-size: 11px;
-  letter-spacing: 0.04em;
+  font-size: 0.62rem;
   color: rgba(90,62,75,0.38);
-  margin-top: 6px;
+  margin-top: 3px;
+  letter-spacing: 0.04em;
 }
 
 /* ── RAIL CARD COLORS (saturated, not grey) ── */

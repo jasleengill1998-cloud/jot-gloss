@@ -5,7 +5,6 @@ import { useFiles } from './hooks/useFiles'
 import { useStudyTimer } from './hooks/useStudyTimer'
 import { useGramophone } from './hooks/useGramophone'
 import type { MoodKey } from './hooks/useGramophone'
-import ArchNiche from './components/ArchNiche'
 import BookplateLogo from './components/BookplateLogo'
 import ClassFolder from './components/ClassFolder'
 import ClipboardWatcher from './components/ClipboardWatcher'
@@ -25,7 +24,6 @@ import StudyStats from './components/StudyStats'
 import StudyTimer from './components/StudyTimer'
 import SyncPanel from './components/SyncPanel'
 import { ArchDivider } from './components/Ornaments'
-import { ArchBottom, ArchTop, DiamondDivider as SidebarDiamondDivider } from './components/SidebarArch'
 import UtilityBookplate from './components/UtilityBookplate'
 import { loadAppSession, saveAppSession, type AppNav, type FocusedObject } from './utils/appSession'
 import { getVersionGroup, getVersionSummary } from './utils/studyFiles'
@@ -156,6 +154,7 @@ interface RailProps {
   studyMixes: StudyMix[]
   activeMixKey: string
   musicPlaying: boolean
+  musicActionLabel: string
   onToggleMusic: () => void
   onSelectMix: (mix: StudyMix) => void
 }
@@ -227,6 +226,7 @@ function DeskRailContent({
   studyMixes,
   activeMixKey,
   musicPlaying,
+  musicActionLabel,
   onToggleMusic,
   onSelectMix,
 }: RailProps) {
@@ -286,7 +286,7 @@ function DeskRailContent({
       <UtilityBookplate tone="cream" kicker="The Gramophone" title={musicPlaying ? 'Now playing' : ''}>
         <div className="music-drawer-row">
           <button type="button" className="bookplate-action compact" onClick={onToggleMusic}>
-            {musicPlaying ? 'Lift the needle' : 'Set the needle'}
+            {musicActionLabel}
           </button>
           <div className="music-mix-row">
             {studyMixes.map((mix) => (
@@ -303,7 +303,7 @@ function DeskRailContent({
         </div>
       </UtilityBookplate>
 
-      <UtilityBookplate tone="lilac" kicker="Filing Cabinet" title="File this away">
+      <UtilityBookplate tone="lilac" kicker="The Filing Cabinet" title="File this away">
         <div className="rail-button-stack">
           <button type="button" className={`bookplate-action ${activePanel === 'upload' ? 'active' : ''}`} onClick={() => onTogglePanel('upload')}>
             Place in the cabinet
@@ -348,6 +348,7 @@ function JotGlossRailContent({
   studyMixes,
   activeMixKey,
   musicPlaying,
+  musicActionLabel,
   onToggleMusic,
   onSelectMix,
 }: RailProps) {
@@ -355,7 +356,7 @@ function JotGlossRailContent({
 
   return (
     <div className="desk-rail-stack">
-      <UtilityBookplate tone="sage" kicker="Stationery" title="Notebook">
+      <UtilityBookplate tone="sage" kicker="Writing Desk" title="Notebook">
         <p className="rail-copy">
           {pinnedNote
             ? pinnedNote.text
@@ -371,7 +372,7 @@ function JotGlossRailContent({
         </div>
       </UtilityBookplate>
 
-      <UtilityBookplate tone="powder" kicker="Clipboard" title={continueFile ? humanTitle(continueFile.name) : 'Pick up where you left off.'}>
+      <UtilityBookplate tone="powder" kicker="The Clipboard" title={continueFile ? humanTitle(continueFile.name) : 'Pick up where you left off.'}>
         <p className="rail-copy">
           {continueFile ? `${continueFile.className} · ${continueFile.resourceType}` : 'Open a folio and the clipboard will hold your place.'}
         </p>
@@ -401,7 +402,7 @@ function JotGlossRailContent({
       <UtilityBookplate tone="cream" kicker="The Gramophone" title={musicPlaying ? 'Now playing' : ''}>
         <div className="music-drawer-row">
           <button type="button" className="bookplate-action compact" onClick={onToggleMusic}>
-            {musicPlaying ? 'Lift the needle' : 'Set the needle'}
+            {musicActionLabel}
           </button>
           <div className="music-mix-row">
             {studyMixes.map((mix) => (
@@ -418,7 +419,7 @@ function JotGlossRailContent({
         </div>
       </UtilityBookplate>
 
-      <UtilityBookplate tone="butter" kicker="Filing Cabinet" title="Archive and versions">
+      <UtilityBookplate tone="butter" kicker="The Filing Cabinet" title="Archive and versions">
         <div className="rail-button-stack">
           <button type="button" className={`bookplate-action ${isArchiveView ? 'active' : ''}`} onClick={onOpenArchive}>
             Open Versions
@@ -477,6 +478,7 @@ function JotGlossStudyRail({
   studyMixes,
   activeMixKey,
   musicPlaying,
+  musicActionLabel,
   onToggleMusic,
   onSelectMix,
 }: RailProps) {
@@ -486,7 +488,7 @@ function JotGlossStudyRail({
     <div className="desk-rail-stack">
       <FocusableRailSection
         tone="sage"
-        kicker="Stationery"
+        kicker="Writing Desk"
         title="Notebook"
         objectKey="notebook"
         focusedObject={focusedObject}
@@ -520,7 +522,7 @@ function JotGlossStudyRail({
 
       <FocusableRailSection
         tone="butter"
-        kicker="Clipboard"
+        kicker="The Clipboard"
         title="Pick up where you left off."
         objectKey="clipboard"
         focusedObject={focusedObject}
@@ -579,7 +581,7 @@ function JotGlossStudyRail({
         <div className="desk-cabinet-content">
           <div className="music-drawer-row">
             <button type="button" className="bookplate-action compact" onClick={onToggleMusic}>
-              {musicPlaying ? 'Lift the needle' : 'Set the needle'}
+              {musicActionLabel}
             </button>
             <div className="music-mix-row">
               {studyMixes.map((mix) => (
@@ -601,7 +603,7 @@ function JotGlossStudyRail({
 
       <FocusableRailSection
         tone="lilac"
-        kicker="Filing Cabinet"
+        kicker="The Filing Cabinet"
         title="File in the cabinet"
         objectKey="cabinet"
         focusedObject={focusedObject}
@@ -616,7 +618,7 @@ function JotGlossStudyRail({
         closeLabel="Leave the cabinet"
       >
         <details className="desk-cabinet-details rail-drawer" open={filingCabinetActive} onToggle={(event) => onCabinetToggle((event.currentTarget as HTMLDetailsElement).open)}>
-          <summary className="desk-cabinet-summary">{filingCabinetActive ? 'Close the cabinet' : 'Open the cabinet'}</summary>
+          <summary className="desk-cabinet-summary">{filingCabinetActive ? 'Close the cabinet' : 'Open the filing cabinet'}</summary>
           <div className="desk-cabinet-content">
             <div className="rail-button-stack">
               <button type="button" className={`bookplate-action ${isArchiveView ? 'active' : ''}`} onClick={onOpenArchive}>
@@ -1088,25 +1090,38 @@ export default function App() {
     return () => controller.abort()
   }, [])
 
-  const toggleMusic = useCallback(() => {
-    gramophone.toggleNeedle()
-  }, [gramophone])
-
   const selectMusicMix = useCallback((mix: StudyMix) => {
     setActiveMix(mix)
     gramophone.selectMood(mix.key as MoodKey)
   }, [gramophone])
 
   const titleBlock = (
-    <ArchNiche variant="title" tint="powder" style={{ minHeight: 228 }}>
-      <div style={{ padding: 'calc(var(--space-2xl) * 3) var(--space-xl) var(--space-lg)', textAlign: 'center', maxWidth: 620, margin: '0 auto' }}>
+    <div
+      style={{
+        minHeight: 228,
+        background: 'rgba(214, 228, 237, 0.78)',
+        border: '1px solid rgba(169, 151, 141, 0.28)',
+        boxShadow: '0 18px 34px rgba(86, 60, 68, 0.08)',
+        position: 'relative',
+      }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 'var(--space-sm)',
+          border: '1px solid rgba(199, 183, 157, 0.52)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div style={{ padding: 'calc(var(--space-2xl) * 1.5) var(--space-xl) var(--space-lg)', textAlign: 'center', maxWidth: 620, margin: '0 auto', position: 'relative' }}>
         {showFolders && !showArchive && (
           <>
             <div className="wordmark-lockup">
-              <span className="wordmark-jot">Jot</span>
+              <span className="wordmark-jot">JOT</span>
               <div className="wordmark-rule" />
               <span className="wordmark-gloss">Gloss</span>
-              <span className="wordmark-slogan">notes in the margin</span>
+              <span className="wordmark-sub">notes in the margin</span>
             </div>
             <div className="bloom-stats">
               <span className="collection-stat">{active.length} live pages</span>
@@ -1142,7 +1157,7 @@ export default function App() {
           </>
         )}
       </div>
-    </ArchNiche>
+    </div>
   )
 
   return (
@@ -1151,12 +1166,16 @@ export default function App() {
         <div className="portal-shell">
           <nav className={`archive-rail ${focusModeActive ? 'archive-rail-muted' : ''}`}>
             <div className="sidebar-arch hidden lg:flex">
-              <div className="sidebar-arch-top" onClick={goHome} role="button" tabIndex={0} style={{ cursor: 'pointer' }}>
-                <ArchTop />
-              </div>
-
               <div className="sidebar-arch-sides">
                 <div className="sidebar-arch-content">
+                  <div className="sidebar-section">
+                    <button type="button" className="desk-tool-link" onClick={goHome} style={{ marginBottom: 0 }}>
+                      Return to the desk
+                    </button>
+                  </div>
+
+                  <DiamondDivider />
+
                   <div className="sidebar-section">
                     <div className="rail-heading">Index</div>
                     <div className={`rail-item ${nav === 'library' && !selectedCourse && selectedClass !== '' ? 'active' : ''}`} onClick={openCourseFolios} role="button" tabIndex={0}>
@@ -1170,7 +1189,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <SidebarDiamondDivider />
+                  <DiamondDivider />
 
                   <div className="sidebar-section">
                     <div className="rail-heading">Courses</div>
@@ -1187,7 +1206,7 @@ export default function App() {
                     ))}
                   </div>
 
-                  <SidebarDiamondDivider />
+                  <DiamondDivider />
 
                   <div className="sidebar-section sidebar-courses-editor">
                     <details>
@@ -1221,9 +1240,6 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="sidebar-arch-bottom">
-                <ArchBottom />
-              </div>
             </div>
 
             <div className="mobile-study-door-bar lg:hidden">
@@ -1263,10 +1279,6 @@ export default function App() {
                   aria-label="Course folios"
                 >
                   <div className="study-door-shell sidebar-arch">
-                    <div className="sidebar-arch-top">
-                      <ArchTop />
-                    </div>
-
                     <div className="sidebar-arch-sides">
                       <div className="sidebar-arch-content study-door-content">
                         <div className="study-door-head">
@@ -1275,6 +1287,14 @@ export default function App() {
                             Close
                           </button>
                         </div>
+
+                        <div className="sidebar-section">
+                          <button type="button" className="desk-tool-link" onClick={goHome}>
+                            Return to the desk
+                          </button>
+                        </div>
+
+                        <DiamondDivider />
 
                         <div className="sidebar-section">
                           <div className={`rail-item ${nav === 'library' && !selectedCourse && selectedClass !== '' ? 'active' : ''}`} onClick={openCourseFolios} role="button" tabIndex={0}>
@@ -1288,7 +1308,7 @@ export default function App() {
                           </div>
                         </div>
 
-                        <SidebarDiamondDivider />
+                        <DiamondDivider />
 
                         <div className="sidebar-section">
                           <div className="rail-heading">Courses</div>
@@ -1305,7 +1325,7 @@ export default function App() {
                           ))}
                         </div>
 
-                        <SidebarDiamondDivider />
+                        <DiamondDivider />
 
                         <div className="sidebar-section sidebar-courses-editor">
                           <details>
@@ -1339,9 +1359,6 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="sidebar-arch-bottom">
-                      <ArchBottom />
-                    </div>
                   </div>
                 </div>
               </>
@@ -1361,7 +1378,7 @@ export default function App() {
                     accent={getFolioAccent(featured.className)}
                     onOpen={() => openFileWithFocus(featured)}
                   >
-                    <p className="hero-note">Resume exactly where you left off.</p>
+                    <p className="hero-note">Pick up where you left off.</p>
                   </StudyFolio>
                 </div>
               )}
@@ -1395,7 +1412,8 @@ export default function App() {
                     studyMixes={STUDY_MIXES}
                     activeMixKey={activeMix.key}
                     musicPlaying={musicPlaying}
-                    onToggleMusic={toggleMusic}
+                    musicActionLabel={gramophone.actionLabel}
+                    onToggleMusic={gramophone.toggleNeedle}
                     onSelectMix={selectMusicMix}
                   />
                 </div>
@@ -1594,7 +1612,8 @@ export default function App() {
               studyMixes={STUDY_MIXES}
               activeMixKey={activeMix.key}
               musicPlaying={musicPlaying}
-              onToggleMusic={toggleMusic}
+              musicActionLabel={gramophone.actionLabel}
+              onToggleMusic={gramophone.toggleNeedle}
               onSelectMix={selectMusicMix}
             />
           </aside>

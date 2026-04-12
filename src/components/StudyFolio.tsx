@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import ArchNiche from './ArchNiche'
 
 export type Accent = 'oxblood' | 'powder' | 'butter' | 'lilac' | 'blush' | 'sage'
 
@@ -26,11 +25,40 @@ export default function StudyFolio({
 }: Props) {
   const tint = accent === 'oxblood' || accent === 'blush' ? 'butter' : accent
   const stampColor = accent === 'oxblood' ? '#6e3040' : '#c97c8a'
+  const surfaceByTint: Record<Exclude<Accent, 'oxblood' | 'blush'> | 'butter', string> = {
+    powder: 'rgba(214, 228, 237, 0.92)',
+    butter: 'rgba(245, 230, 184, 0.92)',
+    lilac: 'rgba(221, 212, 236, 0.92)',
+    sage: 'rgba(212, 228, 208, 0.92)',
+  }
 
   return (
     <article style={{ width: '100%' }}>
-      <ArchNiche onClick={onOpen} emphasis tint={tint} variant="hero" shape="hybrid" style={{ cursor: 'pointer', minHeight: 360 }}>
-        <div style={{ padding: '146px 40px 38px', textAlign: 'center', maxWidth: 620, margin: '0 auto' }}>
+      <button
+        type="button"
+        onClick={onOpen}
+        style={{
+          width: '100%',
+          minHeight: 320,
+          background: surfaceByTint[tint],
+          border: '1px solid rgba(169, 151, 141, 0.28)',
+          boxShadow: '0 18px 34px rgba(86, 60, 68, 0.08)',
+          cursor: onOpen ? 'pointer' : 'default',
+          padding: 0,
+          textAlign: 'center',
+          position: 'relative',
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 'var(--space-sm)',
+            border: '1px solid rgba(199, 183, 157, 0.52)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div style={{ padding: 'var(--space-2xl) var(--space-xl) var(--space-lg)', textAlign: 'center', maxWidth: 620, margin: '0 auto', position: 'relative' }}>
           <div
             style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
@@ -104,7 +132,7 @@ export default function StudyFolio({
 
           {children && <div style={{ marginTop: 18 }}>{children}</div>}
         </div>
-      </ArchNiche>
+      </button>
     </article>
   )
 }
