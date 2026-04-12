@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1400" viewBox="0 0 900 1400">
+  <defs>
+    <style>
+      .gold{stroke:#c6a14a; fill:none; stroke-linecap:round; stroke-linejoin:round}
+      .goldfill{fill:#c6a14a; stroke:none}
+      .stem{stroke:#9a8f50; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+      .leaf{fill:#a9b8a6; stroke:#8d9b89; stroke-width:0.8}
+      .leaf2{fill:#97b9bd; stroke:#76979b; stroke-width:0.8}
+      .petalPink{fill:#e8c0be; stroke:#c89c9a; stroke-width:0.8}
+      .petalBlue{fill:#a9c4cf; stroke:#7d9aa4; stroke-width:0.8}
+      .petalCream{fill:#f2e6cf; stroke:#d3c2a4; stroke-width:0.8}
+      .center{fill:#d8b762; stroke:#be9b46; stroke-width:0.8}
+    </style>
+    <g id="miniFloral">
+      <path class="stem" d="M0,0 C8,-8 18,-15 26,-26"/>
+      <path class="leaf" d="M11,-12 C1,-18 0,-30 12,-28 C18,-23 18,-16 11,-12 Z"/>
+      <path class="leaf2" d="M20,-22 C31,-25 38,-36 27,-40 C18,-38 14,-28 20,-22 Z"/>
+      <ellipse class="petalPink" cx="30" cy="-30" rx="6" ry="10" transform="rotate(0 30 -30)"/>
+      <ellipse class="petalPink" cx="30" cy="-30" rx="6" ry="10" transform="rotate(72 30 -30)"/>
+      <ellipse class="petalPink" cx="30" cy="-30" rx="6" ry="10" transform="rotate(144 30 -30)"/>
+      <ellipse class="petalPink" cx="30" cy="-30" rx="6" ry="10" transform="rotate(216 30 -30)"/>
+      <ellipse class="petalPink" cx="30" cy="-30" rx="6" ry="10" transform="rotate(288 30 -30)"/>
+      <circle class="center" cx="30" cy="-30" r="4"/>
+    </g>
+
+    <g id="miniBlueFlower">
+      <path class="stem" d="M0,0 C6,-5 12,-13 18,-18"/>
+      <path class="leaf2" d="M7,-8 C0,-14 -1,-22 8,-22 C13,-18 13,-11 7,-8 Z"/>
+      <ellipse class="petalBlue" cx="20" cy="-20" rx="5.5" ry="9" transform="rotate(0 20 -20)"/>
+      <ellipse class="petalBlue" cx="20" cy="-20" rx="5.5" ry="9" transform="rotate(90 20 -20)"/>
+      <ellipse class="petalBlue" cx="20" cy="-20" rx="5.5" ry="9" transform="rotate(45 20 -20)"/>
+      <ellipse class="petalBlue" cx="20" cy="-20" rx="5.5" ry="9" transform="rotate(135 20 -20)"/>
+      <circle class="center" cx="20" cy="-20" r="3.5"/>
+    </g>
+
+    <g id="borderRosette">
+      <path class="gold" stroke-width="2.2" d="M0,0 C20,-16 42,-16 62,0 C42,16 20,16 0,0 Z"/>
+      <circle class="goldfill" cx="31" cy="0" r="4"/>
+    </g>
+
+    <pattern id="bead" width="12" height="12" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="6" r="1.6" fill="#c6a14a"/>
+    </pattern>
+  </defs>
+
+  <rect x="14" y="14" width="872" height="1372" fill="#fbf7f0" stroke="#c6a14a" stroke-width="4"/>
+  <rect x="28" y="28" width="844" height="1344" fill="none" stroke="#c6a14a" stroke-width="1.5"/>
+  <rect x="38" y="38" width="824" height="1324" fill="none" stroke="url(#bead)" stroke-width="8"/>
+
+  <g opacity="0.95">
+    <!-- top vines -->
+    <path class="stem" d="M70,120 C135,85 180,80 230,105 C280,130 330,138 390,100 C450,62 505,62 570,100 C635,138 690,132 740,104 C790,76 835,90 870,120" stroke-width="2.5"/>
+    <path class="stem" d="M90,170 C160,130 220,130 285,155 C350,180 410,183 450,138 C490,183 550,180 615,155 C680,130 740,130 810,170" stroke-width="1.7"/>
+    <!-- bottom vines -->
+    <path class="stem" d="M70,1280 C135,1315 180,1320 230,1295 C280,1270 330,1262 390,1300 C450,1338 505,1338 570,1300 C635,1262 690,1268 740,1296 C790,1324 835,1310 870,1280" stroke-width="2.5"/>
+    <path class="stem" d="M90,1230 C160,1270 220,1270 285,1245 C350,1220 410,1217 450,1262 C490,1217 550,1220 615,1245 C680,1270 740,1270 810,1230" stroke-width="1.7"/>
+    <!-- side vines -->
+    <path class="stem" d="M108,120 C72,200 84,290 120,360 C150,418 156,470 116,550 C76,630 78,714 120,790 C152,850 152,910 114,990 C76,1070 84,1180 108,1280" stroke-width="2.1"/>
+    <path class="stem" d="M792,120 C828,200 816,290 780,360 C750,418 744,470 784,550 C824,630 822,714 780,790 C748,850 748,910 786,990 C824,1070 816,1180 792,1280" stroke-width="2.1"/>
+  </g>
+
+  <!-- corner flourishes -->
+  <g transform="translate(92,112)"><use href="#miniFloral"/><use href="#miniBlueFlower" transform="translate(32,20) rotate(-10)"/><use href="#miniFloral" transform="translate(80,8) rotate(22) scale(0.85)"/></g>
+  <g transform="translate(808,112) scale(-1,1)"><use href="#miniFloral"/><use href="#miniBlueFlower" transform="translate(32,20) rotate(-10)"/><use href="#miniFloral" transform="translate(80,8) rotate(22) scale(0.85)"/></g>
+  <g transform="translate(92,1288) scale(1,-1)"><use href="#miniFloral"/><use href="#miniBlueFlower" transform="translate(32,20) rotate(-10)"/><use href="#miniFloral" transform="translate(80,8) rotate(22) scale(0.85)"/></g>
+  <g transform="translate(808,1288) scale(-1,-1)"><use href="#miniFloral"/><use href="#miniBlueFlower" transform="translate(32,20) rotate(-10)"/><use href="#miniFloral" transform="translate(80,8) rotate(22) scale(0.85)"/></g>
+
+  <!-- repeating top/bottom motifs -->
+  <g>
+    <use href="#borderRosette" transform="translate(150,86) scale(0.8)"/>
+    <use href="#borderRosette" transform="translate(300,76) scale(0.95)"/>
+    <use href="#borderRosette" transform="translate(450,68) scale(1.08)"/>
+    <use href="#borderRosette" transform="translate(600,76) scale(0.95)"/>
+    <use href="#borderRosette" transform="translate(750,86) scale(0.8)"/>
+    <use href="#borderRosette" transform="translate(150,1314) rotate(180) scale(0.8)"/>
+    <use href="#borderRosette" transform="translate(300,1324) rotate(180) scale(0.95)"/>
+    <use href="#borderRosette" transform="translate(450,1332) rotate(180) scale(1.08)"/>
+    <use href="#borderRosette" transform="translate(600,1324) rotate(180) scale(0.95)"/>
+    <use href="#borderRosette" transform="translate(750,1314) rotate(180) scale(0.8)"/>
+  </g>
+
+  <!-- scattered blossoms along borders -->
+  <g>
+    <use href="#miniBlueFlower" transform="translate(180,150) rotate(15)"/>
+    <use href="#miniFloral" transform="translate(265,138) rotate(-8) scale(0.92)"/>
+    <use href="#miniBlueFlower" transform="translate(360,158) rotate(12) scale(1.08)"/>
+    <use href="#miniFloral" transform="translate(495,138) rotate(6)"/>
+    <use href="#miniBlueFlower" transform="translate(632,154) rotate(-14) scale(1.05)"/>
+    <use href="#miniFloral" transform="translate(740,150) rotate(10) scale(0.88)"/>
+
+    <use href="#miniBlueFlower" transform="translate(180,1250) rotate(-165)"/>
+    <use href="#miniFloral" transform="translate(265,1264) rotate(188) scale(0.92)"/>
+    <use href="#miniBlueFlower" transform="translate(360,1244) rotate(168) scale(1.08)"/>
+    <use href="#miniFloral" transform="translate(495,1266) rotate(174)"/>
+    <use href="#miniBlueFlower" transform="translate(632,1248) rotate(194) scale(1.05)"/>
+    <use href="#miniFloral" transform="translate(740,1252) rotate(170) scale(0.88)"/>
+
+    <use href="#miniFloral" transform="translate(104,260) rotate(92) scale(0.9)"/>
+    <use href="#miniBlueFlower" transform="translate(112,420) rotate(108)"/>
+    <use href="#miniFloral" transform="translate(102,595) rotate(82) scale(1.02)"/>
+    <use href="#miniBlueFlower" transform="translate(118,770) rotate(98) scale(0.94)"/>
+    <use href="#miniFloral" transform="translate(100,970) rotate(84)"/>
+    <use href="#miniBlueFlower" transform="translate(108,1130) rotate(100) scale(1.04)"/>
+
+    <use href="#miniFloral" transform="translate(796,260) scale(-1,1) rotate(-92) scale(0.9)"/>
+    <use href="#miniBlueFlower" transform="translate(788,420) scale(-1,1) rotate(-108)"/>
+    <use href="#miniFloral" transform="translate(798,595) scale(-1,1) rotate(-82) scale(1.02)"/>
+    <use href="#miniBlueFlower" transform="translate(782,770) scale(-1,1) rotate(-98) scale(0.94)"/>
+    <use href="#miniFloral" transform="translate(800,970) scale(-1,1) rotate(-84)"/>
+    <use href="#miniBlueFlower" transform="translate(792,1130) scale(-1,1) rotate(-100) scale(1.04)"/>
+  </g>
+
+  <!-- open center area -->
+  <rect x="150" y="220" width="600" height="960" fill="white" opacity="0.01" stroke="none"/>
+</svg>

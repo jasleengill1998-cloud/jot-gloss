@@ -1,0 +1,7 @@
+.vercel
+generated/
+node_modules/
+dist/
+
+# Audio files (self-hosted MP3s, keep .gitkeep only)
+public/audio/*.mp3

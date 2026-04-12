@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="200" viewBox="0 0 1200 200">
+  <defs>
+    <g id="vine">
+      <path d="M0,100 C50,20 150,180 200,100 S350,20 400,100" fill="none" stroke="#c9a24a" stroke-width="3"/>
+      <circle cx="100" cy="80" r="8" fill="#e8a0a8"/>
+      <circle cx="300" cy="120" r="8" fill="#9cc3d5"/>
+      <circle cx="200" cy="100" r="6" fill="#f2c66d"/>
+    </g>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="200" fill="#f7f1e6"/>
+
+  <g>
+    <use href="#vine" x="0"/>
+    <use href="#vine" x="400"/>
+    <use href="#vine" x="800"/>
+  </g>
+
+  <rect x="0" y="0" width="1200" height="200" fill="none" stroke="#c9a24a" stroke-width="6"/>
+</svg>

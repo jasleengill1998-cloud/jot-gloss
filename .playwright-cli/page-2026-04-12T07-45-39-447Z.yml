@@ -1,0 +1,84 @@
+- generic [ref=e5]:
+  - navigation [ref=e6]:
+    - generic [ref=e7]:
+      - button [ref=e8] [cursor=pointer]:
+        - img [ref=e9]:
+          - generic [ref=e15]: JG
+      - generic [ref=e353]:
+        - generic [ref=e354]:
+          - generic [ref=e355]: Index
+          - button "Course Folios" [ref=e356] [cursor=pointer]
+          - button "All Entries" [ref=e357] [cursor=pointer]
+          - button "Versions" [ref=e358] [cursor=pointer]
+        - img [ref=e360]
+        - generic [ref=e373]:
+          - generic [ref=e374]: Courses
+          - button "MBAS 832 · Strategy" [ref=e375] [cursor=pointer]
+          - button "MBAS 811 · Financial Accounting" [ref=e376] [cursor=pointer]
+          - button "MBAS 801 · Economics" [ref=e377] [cursor=pointer]
+          - button "General" [ref=e378] [cursor=pointer]
+        - img [ref=e380]
+        - group [ref=e394]:
+          - generic "Edit Courses" [ref=e395] [cursor=pointer]
+      - img [ref=e397]:
+        - generic [ref=e644]:
+          - generic [ref=e646]: JG
+          - generic [ref=e647]: EST. MMXXVI
+  - main [ref=e648]:
+    - generic [ref=e649]:
+      - generic [ref=e651]:
+        - img
+        - generic [ref=e653]:
+          - button "Jot Gloss" [ref=e654] [cursor=pointer]
+          - generic [ref=e655]:
+            - generic [ref=e656]: 0 live pages
+            - generic [ref=e657]: ·4 course folios
+            - generic [ref=e658]: ·0 saved versions
+      - generic [ref=e661]:
+        - generic [ref=e663]:
+          - generic [ref=e664]: Opening
+          - heading "Loading your desk" [level=3] [ref=e665]
+        - paragraph [ref=e667]: The folios are being gathered now.
+      - generic [ref=e668]: Jasleen's study library
+  - complementary [ref=e669]:
+    - generic [ref=e670]:
+      - generic [ref=e672]:
+        - generic [ref=e674]:
+          - generic [ref=e675]: Stationery
+          - heading "Notebook" [level=3] [ref=e676]
+        - generic [ref=e677]:
+          - paragraph [ref=e678]: Keep one working page beside the desk so notes, checklists, and loose thoughts stay in the room.
+          - generic [ref=e679]: Open the notebook to save notes and to-do slips.
+          - button "Open Notebook" [ref=e681] [cursor=pointer]
+      - img [ref=e683]
+      - generic [ref=e697]:
+        - generic [ref=e699]:
+          - generic [ref=e700]: Clipboard
+          - heading "Resume studying" [level=3] [ref=e701]
+        - group [ref=e703]:
+          - generic "Close the clipboard" [ref=e704] [cursor=pointer]
+          - generic [ref=e705]:
+            - paragraph [ref=e706]: Nothing on the clipboard yet.
+            - generic [ref=e707]:
+              - generic [ref=e708]: Recently opened
+              - paragraph [ref=e710]: Resume a folio or save a note and the clipboard will start keeping a trail for you.
+      - img [ref=e712]
+      - generic [ref=e726]:
+        - generic [ref=e728]:
+          - generic [ref=e729]: Study Music
+          - heading "Parlour player" [level=3] [ref=e730]
+        - group [ref=e732]:
+          - generic "Hide the music drawer" [ref=e733] [cursor=pointer]
+          - generic [ref=e735]:
+            - button "Play" [ref=e736] [cursor=pointer]
+            - generic [ref=e737]:
+              - button "Library" [ref=e738] [cursor=pointer]
+              - button "Night" [ref=e739] [cursor=pointer]
+              - button "Rain" [ref=e740] [cursor=pointer]
+      - img [ref=e742]
+      - generic [ref=e756]:
+        - generic [ref=e758]:
+          - generic [ref=e759]: Filing Cabinet
+          - heading "File in the cabinet" [level=3] [ref=e760]
+        - group [ref=e762]:
+          - generic "Open the cabinet" [ref=e763] [cursor=pointer]

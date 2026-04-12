@@ -1,0 +1,139 @@
+import { useState, useEffect, useCallback } from 'react'
+import { RESOURCE_TYPES } from '../types'
+import { detectResourceType, detectClass } from '../utils/detect'
+
+interface Props {
+  classes: string[]
+  onSave: (name: string, content: string, className: string, resourceType: string) => void
+}
+
+function looksLikeCode(text: string): boolean {
+  if (text.length < 50) return false
+  // Check for code patterns
+  return /function\s+[A-Z]/.test(text) ||
+    /React\.createElement/.test(text) ||
+    /useState|useEffect/.test(text) ||
+    /^```/m.test(text) ||
+    /^import\s+/.test(text) ||
+    /^export\s+(default\s+)?function/.test(text) ||
+    /^#\s+\w/.test(text) || // markdown heading
+    /<\w+[\s>]/.test(text)  // HTML/JSX tags
+}
+
+function suggestName(content: string): string {
+  // Try to extract component name
+  const funcMatch = content.match(/function\s+([A-Z]\w*)/)
+  if (funcMatch) return funcMatch[1].replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '') + '.jsx'
+
+  // Try to extract markdown title
+  const mdMatch = content.match(/^#\s+(.+)/m)
+  if (mdMatch) return mdMatch[1].toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '.md'
+
+  // Check if it's HTML
+  if (content.includes('<!DOCTYPE') || content.includes('<html')) return 'document.html'
+
+  return 'untitled.jsx'
+}
+
+export default function ClipboardWatcher({ classes, onSave }: Props) {
+  const [clipContent, setClipContent] = useState<string | null>(null)
+  const [fileName, setFileName] = useState('')
+  const [className, setClassName] = useState(classes[0] ?? 'General')
+  const [resourceType, setResourceType] = useState(RESOURCE_TYPES[0])
+  const [saved, setSaved] = useState(false)
+
+  // Check clipboard when window gets focus
+  const checkClipboard = useCallback(async () => {
+    try {
+      const text = await navigator.clipboard.readText()
+      if (text && looksLikeCode(text) && text !== localStorage.getItem('sb-last-clip')) {
+        setClipContent(text)
+        setFileName(suggestName(text))
+        setClassName(detectClass(text, classes))
+        setResourceType(detectResourceType('', text))
+      }
+    } catch {
+      // Clipboard access denied — silent fail
+    }
+  }, [classes])
+
+  useEffect(() => {
+    window.addEventListener('focus', checkClipboard)
+    return () => window.removeEventListener('focus', checkClipboard)
+  }, [checkClipboard])
+
+  const handleSave = () => {
+    if (!clipContent || !fileName.trim()) return
+    // Add extension if missing
+    let name = fileName.trim()
+    if (!name.includes('.')) {
+      if (/function\s+[A-Z]|React\.|useState/.test(clipContent)) name += '.jsx'
+      else if (clipContent.startsWith('#')) name += '.md'
+      else name += '.jsx'
+    }
+    onSave(name, clipContent, className, resourceType)
+    localStorage.setItem('sb-last-clip', clipContent)
+    setSaved(true)
+    setTimeout(() => { setSaved(false); setClipContent(null) }, 2000)
+  }
+
+  const dismiss = () => {
+    if (clipContent) localStorage.setItem('sb-last-clip', clipContent)
+    setClipContent(null)
+  }
+
+  if (!clipContent) return null
+
+  return (
+    <div className="fixed bottom-4 right-4 z-[180] animate-slideDown"
+         style={{ maxWidth: 360 }}>
+      <div className="panel-warm p-4 shadow-lg" style={{ boxShadow: '0 8px 30px rgba(42,34,32,0.15)' }}>
+        {saved ? (
+          <div className="text-[12px] font-body font-semibold" style={{ color: '#4a5a40' }}>
+            Saved to library!
+          </div>
+        ) : (
+          <>
+            <div className="flex items-start justify-between mb-2">
+              <div>
+                <p className="text-[11px] font-body font-semibold" style={{ color: '#6e3040' }}>
+                  Code detected on clipboard
+                </p>
+                <p className="text-[10px] font-body mt-0.5" style={{ color: '#8a7e6a' }}>
+                  Copied from another tab? Save it here.
+                </p>
+              </div>
+              <button onClick={dismiss} className="text-[10px] font-body ml-2" style={{ color: '#a09880' }}>
+                dismiss
+              </button>
+            </div>
+
+            {/* Preview */}
+            <pre className="text-[9px] font-body p-2 mb-2 overflow-hidden rounded"
+                 style={{ background: '#2a2220', color: '#e0d4c0', maxHeight: 60 }}>
+              {clipContent.slice(0, 200)}{clipContent.length > 200 ? '...' : ''}
+            </pre>
+
+            {/* Name + metadata */}
+            <input value={fileName} onChange={e => setFileName(e.target.value)}
+              className="w-full px-2 py-1 mb-1.5 text-[11px] input-warm" placeholder="filename.jsx" />
+            <div className="flex gap-1.5 mb-2">
+              <select value={className} onChange={e => setClassName(e.target.value)}
+                className="flex-1 px-1.5 py-1 text-[10px] input-warm">
+                {classes.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <select value={resourceType} onChange={e => setResourceType(e.target.value)}
+                className="flex-1 px-1.5 py-1 text-[10px] input-warm">
+                {RESOURCE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+
+            <button onClick={handleSave} className="btn-primary w-full py-1.5">
+              Save to Library
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

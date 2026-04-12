@@ -1,0 +1,53 @@
+- generic [ref=e5]:
+  - navigation [ref=e6]:
+    - generic [ref=e7]:
+      - button "Jot Gloss" [ref=e8] [cursor=pointer]:
+        - img "Jot Gloss" [ref=e10]:
+          - generic [ref=e48]: JG
+          - generic [ref=e53]: JOT GLOSS
+      - button "Course Folios" [ref=e54] [cursor=pointer]:
+        - generic [ref=e55]: Course Folios
+        - generic [ref=e56]: v
+  - main [ref=e57]:
+    - region "Study notebook" [ref=e60]:
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - generic [ref=e65]: JG
+            - generic [ref=e66]: Study Journal
+          - generic [ref=e67]:
+            - generic [ref=e68]: Study Journal
+            - heading "Keep one open volume on the desk." [level=2] [ref=e69]
+            - paragraph [ref=e70]: Work on the left page and keep the current folio close at hand on the right.
+          - button "Set Aside" [ref=e71] [cursor=pointer]
+        - tablist "Notebook sections" [ref=e72]:
+          - tab "To-Do" [ref=e73] [cursor=pointer]
+          - tab "Sticky Notes" [ref=e74] [cursor=pointer]
+          - tab "Freeform" [selected] [ref=e75] [cursor=pointer]
+        - generic [ref=e76]:
+          - generic [ref=e78]:
+            - generic [ref=e79]:
+              - generic [ref=e80]: Freeform
+              - generic [ref=e81]: Quiet on the desk
+            - textbox "Keep rough explanations, reminders, and loose working notes here." [ref=e82]
+            - generic [ref=e83]:
+              - button "Set Aside Page" [ref=e84] [cursor=pointer]
+              - button "Set on the Rail" [disabled] [ref=e85]
+          - complementary [ref=e86]:
+            - generic [ref=e87]:
+              - generic [ref=e88]:
+                - generic [ref=e89]: Reading Folio
+                - generic [ref=e90]: Waiting on the desk
+              - paragraph [ref=e91]: Open a folio and it will wait here beside the journal.
+            - generic [ref=e92]:
+              - generic [ref=e94]: Desk Markers
+              - generic [ref=e95]:
+                - generic [ref=e96]:
+                  - generic [ref=e97]: Pinned slip
+                  - strong [ref=e98]: Not pinned
+                - generic [ref=e99]:
+                  - generic [ref=e100]: Checklist
+                  - strong [ref=e101]: Clear
+                - generic [ref=e102]:
+                  - generic [ref=e103]: Freeform page
+                  - strong [ref=e104]: Blank

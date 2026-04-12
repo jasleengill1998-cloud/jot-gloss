@@ -1,0 +1,209 @@
+- generic [ref=e5]:
+  - navigation [ref=e6]:
+    - generic [ref=e7]:
+      - button [ref=e8] [cursor=pointer]:
+        - img [ref=e9]:
+          - generic [ref=e15]: JG
+      - generic [ref=e353]:
+        - generic [ref=e354]:
+          - generic [ref=e355]: Index
+          - button "Course Folios" [ref=e356] [cursor=pointer]
+          - button "All Entries" [ref=e357] [cursor=pointer]
+          - button "Versions" [ref=e358] [cursor=pointer]
+        - img [ref=e360]
+        - generic [ref=e373]:
+          - generic [ref=e374]: Courses
+          - button "MBAS 832 · Strategy" [ref=e375] [cursor=pointer]
+          - button "MBAS 811 · Financial Accounting" [ref=e376] [cursor=pointer]
+          - button "MBAS 801 · Economics" [ref=e377] [cursor=pointer]
+          - button "General" [ref=e378] [cursor=pointer]
+        - img [ref=e380]
+        - group [ref=e394]:
+          - generic "Edit Courses" [ref=e395] [cursor=pointer]
+      - img [ref=e397]:
+        - generic [ref=e644]:
+          - generic [ref=e646]: JG
+          - generic [ref=e647]: EST. MMXXVI
+  - main [ref=e648]:
+    - generic [ref=e649]:
+      - generic [ref=e651]:
+        - img
+        - generic [ref=e653]:
+          - button "Jot Gloss" [ref=e654] [cursor=pointer]
+          - generic [ref=e655]:
+            - generic [ref=e656]: 9 live pages
+            - generic [ref=e657]: ·4 course folios
+            - generic [ref=e658]: ·0 saved versions
+      - article [ref=e660]:
+        - generic [ref=e661] [cursor=pointer]:
+          - img
+          - generic [ref=e663]:
+            - generic [ref=e664]: ✦ Latest Entry ✦
+            - heading "Topic9 Cue Cards" [level=2] [ref=e665]
+            - paragraph [ref=e666]: MBAS 801 — Economics · Interactive Study
+            - paragraph [ref=e669]: Resume exactly where you left off.
+      - generic [ref=e670]:
+        - generic [ref=e672]:
+          - generic [ref=e674]:
+            - generic [ref=e675]: Course Folios
+            - heading "By course" [level=3] [ref=e676]
+          - generic [ref=e677]:
+            - generic [ref=e678]:
+              - generic [ref=e679]: Sort by
+              - generic [ref=e680]:
+                - button "Course" [ref=e681] [cursor=pointer]
+                - button "Entries" [ref=e682] [cursor=pointer]
+                - button "Recent" [ref=e683] [cursor=pointer]
+            - generic [ref=e684]:
+              - generic [ref=e685] [cursor=pointer]:
+                - img
+                - generic [ref=e687]:
+                  - generic [ref=e688]: Course Folio
+                  - heading "General" [level=3] [ref=e689]
+                  - paragraph [ref=e691]: 0 entries
+              - generic [ref=e692] [cursor=pointer]:
+                - img
+                - generic [ref=e694]:
+                  - generic [ref=e695]: Course Folio
+                  - heading "MBAS 801 — Economics" [level=3] [ref=e696]
+                  - paragraph [ref=e698]: 9 entries
+              - generic [ref=e699] [cursor=pointer]:
+                - img
+                - generic [ref=e701]:
+                  - generic [ref=e702]: Course Folio
+                  - heading "MBAS 811 — Financial Accounting" [level=3] [ref=e703]
+                  - paragraph [ref=e705]: 0 entries
+              - generic [ref=e706] [cursor=pointer]:
+                - img
+                - generic [ref=e708]:
+                  - generic [ref=e709]: Course Folio
+                  - heading "MBAS 832 — Strategy" [level=3] [ref=e710]
+                  - paragraph [ref=e712]: 0 entries
+          - generic [ref=e713]: 4 folios · 9 live pages
+        - img [ref=e715]
+        - generic [ref=e727]:
+          - generic [ref=e730]: Recent Pages
+          - generic [ref=e732]:
+            - button "Open Topic8 Cue Cards" [ref=e733] [cursor=pointer]:
+              - generic [ref=e735]:
+                - generic [ref=e736]:
+                  - generic [ref=e737]: MBAS 801 — Economics
+                  - generic [ref=e738]: Apr 12, 26
+                - heading "Topic8 Cue Cards" [level=3] [ref=e739]
+                - generic [ref=e740]:
+                  - generic [ref=e741]: Interactive Study
+                  - generic [ref=e742]: ·
+                  - generic [ref=e743]: 5.7 KB
+                - generic [ref=e744]:
+                  - button "Edit" [ref=e745]
+                  - button "Save Version" [ref=e746]
+                  - button "Remove" [ref=e747]
+            - button "Open Topic7 Cue Cards" [ref=e748] [cursor=pointer]:
+              - generic [ref=e750]:
+                - generic [ref=e751]:
+                  - generic [ref=e752]: MBAS 801 — Economics
+                  - generic [ref=e753]: Apr 12, 26
+                - heading "Topic7 Cue Cards" [level=3] [ref=e754]
+                - generic [ref=e755]:
+                  - generic [ref=e756]: Interactive Study
+                  - generic [ref=e757]: ·
+                  - generic [ref=e758]: 5.4 KB
+                - generic [ref=e759]:
+                  - button "Edit" [ref=e760]
+                  - button "Save Version" [ref=e761]
+                  - button "Remove" [ref=e762]
+            - button "Open Topic6 Cue Cards" [ref=e763] [cursor=pointer]:
+              - generic [ref=e765]:
+                - generic [ref=e766]:
+                  - generic [ref=e767]: MBAS 801 — Economics
+                  - generic [ref=e768]: Apr 12, 26
+                - heading "Topic6 Cue Cards" [level=3] [ref=e769]
+                - generic [ref=e770]:
+                  - generic [ref=e771]: Interactive Study
+                  - generic [ref=e772]: ·
+                  - generic [ref=e773]: 5.7 KB
+                - generic [ref=e774]:
+                  - button "Edit" [ref=e775]
+                  - button "Save Version" [ref=e776]
+                  - button "Remove" [ref=e777]
+            - button "Open Topic5 Cue Cards" [ref=e778] [cursor=pointer]:
+              - generic [ref=e780]:
+                - generic [ref=e781]:
+                  - generic [ref=e782]: MBAS 801 — Economics
+                  - generic [ref=e783]: Apr 12, 26
+                - heading "Topic5 Cue Cards" [level=3] [ref=e784]
+                - generic [ref=e785]:
+                  - generic [ref=e786]: Interactive Study
+                  - generic [ref=e787]: ·
+                  - generic [ref=e788]: 5.6 KB
+                - generic [ref=e789]:
+                  - button "Edit" [ref=e790]
+                  - button "Save Version" [ref=e791]
+                  - button "Remove" [ref=e792]
+            - button "Open Topic4 Cue Cards" [ref=e793] [cursor=pointer]:
+              - generic [ref=e795]:
+                - generic [ref=e796]:
+                  - generic [ref=e797]: MBAS 801 — Economics
+                  - generic [ref=e798]: Apr 12, 26
+                - heading "Topic4 Cue Cards" [level=3] [ref=e799]
+                - generic [ref=e800]:
+                  - generic [ref=e801]: Interactive Study
+                  - generic [ref=e802]: ·
+                  - generic [ref=e803]: 5.5 KB
+                - generic [ref=e804]:
+                  - button "Edit" [ref=e805]
+                  - button "Save Version" [ref=e806]
+                  - button "Remove" [ref=e807]
+            - button "Open Topic3 Cue Cards" [ref=e808] [cursor=pointer]:
+              - generic [ref=e810]:
+                - generic [ref=e811]:
+                  - generic [ref=e812]: MBAS 801 — Economics
+                  - generic [ref=e813]: Apr 12, 26
+                - heading "Topic3 Cue Cards" [level=3] [ref=e814]
+                - generic [ref=e815]:
+                  - generic [ref=e816]: Interactive Study
+                  - generic [ref=e817]: ·
+                  - generic [ref=e818]: 6.0 KB
+                - generic [ref=e819]:
+                  - button "Edit" [ref=e820]
+                  - button "Save Version" [ref=e821]
+                  - button "Remove" [ref=e822]
+        - button "Browse all entries" [ref=e824] [cursor=pointer]
+      - generic [ref=e825]: Jasleen's study library
+  - complementary [ref=e826]:
+    - generic [ref=e827]:
+      - generic [ref=e829]:
+        - generic [ref=e831]:
+          - generic [ref=e832]: Stationery
+          - heading "Notebook" [level=3] [ref=e833]
+        - generic [ref=e834]:
+          - paragraph [ref=e835]: Keep one working page beside the desk so notes, checklists, and loose thoughts stay in the room.
+          - generic [ref=e836]: Open the notebook to save notes and to-do slips.
+          - button "Open Notebook" [ref=e838] [cursor=pointer]
+      - img [ref=e840]
+      - generic [ref=e854]:
+        - generic [ref=e856]:
+          - generic [ref=e857]: Clipboard
+          - heading "Resume studying" [level=3] [ref=e858]
+        - group [ref=e860]:
+          - generic "Open the clipboard" [ref=e861] [cursor=pointer]
+      - img [ref=e863]
+      - generic [ref=e877]:
+        - generic [ref=e879]:
+          - generic [ref=e880]: Study Music
+          - heading "Parlour player" [level=3] [ref=e881]
+        - group [ref=e883]:
+          - generic "Hide the music drawer" [ref=e884] [cursor=pointer]
+          - generic [ref=e886]:
+            - button "Play" [ref=e887] [cursor=pointer]
+            - generic [ref=e888]:
+              - button "Library" [ref=e889] [cursor=pointer]
+              - button "Night" [ref=e890] [cursor=pointer]
+              - button "Rain" [ref=e891] [cursor=pointer]
+      - img [ref=e893]
+      - generic [ref=e907]:
+        - generic [ref=e909]:
+          - generic [ref=e910]: Filing Cabinet
+          - heading "File in the cabinet" [level=3] [ref=e911]
+        - group [ref=e913]:
+          - generic "Open the cabinet" [ref=e914] [cursor=pointer]

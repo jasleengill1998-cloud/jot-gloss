@@ -1,0 +1,45 @@
+import type { StudyFile } from '../types'
+
+interface Props {
+  className: string
+  files: StudyFile[]
+  onClick: () => void
+}
+
+const C: Record<string, { accent: string; bg: string; border: string; s1: string; s2: string }> = {
+  'MBAS 832': { accent: '#6a5a88', bg: '#ddd6e6', border: '#a898b8', s1: '#d4cade', s2: '#ccc0d6' },
+  'MBAS 811': { accent: '#4a6a80', bg: '#d6e0e8', border: '#90a8b8', s1: '#ccd8e0', s2: '#c4d0d8' },
+  'MBAS 801': { accent: '#887828', bg: '#e6e0cc', border: '#bca868', s1: '#ded6c0', s2: '#d6ceb8' },
+  'General':  { accent: '#906868', bg: '#e6d8d8', border: '#b89898', s1: '#ded0d0', s2: '#d6c8c8' },
+}
+
+function g(n: string) {
+  for (const [k, v] of Object.entries(C)) { if (n.includes(k)) return v }
+  return { accent: '#6e3040', bg: '#e0d8c8', border: '#b8a888', s1: '#d8d0c0', s2: '#d0c8b8' }
+}
+
+export default function ClassFolder({ className, files, onClick }: Props) {
+  const c = g(className)
+  const code = className.replace(/\s*[—\-–]\s*.*/, '').replace(/\s+/g, '').toUpperCase() || 'GEN'
+  const types: Record<string, number> = {}
+  files.forEach(f => { types[f.type] = (types[f.type] || 0) + 1 })
+
+  return (
+    <div className="folio" onClick={onClick}
+      style={{ '--f-accent': c.accent, '--f-bg': c.bg, '--f-border': c.border, '--f-stack1': c.s1, '--f-stack2': c.s2 } as React.CSSProperties}>
+      <div className="folio-tab" style={{ background: c.accent }}>{code}</div>
+      <div className="pt-7 pb-4 px-5">
+        <h3 className="font-heading text-[15px] font-bold text-[#261e18] leading-snug">{className}</h3>
+        <p className="text-[10px] font-body mt-1.5" style={{ color: '#5a5040' }}>
+          {files.length} paper{files.length !== 1 ? 's' : ''}
+          <span className="ml-2" style={{ color: '#a09878' }}>
+            {Object.entries(types).map(([t, n]) => `${n} ${t}`).join(' \u00b7 ')}
+          </span>
+        </p>
+      </div>
+      <div className="absolute top-7 right-4 text-[9px] font-body font-bold tracking-wider uppercase" style={{ color: c.accent }}>
+        open {'\u203a'}
+      </div>
+    </div>
+  )
+}

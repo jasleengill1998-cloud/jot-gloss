@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "studybloom-dev",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": ["/c", "cd /d C:\\Users\\jasle\\OneDrive\\Desktop\\experimenting\\studybloom && npx vite --port 5188"],
+      "port": 5188
+    }
+  ]
+}

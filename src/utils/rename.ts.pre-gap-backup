@@ -1,0 +1,56 @@
+/** Generate a logical filename from metadata */
+export function suggestLogicalName(
+  originalName: string,
+  className: string,
+  resourceType: string,
+): string {
+  const ext = originalName.includes('.') ? '.' + originalName.split('.').pop() : '.jsx'
+
+  // Class code: "MBAS 832 — Strategy" → "mbas832"
+  const classCode = className
+    .replace(/\s*[—\-–]\s*.*/g, '')  // strip everything after dash
+    .replace(/\s+/g, '')             // remove spaces
+    .toLowerCase()
+
+  // Resource type shorthand
+  const typeMap: Record<string, string> = {
+    'Interactive Study': 'interactive',
+    'Notes': 'notes',
+    'Cheat Sheet': 'cheatsheet',
+    'Practice Problems': 'practice',
+    'Lecture Slides': 'slides',
+    'Reference': 'reference',
+    'Other': 'misc',
+  }
+  const typeCode = typeMap[resourceType] || resourceType.toLowerCase().replace(/\s+/g, '-')
+
+  // Topic: extract from original filename
+  const topic = originalName
+    .replace(/\.\w+$/, '')           // strip extension
+    .replace(/[-_]/g, ' ')          // normalize separators
+    .replace(/\b(mbas|econ|fin|acct|strat)\d*\b/gi, '') // strip class codes
+    .replace(/\b(flashcard|quiz|cheat|sheet|notes|practice|reference|interactive|study)\w*\b/gi, '') // strip type words
+    .trim()
+    .replace(/\s+/g, '-')
+    .toLowerCase()
+    || 'study-material'
+
+  return `${classCode}_${typeCode}_${topic}${ext}`
+}
+
+/** Batch-rename suggestion for multiple files */
+export function suggestBatchNames(
+  files: Array<{ name: string; className: string; resourceType: string }>,
+): string[] {
+  const counts: Record<string, number> = {}
+  return files.map(f => {
+    let name = suggestLogicalName(f.name, f.className, f.resourceType)
+    if (counts[name]) {
+      const ext = name.includes('.') ? '.' + name.split('.').pop() : ''
+      const base = name.replace(/\.\w+$/, '')
+      name = `${base}_${counts[name] + 1}${ext}`
+    }
+    counts[name] = (counts[name] || 0) + 1
+    return name
+  })
+}

@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1400" viewBox="0 0 900 1400">
+  <defs>
+    <style>
+      .gold{stroke:#c6a14a; fill:none; stroke-linecap:round; stroke-linejoin:round}
+      .bluefill{fill:#1d4f92}
+      .paper{fill:#f3ecdc}
+      .goldfill{fill:#c6a14a}
+    </style>
+    <g id="vineUnit">
+      <path class="gold" stroke-width="3" d="M0,0 C18,-10 26,-30 20,-52 C14,-74 -2,-84 -24,-84"/>
+      <path class="gold" stroke-width="2.2" d="M-3,-14 C7,-20 13,-32 10,-43 C6,-56 -3,-62 -16,-60"/>
+      <path class="gold" stroke-width="2.2" d="M-12,-30 C-1,-32 8,-42 6,-53 C4,-65 -8,-72 -20,-70"/>
+      <path class="gold" stroke-width="2.6" d="M20,-52 C34,-48 42,-36 40,-22 C38,-8 24,2 10,0"/>
+      <path class="gold" stroke-width="2" d="M8,-74 C18,-78 24,-90 20,-100 C16,-110 2,-112 -6,-104"/>
+      <path class="gold" stroke-width="2" d="M24,-18 C34,-20 42,-12 42,-2 C42,10 30,18 20,12"/>
+      <path class="gold" stroke-width="2.4" d="M-24,-84 C-42,-88 -56,-102 -60,-120"/>
+      <path class="gold" stroke-width="2" d="M-30,-90 C-40,-94 -46,-104 -48,-114"/>
+      <path class="gold" stroke-width="2.4" d="M-8,-70 C-2,-78 4,-84 14,-88"/>
+      <path class="gold" stroke-width="2.2" d="M4,-44 C13,-44 20,-50 20,-58 C20,-66 13,-72 6,-72 C0,-66 -1,-54 4,-44 Z"/>
+      <path class="gold" stroke-width="2.2" d="M23,-77 C33,-76 41,-82 42,-90 C43,-99 35,-107 26,-106 C19,-100 18,-86 23,-77 Z"/>
+      <path class="gold" stroke-width="2.2" d="M20,-5 C30,-5 38,2 38,11 C38,20 30,28 20,26 C14,18 13,4 20,-5 Z"/>
+      <path class="gold" stroke-width="2.2" d="M-48,-118 C-38,-120 -29,-128 -28,-137 C-27,-146 -35,-152 -44,-151 C-50,-145 -52,-127 -48,-118 Z"/>
+    </g>
+    <pattern id="grain" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="5" r="0.6" fill="#e7dfc8"/>
+      <circle cx="14" cy="10" r="0.5" fill="#e4dbc3"/>
+      <circle cx="8" cy="15" r="0.4" fill="#ded4bb"/>
+    </pattern>
+  </defs>
+
+  <rect width="900" height="1400" class="paper"/>
+  <rect width="900" height="1400" fill="url(#grain)" opacity="0.65"/>
+
+  <rect x="25" y="25" width="850" height="1350" fill="none" stroke="#c6a14a" stroke-width="4"/>
+  <rect x="36" y="36" width="828" height="1328" fill="none" stroke="#7f6324" stroke-width="1"/>
+  <rect x="52" y="52" width="796" height="1296" class="bluefill" stroke="#c6a14a" stroke-width="4"/>
+  <rect x="170" y="175" width="560" height="1050" fill="#efe8d5" stroke="#c6a14a" stroke-width="6"/>
+  <rect x="182" y="187" width="536" height="1026" fill="none" stroke="#8f6f29" stroke-width="1"/>
+  <rect x="192" y="197" width="516" height="1006" fill="none" stroke="#c6a14a" stroke-width="2"/>
+
+  <!-- top and bottom central wave -->
+  <path class="gold" stroke-width="5" d="M260,142 C320,142 340,90 390,90 C425,90 448,118 450,118 C452,118 475,90 510,90 C560,90 580,142 640,142"/>
+  <path class="gold" stroke-width="5" d="M260,1258 C320,1258 340,1310 390,1310 C425,1310 448,1282 450,1282 C452,1282 475,1310 510,1310 C560,1310 580,1258 640,1258"/>
+
+  <!-- repeated side units -->
+  <g transform="translate(126,1265)">
+    <use href="#vineUnit"/>
+    <use href="#vineUnit" transform="translate(0,-150)"/>
+    <use href="#vineUnit" transform="translate(0,-300)"/>
+    <use href="#vineUnit" transform="translate(0,-450)"/>
+    <use href="#vineUnit" transform="translate(0,-600)"/>
+    <use href="#vineUnit" transform="translate(0,-750)"/>
+    <use href="#vineUnit" transform="translate(0,-900)"/>
+    <use href="#vineUnit" transform="translate(0,-1050)"/>
+  </g>
+
+  <g transform="translate(774,135) scale(-1,1)">
+    <use href="#vineUnit"/>
+    <use href="#vineUnit" transform="translate(0,150)"/>
+    <use href="#vineUnit" transform="translate(0,300)"/>
+    <use href="#vineUnit" transform="translate(0,450)"/>
+    <use href="#vineUnit" transform="translate(0,600)"/>
+    <use href="#vineUnit" transform="translate(0,750)"/>
+    <use href="#vineUnit" transform="translate(0,900)"/>
+    <use href="#vineUnit" transform="translate(0,1050)"/>
+  </g>
+
+  <!-- top and bottom rows -->
+  <g transform="translate(120,180) rotate(90)">
+    <use href="#vineUnit"/><use href="#vineUnit" transform="translate(0,-140)"/>
+    <use href="#vineUnit" transform="translate(0,-280)"/><use href="#vineUnit" transform="translate(0,-420)"/>
+    <use href="#vineUnit" transform="translate(0,-560)"/>
+  </g>
+  <g transform="translate(780,1220) rotate(-90)">
+    <use href="#vineUnit"/><use href="#vineUnit" transform="translate(0,-140)"/>
+    <use href="#vineUnit" transform="translate(0,-280)"/><use href="#vineUnit" transform="translate(0,-420)"/>
+    <use href="#vineUnit" transform="translate(0,-560)"/>
+  </g>
+
+  <!-- corner knots -->
+  <path class="gold" stroke-width="3.5" d="M85,120 C130,80 170,90 190,135"/>
+  <path class="gold" stroke-width="3.5" d="M815,120 C770,80 730,90 710,135"/>
+  <path class="gold" stroke-width="3.5" d="M85,1280 C130,1320 170,1310 190,1265"/>
+  <path class="gold" stroke-width="3.5" d="M815,1280 C770,1320 730,1310 710,1265"/>
+
+  <!-- small gold stars -->
+  <g class="goldfill">
+    <path d="M448,118 l4,8 8,1 -6,6 2,8 -8,-4 -8,4 2,-8 -6,-6 8,-1z"/>
+    <path d="M448,1282 l4,8 8,1 -6,6 2,8 -8,-4 -8,4 2,-8 -6,-6 8,-1z"/>
+  </g>
+</svg>

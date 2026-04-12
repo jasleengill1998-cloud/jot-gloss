@@ -1,0 +1,92 @@
+- generic [ref=e5]:
+  - navigation [ref=e6]:
+    - button "Jot Gloss" [ref=e7] [cursor=pointer]:
+      - img "Jot Gloss" [ref=e9]:
+        - generic [ref=e47]: JG
+        - generic [ref=e52]: JOT GLOSS
+    - generic [ref=e53]:
+      - button "Folios" [ref=e54] [cursor=pointer]
+      - button "All Entries" [ref=e55] [cursor=pointer]
+      - button "Versions" [ref=e56] [cursor=pointer]
+      - button "MBAS 832" [ref=e57] [cursor=pointer]
+      - button "MBAS 811" [ref=e58] [cursor=pointer]
+      - button "MBAS 801" [ref=e59] [cursor=pointer]
+      - button "General" [ref=e60] [cursor=pointer]
+  - main [ref=e61]:
+    - generic [ref=e62]:
+      - generic [ref=e64]:
+        - img
+        - generic [ref=e66]:
+          - button "Jot Gloss" [ref=e67] [cursor=pointer]
+          - generic [ref=e68]:
+            - generic [ref=e69]: 0 live pages
+            - generic [ref=e70]: ·4 course folios
+            - generic [ref=e71]: ·0 saved versions
+      - generic [ref=e73]:
+        - generic [ref=e75]:
+          - generic [ref=e77]:
+            - generic [ref=e78]: Stationery
+            - heading "Notebook" [level=3] [ref=e79]
+          - generic [ref=e80]:
+            - paragraph [ref=e81]: Keep one working page beside the desk so notes, checklists, and loose thoughts stay in the room.
+            - generic [ref=e82]: Open the notebook to save notes and to-do slips.
+            - button "Open Notebook" [ref=e84] [cursor=pointer]
+        - img [ref=e86]
+        - generic [ref=e100]:
+          - generic [ref=e102]:
+            - generic [ref=e103]: Clipboard
+            - heading "Resume studying" [level=3] [ref=e104]
+          - group [ref=e106]:
+            - generic "Close the clipboard" [ref=e107] [cursor=pointer]
+            - generic [ref=e108]:
+              - paragraph [ref=e109]: Nothing on the clipboard yet.
+              - generic [ref=e110]:
+                - generic [ref=e111]: Recently opened
+                - paragraph [ref=e113]: Resume a folio or save a note and the clipboard will start keeping a trail for you.
+        - img [ref=e115]
+        - generic [ref=e129]:
+          - generic [ref=e131]:
+            - generic [ref=e132]: Study Music
+            - heading "Parlour player" [level=3] [ref=e133]
+          - group [ref=e135]:
+            - generic "Hide the music drawer" [ref=e136] [cursor=pointer]
+            - generic [ref=e138]:
+              - button "Play" [ref=e139] [cursor=pointer]
+              - generic [ref=e140]:
+                - button "Library" [ref=e141] [cursor=pointer]
+                - button "Night" [ref=e142] [cursor=pointer]
+                - button "Rain" [ref=e143] [cursor=pointer]
+        - img [ref=e145]
+        - generic [ref=e159]:
+          - generic [ref=e161]:
+            - generic [ref=e162]: Filing Cabinet
+            - heading "File in the cabinet" [level=3] [ref=e163]
+          - group [ref=e165]:
+            - generic "Open the cabinet" [ref=e166] [cursor=pointer]
+      - generic [ref=e168]:
+        - generic [ref=e169]:
+          - generic [ref=e170]:
+            - generic [ref=e171]: Notes & To-Do
+            - heading "Keep a working page beside the desk." [level=2] [ref=e172]
+          - button "Close" [ref=e173] [cursor=pointer]
+        - generic [ref=e174]:
+          - generic [ref=e175]:
+            - generic [ref=e176]:
+              - generic [ref=e177]: Notebook
+              - generic [ref=e178]: Idle
+            - textbox "Keep rough explanations, reminders, and loose working notes here." [ref=e179]
+            - generic [ref=e180]:
+              - button "Save Changes" [ref=e181] [cursor=pointer]
+              - button "Pin Note to Rail" [disabled] [ref=e182]
+          - generic [ref=e184]:
+            - generic [ref=e186]: Checklist
+            - generic [ref=e187]:
+              - textbox "Add a task" [ref=e188]
+              - button "Add" [ref=e189] [cursor=pointer]
+            - paragraph [ref=e191]: Nothing queued yet. Add the next small piece of work so the desk can hold it for you.
+      - generic [ref=e194]:
+        - generic [ref=e196]:
+          - generic [ref=e197]: Opening
+          - heading "Loading your desk" [level=3] [ref=e198]
+        - paragraph [ref=e200]: The folios are being gathered now.
+      - generic [ref=e201]: Jasleen's study library

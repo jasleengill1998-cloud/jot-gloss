@@ -1,0 +1,78 @@
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - navigation [ref=e6]:
+      - generic [ref=e7]:
+        - button [ref=e8] [cursor=pointer]:
+          - img [ref=e9]:
+            - generic [ref=e15]: SB
+        - generic [ref=e353]:
+          - generic [ref=e354]:
+            - generic [ref=e355]: Index
+            - button "Course Folios" [ref=e356] [cursor=pointer]
+            - button "All Entries" [ref=e357] [cursor=pointer]
+          - img [ref=e359]
+          - generic [ref=e372]:
+            - generic [ref=e373]: Courses
+            - button "MBAS 832 · Strategy" [ref=e374] [cursor=pointer]
+            - button "MBAS 811 · Financial Accounting" [ref=e375] [cursor=pointer]
+            - button "MBAS 801 · Economics" [ref=e376] [cursor=pointer]
+            - button "General" [ref=e377] [cursor=pointer]
+          - img [ref=e379]
+          - generic [ref=e392]:
+            - generic [ref=e393]: Filing Cabinet
+            - button "Archive" [ref=e394] [cursor=pointer]
+          - img [ref=e396]
+          - group [ref=e410]:
+            - generic "Edit Courses" [ref=e411] [cursor=pointer]
+        - img [ref=e413]
+    - main [ref=e660]:
+      - generic [ref=e661]:
+        - generic [ref=e663]:
+          - img
+          - generic [ref=e665]:
+            - button "StudyBloom" [ref=e666] [cursor=pointer]
+            - generic [ref=e667]:
+              - generic [ref=e668]: 0 live pages
+              - generic [ref=e669]: ·4 course folios
+              - generic [ref=e670]: ·0 saved versions
+        - generic [ref=e673]:
+          - generic [ref=e675]:
+            - generic [ref=e676]: Opening
+            - heading "Loading your desk" [level=3] [ref=e677]
+          - paragraph [ref=e679]: The folios are being gathered now.
+        - generic [ref=e680]: ❧ a private study desk ☙
+    - complementary [ref=e681]:
+      - generic [ref=e682]:
+        - generic [ref=e684]:
+          - generic [ref=e686]:
+            - generic [ref=e687]: Desk Accessories
+            - heading "Stationery Drawer" [level=3] [ref=e688]
+          - generic [ref=e690]:
+            - button "Upload File" [ref=e691] [cursor=pointer]
+            - button "Paste from Claude" [ref=e692] [cursor=pointer]
+            - button "Prompt Bank" [ref=e693] [cursor=pointer]
+            - button "Study Clock" [ref=e694] [cursor=pointer]
+            - button "Study Ledger" [ref=e695] [cursor=pointer]
+            - button "Sync" [ref=e696] [cursor=pointer]
+        - generic [ref=e698]:
+          - generic [ref=e700]:
+            - generic [ref=e701]: Recent Activity
+            - heading "Recently opened" [level=3] [ref=e702]
+          - paragraph [ref=e705]: Open a file or add a note and the desk will start keeping track for you.
+        - generic [ref=e707]:
+          - generic [ref=e709]:
+            - generic [ref=e710]: Notes · To-Do · Sticky
+            - heading "Notebook" [level=3] [ref=e711]
+          - button "Open Notebook" [ref=e714] [cursor=pointer]
+        - generic [ref=e716]:
+          - generic [ref=e718]:
+            - generic [ref=e719]: Today’s Quote
+            - heading "April 11, 2026" [level=3] [ref=e720]
+          - paragraph [ref=e722]: Small, steady study sessions are how understanding starts to feel inevitable.
+  - generic [ref=e723]:
+    - generic [ref=e724]:
+      - generic [ref=e725]: Study Music
+      - generic [ref=e726]: Lo-fi room
+    - button "Play" [ref=e727] [cursor=pointer]
+    - link "YouTube" [ref=e728] [cursor=pointer]:
+      - /url: https://www.youtube.com/playlist?list=PLqknkDPsDk3afCSylXnMIYRRb8UAAMO4F

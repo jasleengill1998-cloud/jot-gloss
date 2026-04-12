@@ -1,0 +1,132 @@
+import { useState, useEffect, useCallback } from 'react'
+import type { StudyFile, FileType, DuplicateAction, StudySource } from '../types'
+import * as db from '../db/indexeddb'
+import { SAMPLE_FILE } from '../db/sample-data'
+import { getBaseName } from '../utils/studyFiles'
+
+function detectFileType(name: string): FileType {
+  const ext = name.split('.').pop()?.toLowerCase() ?? ''
+  if (ext === 'jsx' || ext === 'tsx') return 'jsx'
+  if (ext === 'html' || ext === 'htm') return 'html'
+  if (ext === 'pdf') return 'pdf'
+  if (ext === 'md' || ext === 'mdx' || ext === 'markdown' || ext === 'txt') return 'markdown'
+  return 'other'
+}
+
+function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
+}
+
+/** Strip version-like suffixes to find the "base" filename for duplicate detection */
+function baseName(name: string): string {
+  return name
+    .replace(/\s*\(?\d+\)?\s*(?=\.\w+$)/, '')   // "file (2).jsx" → "file.jsx"
+    .replace(/[-_]v?\d+(?=\.\w+$)/i, '')          // "file-v2.jsx" → "file.jsx"
+}
+
+export function useFiles() {
+  const [files, setFiles] = useState<StudyFile[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const refresh = useCallback(async () => {
+    const all = await db.getAllFiles()
+    setFiles(all)
+    setLoading(false)
+  }, [])
+
+  // Seed sample data on first load
+  useEffect(() => {
+    (async () => {
+      const all = await db.getAllFiles()
+      if (all.length === 0) {
+        await db.putFile({ ...SAMPLE_FILE, createdAt: Date.now(), updatedAt: Date.now() })
+      }
+      await refresh()
+    })()
+  }, [refresh])
+
+  /** Find files with a similar base name (for duplicate detection) */
+  const findDuplicates = useCallback(async (name: string): Promise<StudyFile[]> => {
+    const base = baseName(name)
+    const all = await db.getAllFiles()
+    return all.filter(f => !f.archived && baseName(f.name) === base)
+  }, [])
+
+  const addFile = useCallback(async (
+    rawFile: File,
+    className: string,
+    resourceType: string,
+    duplicateAction?: DuplicateAction,
+  ) => {
+    const type = detectFileType(rawFile.name)
+
+    // Handle duplicates
+    const existing = await findDuplicates(rawFile.name)
+    if (existing.length > 0 && duplicateAction) {
+      if (duplicateAction === 'skip') return null
+      if (duplicateAction === 'replace') {
+        for (const f of existing) await db.deleteFile(f.id)
+      }
+      if (duplicateAction === 'archive') {
+        for (const f of existing) {
+          f.archived = true
+          f.updatedAt = Date.now()
+          await db.putFile(f)
+        }
+      }
+      // 'keep-both' → just add the new file without touching existing
+    }
+
+    const version = existing.length + 1
+
+    let content: string
+    if (type === 'pdf' || type === 'other') {
+      content = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = reject
+        reader.readAsDataURL(rawFile)
+      })
+    } else {
+      content = await rawFile.text()
+    }
+
+    const studyFile: StudyFile = {
+      id: generateId(),
+      name: rawFile.name,
+      type,
+      content,
+      className: className || 'General',
+      resourceType: resourceType || 'Other',
+      version,
+      archived: false,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      size: rawFile.size,
+    }
+
+    await db.putFile(studyFile)
+    await refresh()
+    return studyFile
+  }, [refresh, findDuplicates])
+
+  const updateFile = useCallback(async (id: string, updates: Partial<StudyFile>) => {
+    const file = await db.getFile(id)
+    if (!file) return
+    Object.assign(file, updates, { updatedAt: Date.now() })
+    await db.putFile(file)
+    await refresh()
+  }, [refresh])
+
+  const removeFile = useCallback(async (id: string) => {
+    await db.deleteFile(id)
+    await refresh()
+  }, [refresh])
+
+  const replaceAllFiles = useCallback(async (nextFiles: StudyFile[]) => {
+    await db.replaceAllFiles(nextFiles)
+    await refresh()
+  }, [refresh])
+
+  return { files, loading, addFile, updateFile, removeFile, findDuplicates, refresh, replaceAllFiles }
+}
