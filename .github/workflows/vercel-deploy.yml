@@ -17,9 +17,9 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run build
-      - name: Create Vercel project link
+      - name: Link and deploy to Vercel
         run: |
+          npm i -g vercel@latest
           mkdir -p .vercel
-          echo "{\"orgId\":\"$VERCEL_ORG_ID\",\"projectId\":\"$VERCEL_PROJECT_ID\"}" > .vercel/project.json
-      - name: Deploy to Vercel
-        run: npx vercel@latest deploy --prebuilt --prod --token "$VERCEL_TOKEN" --yes 2>/dev/null || npx vercel@latest --prod --token "$VERCEL_TOKEN" --yes
+          printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
+          vercel deploy --prod --token "$VERCEL_TOKEN" --yes
