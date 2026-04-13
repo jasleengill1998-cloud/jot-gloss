@@ -1,1 +1,243 @@
-Hello from test
+You are a senior frontend engineer on Jot Gloss.
+Project: C:\Users\jasle\Desktop\jot-gloss
+Stack: Vite + React + TypeScript
+Run npm run build after each task. Report PASS or FAIL before moving on.
+
+TASK 1 — Replace useGramophone hook (src/hooks/useGramophone.ts)
+
+Replace the entire file contents with:
+
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+export type MoodKey = 'library' | 'night' | 'rain' | 'static' | 'courtyard' | 'dust'
+
+interface Mood {
+  key: MoodKey
+  label: string
+  file: string
+}
+
+const MOODS: Mood[] = [
+  { key: 'library',   label: 'Sunlight through the stacks', file: '/audio/sunlight-through-the-stacks.mp3' },
+  { key: 'night',     label: 'After hours',                 file: '/audio/the-lamp-stays-on.mp3' },
+  { key: 'rain',      label: 'The window seat',             file: '/audio/the-window-seat.mp3' },
+  { key: 'static',    label: 'The B-side',                  file: '/audio/the-b-side.mp3' },
+  { key: 'courtyard', label: 'The courtyard',               file: '/audio/south-asian-lofi.mp3' },
+  { key: 'dust',      label: 'Dust and strings',            file: '/audio/dust-and-strings.mp3' },
+]
+
+export interface GramophoneState {
+  playing: boolean
+  loading: boolean
+  error: string | null
+  volume: number
+  mood: Mood
+  moods: Mood[]
+  actionLabel: string
+  moodLabel: string
+  setNeedle: () => void
+  liftNeedle: () => void
+  toggleNeedle: () => void
+  selectMood: (key: MoodKey) => void
+  setVolume: (v: number) => void
+}
+
+export function useGramophone(initialMood: MoodKey = 'library'): GramophoneState {
+  const [mood, setMood] = useState<Mood>(() => MOODS.find((m) => m.key === initialMood) ?? MOODS[0])
+  const [playing, setPlaying] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [volume, setVolumeState] = useState(0.6)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const getAudio = useCallback(() => {
+    if (audioRef.current) return audioRef.current
+    const el = new Audio()
+    el.loop = true
+    el.volume = 0.6
+    audioRef.current = el
+    return el
+  }, [])
+
+  const loadMood = useCallback((m: Mood, autoplay: boolean) => {
+    const audio = getAudio()
+    setError(null)
+    setLoading(true)
+    audio.pause()
+    audio.src = m.file
+    audio.load()
+    const onCanPlay = () => {
+      setLoading(false)
+      if (autoplay) {
+        audio.play().then(() => setPlaying(true)).catch(() => {
+          setError('The ink has run — try again')
+          setPlaying(false)
+        })
+      }
+    }
+    const onError = () => {
+      setLoading(false)
+      setError('The ink has run — try again')
+      setPlaying(false)
+    }
+    audio.addEventListener('canplaythrough', onCanPlay, { once: true })
+    audio.addEventListener('error', onError, { once: true })
+  }, [getAudio])
+
+  const setNeedle = useCallback(() => {
+    const audio = getAudio()
+    if (!audio.src || audio.src === window.location.href) { loadMood(mood, true); return }
+    audio.play().then(() => setPlaying(true)).catch(() => {
+      setError('The ink has run — try again')
+      setPlaying(false)
+    })
+  }, [getAudio, loadMood, mood])
+
+  const liftNeedle = useCallback(() => { getAudio().pause(); setPlaying(false) }, [getAudio])
+  const toggleNeedle = useCallback(() => { if (playing) liftNeedle(); else setNeedle() }, [playing, liftNeedle, setNeedle])
+
+  const selectMood = useCallback((key: MoodKey) => {
+    const m = MOODS.find((x) => x.key === key) ?? MOODS[0]
+    setMood(m)
+    loadMood(m, true)
+  }, [loadMood])
+
+  const setVolume = useCallback((v: number) => {
+    const clamped = Math.max(0, Math.min(1, v))
+    setVolumeState(clamped)
+    getAudio().volume = clamped
+  }, [getAudio])
+
+  useEffect(() => () => {
+    const audio = audioRef.current
+    if (audio) { audio.pause(); audio.src = ''; audioRef.current = null }
+  }, [])
+
+  return {
+    playing, loading, error, volume, mood, moods: MOODS,
+    actionLabel: playing ? 'Lift the needle' : 'Set the needle',
+    moodLabel: mood.label, setNeedle, liftNeedle, toggleNeedle, selectMood, setVolume,
+  }
+}
+
+---
+
+TASK 2 — Update STUDY_MIXES in App.tsx
+
+Find:
+  const STUDY_MIXES: StudyMix[] = [
+    { key: 'library', label: 'The reading hour', startIndex: 0 },
+    { key: 'night',   label: 'Past midnight',    startIndex: 10 },
+    { key: 'rain',    label: 'Rain on glass',    startIndex: 20 },
+  ]
+
+Replace with:
+  const STUDY_MIXES: StudyMix[] = [
+    { key: 'library',   label: 'Sunlight through the stacks', startIndex: 0 },
+    { key: 'night',     label: 'After hours',                 startIndex: 10 },
+    { key: 'rain',      label: 'The window seat',             startIndex: 20 },
+    { key: 'static',    label: 'The B-side',                  startIndex: 30 },
+    { key: 'courtyard', label: 'The courtyard',               startIndex: 40 },
+    { key: 'dust',      label: 'Dust and strings',            startIndex: 50 },
+  ]
+
+---
+
+TASK 3 — Create public/audio/ folder
+
+Create the folder public/audio/ if it does not exist.
+Leave it empty — audio files will be transferred separately.
+Confirm the folder exists.
+
+---
+
+TASK 4 — Add desk calculator to Filing Cabinet
+
+In src/App.tsx, before the App() function definition, add this new component:
+
+function DeskCalculator() {
+  const [display, setDisplay] = React.useState('0')
+  const [prev, setPrev] = React.useState<number | null>(null)
+  const [op, setOp] = React.useState<string | null>(null)
+  const [fresh, setFresh] = React.useState(true)
+
+  const press = (val: string) => {
+    if (val === 'C') { setDisplay('0'); setPrev(null); setOp(null); setFresh(true); return }
+    if (['+', '\u2212', '\u00d7', '\u00f7'].includes(val)) {
+      setPrev(parseFloat(display)); setOp(val); setFresh(true); return
+    }
+    if (val === '=') {
+      if (prev === null || !op) return
+      const cur = parseFloat(display)
+      const result = op === '+' ? prev + cur : op === '\u2212' ? prev - cur : op === '\u00d7' ? prev * cur : cur !== 0 ? prev / cur : 0
+      setDisplay(String(parseFloat(result.toFixed(10))))
+      setPrev(null); setOp(null); setFresh(true); return
+    }
+    if (val === '.' && display.includes('.') && !fresh) return
+    setDisplay(fresh ? (val === '.' ? '0.' : val) : display === '0' && val !== '.' ? val : display + val)
+    setFresh(false)
+  }
+
+  const btn = (label: string, type: 'num' | 'op' | 'eq' | 'clear') => (
+    <button
+      key={label}
+      type="button"
+      onClick={() => press(label)}
+      style={{
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: 13,
+        padding: '6px 0',
+        background: type === 'eq' ? 'rgba(201,124,138,0.15)' : type === 'op' ? 'rgba(199,183,157,0.2)' : type === 'clear' ? 'rgba(201,124,138,0.08)' : 'rgba(255,248,242,0.8)',
+        border: '1px solid rgba(199,183,157,0.3)',
+        color: type === 'op' ? '#5A3E4B' : type === 'eq' ? '#C97C8A' : '#3A2830',
+        cursor: 'pointer',
+        borderRadius: 2,
+      }}
+    >
+      {label}
+    </button>
+  )
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: 18,
+        textAlign: 'right',
+        padding: '6px 10px',
+        background: 'rgba(255,248,242,0.9)',
+        border: '1px solid rgba(199,183,157,0.3)',
+        color: '#3A2830',
+        letterSpacing: '0.04em',
+        minHeight: 36,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}>
+        {display}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+        {btn('C','clear')}{btn('','op')}{btn('','op')}{btn('\u00f7','op')}
+        {btn('7','num')}{btn('8','num')}{btn('9','num')}{btn('\u00d7','op')}
+        {btn('4','num')}{btn('5','num')}{btn('6','num')}{btn('\u2212','op')}
+        {btn('1','num')}{btn('2','num')}{btn('3','num')}{btn('+','op')}
+        {btn('0','num')}{btn('.','num')}{btn('=','eq')}
+      </div>
+    </div>
+  )
+}
+
+Then inside JotGlossStudyRail, find the Filing Cabinet FocusableRailSection details content, after the closing </div> of rail-button-stack, add:
+
+<div style={{ marginTop: 16, borderTop: '1px solid rgba(199,183,157,0.3)', paddingTop: 14 }}>
+  <div className="desk-cabinet-heading" style={{ marginBottom: 8 }}>The Counting House</div>
+  <DeskCalculator />
+</div>
+
+---
+
+TASK 5 — Commit and push
+
+Commit with message:
+"feat: 6 music moods, named tracks, desk calculator"
+Push to GitHub.
