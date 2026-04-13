@@ -25,7 +25,6 @@ import StudyFolio from './components/StudyFolio'
 import type { Accent } from './components/StudyFolio'
 import StudyStats from './components/StudyStats'
 import StudyTimer from './components/StudyTimer'
-import AiSpendingTracker from './components/AiSpendingTracker'
 import SyncPanel from './components/SyncPanel'
 import { ArchDivider, FloralBorder, JaliStrip, MughalCorner } from './components/Ornaments'
 import UtilityBookplate from './components/UtilityBookplate'
@@ -34,7 +33,7 @@ import { getVersionGroup, getVersionSummary } from './utils/studyFiles'
 import { useStickyNotes } from './hooks/useStickyNotes'
 
 type Nav = 'library' | 'archive'
-type PanelKey = 'upload' | 'paste' | 'notebook' | 'prompts' | 'sync' | 'timer' | 'stats' | 'spending' | null
+type PanelKey = 'upload' | 'paste' | 'notebook' | 'prompts' | 'sync' | 'timer' | 'stats' | null
 type FolioSort = 'course' | 'entries' | 'recent'
 type PendingDraftSave = { name: string; content: string; className: string; resourceType: string; source: StudySource }
 type StudyMix = { key: string; label: string; startIndex: number }
@@ -326,7 +325,7 @@ function JotGlossStudyRail({
   onSelectMix,
   onAddStickyNote,
 }: RailProps) {
-  const filingCabinetActive = cabinetOpen || isArchiveView || activePanel === 'upload' || activePanel === 'paste' || activePanel === 'prompts' || activePanel === 'sync' || activePanel === 'timer' || activePanel === 'stats' || activePanel === 'spending'
+  const filingCabinetActive = cabinetOpen || isArchiveView || activePanel === 'upload' || activePanel === 'paste' || activePanel === 'prompts' || activePanel === 'sync' || activePanel === 'timer' || activePanel === 'stats'
 
   return (
     <div className="desk-rail-stack">
@@ -553,9 +552,6 @@ function JotGlossStudyRail({
               </button>
               <button type="button" className={`bookplate-action ${activePanel === 'stats' ? 'active' : ''}`} onClick={() => onTogglePanel('stats')}>
                 The Ledger
-              </button>
-              <button type="button" className={`bookplate-action ${activePanel === 'spending' ? 'active' : ''}`} onClick={() => onTogglePanel('spending')}>
-                The Ink Account
               </button>
               <button type="button" className={`bookplate-action ${activePanel === 'sync' ? 'active' : ''}`} onClick={() => onTogglePanel('sync')}>
                 {syncLabel}
@@ -1462,10 +1458,6 @@ export default function App() {
                       setFocusedObject((current) => current === 'cabinet' ? null : current)
                     }} />}
                     {activePanel === 'stats' && <StudyStats classes={classes} files={visibleFiles} onClose={() => {
-                      setActivePanel(null)
-                      setFocusedObject((current) => current === 'cabinet' ? null : current)
-                    }} />}
-                    {activePanel === 'spending' && <AiSpendingTracker onClose={() => {
                       setActivePanel(null)
                       setFocusedObject((current) => current === 'cabinet' ? null : current)
                     }} />}
