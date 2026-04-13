@@ -6,7 +6,7 @@ interface Props {
   relatedFiles?: StudyFile[]
   onSelectVersion?: (file: StudyFile) => void
   onArchiveVersion?: (id: string) => void
-  onRestoreVersion?: (id: string) => void
+  onRestoreVersion?: (file: StudyFile) => void
   onPersistState?: (id: string, state: Record<string, unknown>) => void
   onClose: () => void
 }
@@ -498,30 +498,22 @@ export default function FileViewer({
 
   return (
     <div
-      className={`fixed inset-0 z-[200] flex items-center justify-center animate-fadeIn ${fullscreen ? '' : 'modal-overlay'}`}
-      role="dialog"
-      aria-modal="true"
+      className="folio-viewer-shell animate-fadeIn"
+      role="region"
       aria-label={`Viewing ${file.name}`}
-      style={{
-        background: fullscreen ? 'rgba(248, 239, 235, 0.96)' : 'rgba(96, 72, 80, 0.26)',
-        backdropFilter: 'blur(6px)',
-        padding: fullscreen ? 10 : window.innerWidth < 640 ? 8 : 20,
-      }}
-      onClick={fullscreen ? undefined : onClose}
     >
       <div
         className="flex flex-col overflow-hidden animate-scaleIn"
         style={{
           width: '100%',
-          maxWidth: fullscreen ? 'min(1200px, 100%)' : 1040,
-          maxHeight: fullscreen ? 'calc(100dvh - 20px)' : 'min(92dvh, 960px)',
-          minHeight: fullscreen ? 'calc(100dvh - 20px)' : 'min(82dvh, 760px)',
-          background: 'rgba(255, 246, 240, 0.96)',
+          height: '100%',
+          background: 'rgba(255, 246, 240, 0.98)',
           border: '1px solid rgba(169, 151, 141, 0.28)',
-          boxShadow: '0 18px 42px rgba(90, 62, 75, 0.12)',
+          boxShadow: '0 8px 32px rgba(90, 62, 75, 0.08)',
           position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
         }}
-        onClick={e => e.stopPropagation()}
       >
         <div
           aria-hidden="true"

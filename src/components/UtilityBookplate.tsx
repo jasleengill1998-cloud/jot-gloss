@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 
-type Tone = 'cream' | 'blush' | 'powder' | 'butter' | 'lilac' | 'sage'
+type Tone = 'parchment' | 'blush' | 'powder' | 'butter' | 'lavender' | 'sage'
 
 interface Props {
   children: ReactNode
@@ -14,11 +14,11 @@ interface Props {
 }
 
 const TONES: Record<Tone, { background: string; wash: string; line: string }> = {
-  cream: { background: 'rgba(255, 248, 242, 0.95)', wash: 'rgba(255, 252, 248, 0.92)', line: 'rgba(184, 160, 144, 0.5)' },
+  parchment: { background: 'rgba(255, 248, 242, 0.95)', wash: 'rgba(255, 252, 248, 0.92)', line: 'rgba(184, 160, 144, 0.5)' },
   blush: { background: 'rgba(255, 234, 230, 0.95)', wash: 'rgba(255, 243, 239, 0.92)', line: 'rgba(201, 124, 138, 0.5)' },
   powder: { background: 'rgba(212, 228, 208, 0.95)', wash: 'rgba(228, 240, 226, 0.92)', line: 'rgba(144, 177, 145, 0.5)' },
   butter: { background: 'rgba(245, 230, 184, 0.95)', wash: 'rgba(250, 240, 210, 0.92)', line: 'rgba(194, 167, 108, 0.52)' },
-  lilac: { background: 'rgba(221, 212, 236, 0.95)', wash: 'rgba(234, 228, 246, 0.92)', line: 'rgba(164, 143, 191, 0.5)' },
+  lavender: { background: 'rgba(221, 212, 236, 0.95)', wash: 'rgba(234, 228, 246, 0.92)', line: 'rgba(164, 143, 191, 0.5)' },
   sage: { background: 'rgba(212, 228, 208, 0.95)', wash: 'rgba(228, 240, 226, 0.92)', line: 'rgba(144, 177, 145, 0.52)' },
 }
 
@@ -27,7 +27,7 @@ export default function UtilityBookplate({
   title,
   kicker,
   footer,
-  tone = 'cream',
+  tone = 'parchment',
   surface = 'default',
   className,
   style,

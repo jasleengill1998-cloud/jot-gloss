@@ -40,7 +40,9 @@ function humanTitle(name: string) {
   let base = name.replace(/\.[^.]+$/, '')
   base = base.replace(/^m[-_]b[-_]a[-_]s[-_]?(\d{3})/i, 'mbas$1')
   base = base.replace(/^mbas[-_]?\d{3}[-_]/i, '')
-  return base.replace(/[-_]+/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b\w/g, (char) => char.toUpperCase()).trim()
+  base = base.replace(/([a-z])([A-Z])/g, '$1 $2')
+  base = base.replace(/[-_]+/g, ' ')
+  return base.replace(/\b\w/g, (char) => char.toUpperCase()).trim()
 }
 
 function shortCourseName(course: string) {
@@ -327,7 +329,7 @@ function JotGlossStudyRail({
       <DiamondDivider />
 
       <FocusableRailSection
-        tone="cream"
+        tone="parchment"
         kicker="Parlour Music"
         title="The Gramophone"
         objectKey="music"
@@ -359,7 +361,7 @@ function JotGlossStudyRail({
       <DiamondDivider />
 
       <FocusableRailSection
-        tone="lilac"
+        tone="lavender"
         kicker="Archive & Sundries"
         title="The Filing Cabinet"
         objectKey="cabinet"
@@ -736,10 +738,14 @@ export default function App() {
     setFocusedObject('folio')
   }, [])
 
-  const closeFolioFocus = useCallback(() => {
+  const closeViewing = useCallback(() => {
     setViewing(null)
     setFocusedObject((current) => current === 'folio' ? null : current)
   }, [])
+
+  const handlePersistState = useCallback((id: string, viewerState: Record<string, unknown>) => {
+    updateFile(id, { viewerState })
+  }, [updateFile])
 
   const handleClipboardToggle = useCallback((open: boolean) => {
     setClipboardOpen(open)
@@ -1124,220 +1130,234 @@ export default function App() {
 
           <main className={`main-desk ${focusModeActive ? 'main-desk-focused' : ''} ${deskFocusOnRail ? 'main-desk-cleared' : ''} ${deskFocusOnFolio ? 'main-desk-folio' : ''}`}>
             <div className={`main-desk-inner ${focusModeActive ? 'main-desk-inner-focused' : ''}`}>
-              {!notebookOverlayActive && <div className={`bloom-title-block ${deskFocusOnRail ? 'desk-panel-resting' : ''}`}>{titleBlock}</div>}
+              {viewing ? (
+                <FileViewer
+                  file={viewing}
+                  relatedFiles={viewing.lineageId ? getVersionGroup(visibleFiles, viewing) : undefined}
+                  onSelectVersion={openFileWithFocus}
+                  onArchiveVersion={(id) => { removeFile(id); closeViewing() }}
+                  onRestoreVersion={openFileWithFocus}
+                  onPersistState={handlePersistState}
+                  onClose={closeViewing}
+                />
+              ) : (
+                <>
+                  {!notebookOverlayActive && <div className={`bloom-title-block ${deskFocusOnRail ? 'desk-panel-resting' : ''}`}>{titleBlock}</div>}
 
-              {!notebookOverlayActive && showFolders && featured && (
-                <div className={`hero-panel ${deskFocusOnRail ? 'desk-panel-resting' : ''}`}>
-                  <StudyFolio
-                    title={humanTitle(featured.name)}
-                    subtitle={`${featured.className} · ${featured.resourceType}`}
-                    stamp="Latest Entry"
-                    accent={getFolioAccent(featured.className)}
-                    onOpen={() => openFileWithFocus(featured)}
-                  >
-                    <p className="hero-note">Pick up where you left off.</p>
-                  </StudyFolio>
-                </div>
-              )}
-
-              {!notebookOverlayActive && (
-                <div className={`desk-rail-inline ${deskFocusOnFolio ? 'desk-rail-inline-resting' : ''}`}>
-                  <JotGlossStudyRail
-                    continueFile={continueFile}
-                    recentActivity={recentActivity}
-                    pinnedNote={pinnedNote}
-                    dailyCard={dailyCard}
-                    activePanel={activePanel}
-                    isArchiveView={showArchive}
-                    clipboardOpen={clipboardOpen}
-                    cabinetOpen={cabinetOpen}
-                    musicOpen={musicOpen}
-                    focusedObject={focusedObject}
-                    onTogglePanel={togglePanel}
-                    onOpenFile={openFileWithFocus}
-                    onOpenArchive={() => {
-                      setActivePanel(null)
-                      switchNav('archive')
-                      setFocusedObject('cabinet')
-                    }}
-                    onFocusObject={setFocusedObject}
-                    onClearFocus={clearFocusedObject}
-                    onClipboardToggle={handleClipboardToggle}
-                    onCabinetToggle={handleCabinetToggle}
-                    onMusicToggle={setMusicOpen}
-                    syncLabel={syncLabel}
-                    studyMixes={STUDY_MIXES}
-                    activeMixKey={activeMix.key}
-                    musicPlaying={musicPlaying}
-                    musicActionLabel={gramophone.actionLabel}
-                    onToggleMusic={gramophone.toggleNeedle}
-                    onSelectMix={selectMusicMix}
-                  />
-                </div>
-              )}
-
-              <div className={`desk-active-panel ${notebookOverlayActive ? 'desk-active-panel-focused' : ''}`}>
-                {activePanel === 'upload' && <FileUploader classes={classes} onUpload={handleUpload} onClose={() => {
-                  setActivePanel(null)
-                  setFocusedObject((current) => current === 'cabinet' ? null : current)
-                }} />}
-                {activePanel === 'paste' && <QuickAdd classes={classes} onSave={handleDirectSave} onClose={() => {
-                  setActivePanel(null)
-                  setFocusedObject((current) => current === 'cabinet' ? null : current)
-                }} />}
-                {activePanel === 'notebook' && (
-                  <DeskNotebook
-                    notes={noteFile?.content || ''}
-                    tasks={notebookTasks}
-                    hasPinnedNote={Boolean(pinnedNote)}
-                    companionFile={continueFile}
-                    onSave={handleNotebookSave}
-                    onPin={handlePinNote}
-                    onClearPin={clearPinnedNote}
-                    onOpenCompanion={openFileWithFocus}
-                    onClose={() => {
-                      setActivePanel(null)
-                      setFocusedObject(null)
-                    }}
-                  />
-                )}
-                {activePanel === 'prompts' && <PromptBank onClose={() => {
-                  setActivePanel(null)
-                  setFocusedObject((current) => current === 'cabinet' ? null : current)
-                }} />}
-                {activePanel === 'sync' && <SyncPanel files={files} classes={classes} onRefresh={handleSyncRefresh} onClose={() => {
-                  setActivePanel(null)
-                  setFocusedObject((current) => current === 'cabinet' ? null : current)
-                }} />}
-                {activePanel === 'timer' && <StudyTimer timer={timer} classes={classes} onClose={() => {
-                  setActivePanel(null)
-                  setFocusedObject((current) => current === 'cabinet' ? null : current)
-                }} />}
-                {activePanel === 'stats' && <StudyStats classes={classes} files={visibleFiles} onClose={() => {
-                  setActivePanel(null)
-                  setFocusedObject((current) => current === 'cabinet' ? null : current)
-                }} />}
-              </div>
-
-              {!notebookOverlayActive && (!showFolders || showArchive || selectedClass !== null) && (
-                <UtilityBookplate tone="cream" surface="bare" kicker="Index" className={`search-filter-shell ${deskFocusOnRail ? 'desk-panel-resting' : ''}`}>
-                  <input type="search" placeholder="Search notes and folios..." value={filters.search} onChange={(event) => setFilters({ ...filters, search: event.target.value })} className="index-search" />
-
-                  <div className="search-filter-controls">
-                    <div className="sort-link-row">
-                      {([
-                        ['updatedAt', 'Recent'],
-                        ['createdAt', 'Added'],
-                        ['name', 'A-Z'],
-                      ] as const).map(([field, label]) => (
-                        <button
-                          key={field}
-                          type="button"
-                          className={`sort-link ${sortField === field ? 'active' : ''}`}
-                          onClick={() => {
-                            if (sortField === field) setSortDir((current) => current === 'asc' ? 'desc' : 'asc')
-                            else {
-                              setSortField(field as SortField)
-                              setSortDir(field === 'name' ? 'asc' : 'desc')
-                            }
-                          }}
-                        >
-                          {label} {sortField === field ? (sortDir === 'asc' ? '\u2191' : '\u2193') : ''}
-                        </button>
-                      ))}
+                  {!notebookOverlayActive && showFolders && featured && (
+                    <div className={`hero-panel ${deskFocusOnRail ? 'desk-panel-resting' : ''}`}>
+                      <StudyFolio
+                        title={humanTitle(featured.name)}
+                        subtitle={`${featured.className} · ${featured.resourceType}`}
+                        stamp="Latest Entry"
+                        accent={getFolioAccent(featured.className)}
+                        onOpen={() => openFileWithFocus(featured)}
+                      >
+                        <p className="hero-note">Pick up where you left off.</p>
+                      </StudyFolio>
                     </div>
-                  </div>
-                </UtilityBookplate>
-              )}
+                  )}
 
-              {!notebookOverlayActive && <div className={`center-content-stack ${deskFocusOnRail ? 'desk-panel-resting' : ''} ${deskFocusOnFolio ? 'center-content-stack-focused' : ''}`}>
-                {loading ? (
-                  <UtilityBookplate tone="cream" surface="bare" kicker="Opening" title="Opening your desk">
-                    <p className="rail-copy">The folios are being gathered now.</p>
-                  </UtilityBookplate>
-                ) : showFolders ? (
-                  <>
-                    <UtilityBookplate tone="cream" surface="bare" kicker="Course Folios" title="By course" footer={`${folders.length} folios · ${active.length} live pages`}>
-                      <div className="folio-sort-row">
-                        <span className="folio-sort-label">Sort by</span>
+                  {!notebookOverlayActive && (
+                    <div className={`desk-rail-inline ${deskFocusOnFolio ? 'desk-rail-inline-resting' : ''}`}>
+                      <JotGlossStudyRail
+                        continueFile={continueFile}
+                        recentActivity={recentActivity}
+                        pinnedNote={pinnedNote}
+                        dailyCard={dailyCard}
+                        activePanel={activePanel}
+                        isArchiveView={showArchive}
+                        clipboardOpen={clipboardOpen}
+                        cabinetOpen={cabinetOpen}
+                        musicOpen={musicOpen}
+                        focusedObject={focusedObject}
+                        onTogglePanel={togglePanel}
+                        onOpenFile={openFileWithFocus}
+                        onOpenArchive={() => {
+                          setActivePanel(null)
+                          switchNav('archive')
+                          setFocusedObject('cabinet')
+                        }}
+                        onFocusObject={setFocusedObject}
+                        onClearFocus={clearFocusedObject}
+                        onClipboardToggle={handleClipboardToggle}
+                        onCabinetToggle={handleCabinetToggle}
+                        onMusicToggle={setMusicOpen}
+                        syncLabel={syncLabel}
+                        studyMixes={STUDY_MIXES}
+                        activeMixKey={activeMix.key}
+                        musicPlaying={musicPlaying}
+                        musicActionLabel={gramophone.actionLabel}
+                        onToggleMusic={gramophone.toggleNeedle}
+                        onSelectMix={selectMusicMix}
+                      />
+                    </div>
+                  )}
+
+                  <div className={`desk-active-panel ${notebookOverlayActive ? 'desk-active-panel-focused' : ''}`}>
+                    {activePanel === 'upload' && <FileUploader classes={classes} onUpload={handleUpload} onClose={() => {
+                      setActivePanel(null)
+                      setFocusedObject((current) => current === 'cabinet' ? null : current)
+                    }} />}
+                    {activePanel === 'paste' && <QuickAdd classes={classes} onSave={handleDirectSave} onClose={() => {
+                      setActivePanel(null)
+                      setFocusedObject((current) => current === 'cabinet' ? null : current)
+                    }} />}
+                    {activePanel === 'notebook' && (
+                      <DeskNotebook
+                        notes={noteFile?.content || ''}
+                        tasks={notebookTasks}
+                        hasPinnedNote={Boolean(pinnedNote)}
+                        companionFile={continueFile}
+                        onSave={handleNotebookSave}
+                        onPin={handlePinNote}
+                        onClearPin={clearPinnedNote}
+                        onOpenCompanion={openFileWithFocus}
+                        onClose={() => {
+                          setActivePanel(null)
+                          setFocusedObject(null)
+                        }}
+                      />
+                    )}
+                    {activePanel === 'prompts' && <PromptBank onClose={() => {
+                      setActivePanel(null)
+                      setFocusedObject((current) => current === 'cabinet' ? null : current)
+                    }} />}
+                    {activePanel === 'sync' && <SyncPanel files={files} classes={classes} onRefresh={handleSyncRefresh} onClose={() => {
+                      setActivePanel(null)
+                      setFocusedObject((current) => current === 'cabinet' ? null : current)
+                    }} />}
+                    {activePanel === 'timer' && <StudyTimer timer={timer} classes={classes} onClose={() => {
+                      setActivePanel(null)
+                      setFocusedObject((current) => current === 'cabinet' ? null : current)
+                    }} />}
+                    {activePanel === 'stats' && <StudyStats classes={classes} files={visibleFiles} onClose={() => {
+                      setActivePanel(null)
+                      setFocusedObject((current) => current === 'cabinet' ? null : current)
+                    }} />}
+                  </div>
+
+                  {!notebookOverlayActive && (!showFolders || showArchive || selectedClass !== null) && (
+                    <UtilityBookplate tone="parchment" surface="bare" kicker="Index" className={`search-filter-shell ${deskFocusOnRail ? 'desk-panel-resting' : ''}`}>
+                      <input type="search" placeholder="Search notes and folios..." value={filters.search} onChange={(event) => setFilters({ ...filters, search: event.target.value })} className="index-search" />
+
+                      <div className="search-filter-controls">
                         <div className="sort-link-row">
                           {([
-                            ['course', 'Course'],
-                            ['entries', 'Entries'],
-                            ['recent', 'Recent'],
-                          ] as const).map(([value, label]) => (
+                            ['updatedAt', 'Recent'],
+                            ['createdAt', 'Added'],
+                            ['name', 'A-Z'],
+                          ] as const).map(([field, label]) => (
                             <button
-                              key={value}
+                              key={field}
                               type="button"
-                              className={`sort-link ${folioSort === value ? 'active' : ''}`}
-                              onClick={() => setFolioSort(value)}
+                              className={`sort-link ${sortField === field ? 'active' : ''}`}
+                              onClick={() => {
+                                if (sortField === field) setSortDir((current) => current === 'asc' ? 'desc' : 'asc')
+                                else {
+                                  setSortField(field as SortField)
+                                  setSortDir(field === 'name' ? 'asc' : 'desc')
+                                }
+                              }}
                             >
-                              {label}
+                              {label} {sortField === field ? (sortDir === 'asc' ? '\u2191' : '\u2193') : ''}
                             </button>
                           ))}
                         </div>
                       </div>
-                      <div className="card-grid">
-                        {sortedFolders.map((folder, index) => (
-                          <ClassFolder key={folder.name} className={folder.name} files={folder.files} onClick={() => setSelectedClass(folder.name)} index={index} />
-                        ))}
-                      </div>
                     </UtilityBookplate>
+                  )}
 
-                    <ArchDivider width="48%" />
+                  {!notebookOverlayActive && <div className={`center-content-stack ${deskFocusOnRail ? 'desk-panel-resting' : ''} ${deskFocusOnFolio ? 'center-content-stack-focused' : ''}`}>
+                    {loading ? (
+                      <UtilityBookplate tone="parchment" surface="bare" kicker="Opening" title="Opening your desk">
+                        <p className="rail-copy">The folios are being gathered now.</p>
+                      </UtilityBookplate>
+                    ) : showFolders ? (
+                      <>
+                        <UtilityBookplate tone="parchment" surface="bare" kicker="Course Folios" title="By course" footer={`${folders.length} folios · ${active.length} live pages`}>
+                          <div className="folio-sort-row">
+                            <span className="folio-sort-label">Sort by</span>
+                            <div className="sort-link-row">
+                              {([
+                                ['course', 'Course'],
+                                ['entries', 'Entries'],
+                                ['recent', 'Recent'],
+                              ] as const).map(([value, label]) => (
+                                <button
+                                  key={value}
+                                  type="button"
+                                  className={`sort-link ${folioSort === value ? 'active' : ''}`}
+                                  onClick={() => setFolioSort(value)}
+                                >
+                                  {label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="card-grid">
+                            {sortedFolders.map((folder, index) => (
+                              <ClassFolder key={folder.name} className={folder.name} files={folder.files} onClick={() => setSelectedClass(folder.name)} index={index} />
+                            ))}
+                          </div>
+                        </UtilityBookplate>
 
-                    <UtilityBookplate tone="cream" surface="bare" kicker="Recent Pages">
-                      <div>
-                        {recent.slice(1, 7).map((file, index) => (
-                          <FileCard
-                            key={file.id}
-                            file={file}
-                            index={index}
-                            versionSummary={versionSummaries.get(file.id)}
-                            onOpen={openFileWithFocus}
-                            onEdit={setEditing}
-                            onArchive={(id: string) => updateFile(id, { archived: true })}
-                            onRestore={(id: string) => updateFile(id, { archived: false })}
-                            onDelete={removeFile}
-                          />
-                        ))}
-                      </div>
-                    </UtilityBookplate>
+                        <ArchDivider width="48%" />
 
-                    <div className="browse-all-wrap">
-                      <button type="button" onClick={() => setSelectedClass('')} className="desk-tool-link browse-all-link">Browse all entries</button>
-                    </div>
-                  </>
-                ) : (
-                  <UtilityBookplate
-                    tone={showArchive ? 'lilac' : selectedCourse ? 'powder' : 'cream'}
-                    surface="bare"
-                    kicker={showArchive ? 'Versions' : 'Entries'}
-                    title={showArchive ? 'Saved versions' : selectedCourse ? undefined : 'All folios'}
-                    footer={`${filtered.length} visible in this view`}
-                  >
-                    {filtered.length === 0 ? (
-                      <p className="rail-copy">No entries are visible in this view yet. Add a folio or clear the current filters to repopulate the desk.</p>
+                        <UtilityBookplate tone="parchment" surface="bare" kicker="Recent Pages">
+                          <div>
+                            {recent.slice(1, 7).map((file, index) => (
+                              <FileCard
+                                key={file.id}
+                                file={file}
+                                index={index}
+                                versionSummary={versionSummaries.get(file.id)}
+                                onOpen={openFileWithFocus}
+                                onEdit={setEditing}
+                                onArchive={(id: string) => updateFile(id, { archived: true })}
+                                onRestore={(id: string) => updateFile(id, { archived: false })}
+                                onDelete={removeFile}
+                              />
+                            ))}
+                          </div>
+                        </UtilityBookplate>
+
+                        <div className="browse-all-wrap">
+                          <button type="button" onClick={() => setSelectedClass('')} className="desk-tool-link browse-all-link">Browse all entries</button>
+                        </div>
+                      </>
                     ) : (
-                      filtered.map((file, index) => (
-                        <FileCard
-                            key={file.id}
-                            file={file}
-                            index={index}
-                            versionSummary={versionSummaries.get(file.id)}
-                            onOpen={openFileWithFocus}
-                            onEdit={setEditing}
-                            onArchive={(id: string) => updateFile(id, { archived: true })}
-                            onRestore={(id: string) => updateFile(id, { archived: false })}
-                          onDelete={removeFile}
-                        />
-                      ))
+                      <UtilityBookplate
+                        tone={showArchive ? 'lavender' : selectedCourse ? 'powder' : 'parchment'}
+                        surface="bare"
+                        kicker={showArchive ? 'Versions' : 'Entries'}
+                        title={showArchive ? 'Saved versions' : selectedCourse ? undefined : 'All folios'}
+                        footer={`${filtered.length} visible in this view`}
+                      >
+                        {filtered.length === 0 ? (
+                          <p className="rail-copy">No entries are visible in this view yet. Add a folio or clear the current filters to repopulate the desk.</p>
+                        ) : (
+                          filtered.map((file, index) => (
+                            <FileCard
+                                key={file.id}
+                                file={file}
+                                index={index}
+                                versionSummary={versionSummaries.get(file.id)}
+                                onOpen={openFileWithFocus}
+                                onEdit={setEditing}
+                                onArchive={(id: string) => updateFile(id, { archived: true })}
+                                onRestore={(id: string) => updateFile(id, { archived: false })}
+                              onDelete={removeFile}
+                            />
+                          ))
+                        )}
+                      </UtilityBookplate>
                     )}
-                  </UtilityBookplate>
-                )}
-              </div>}
+                  </div>}
 
-              {!notebookOverlayActive && <footer className="desk-colophon">Jasleen's study library</footer>}
+                  {!notebookOverlayActive && <footer className="desk-colophon">Jasleen's study library</footer>}
+                </>
+              )}
             </div>
           </main>
 
@@ -1379,15 +1399,6 @@ export default function App() {
 
       {/* Gramophone audio is managed by useGramophone hook -- no DOM element needed */}
       <ClipboardWatcher classes={classes} onSave={handleDirectSave} />
-      {viewing && (
-        <FileViewer
-          file={viewing}
-          relatedFiles={viewing.lineageId ? getVersionGroup(visibleFiles, viewing) : undefined}
-          onSelectVersion={openFileWithFocus}
-          onPersistState={(id, viewerState) => updateFile(id, { viewerState })}
-          onClose={closeFolioFocus}
-        />
-      )}
       {editing && <EditModal file={editing} classes={classes} onSave={(id: string, updates: Partial<StudyFile>) => updateFile(id, updates)} onClose={() => setEditing(null)} />}
       {(dupFile || pendingDraftSave) && <DuplicateModal fileName={dupFile?.name || pendingDraftSave?.name || ''} existing={dupExisting} onAction={handleDupAction} />}
       <FloatingTimer timer={timer} onOpenPanel={() => togglePanel('timer')} />

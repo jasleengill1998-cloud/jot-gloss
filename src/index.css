@@ -2724,3 +2724,16 @@
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration: .01ms !important; transition-duration: .01ms !important } }
 .gramophone-playing .gramophone-icon { opacity: 1; }
 .gramophone-resting .gramophone-icon { opacity: 0.5; }
+
+.folio-viewer-shell {
+  width: 100%;
+  min-height: 70dvh;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 220ms ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
