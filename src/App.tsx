@@ -212,249 +212,6 @@ function FocusableRailSection({
   )
 }
 
-function DeskRailContent({
-  continueFile,
-  recentActivity,
-  pinnedNote,
-  dailyCard,
-  activePanel,
-  isArchiveView,
-  onTogglePanel,
-  onOpenFile,
-  onOpenArchive,
-  syncLabel,
-  studyMixes,
-  activeMixKey,
-  musicPlaying,
-  musicActionLabel,
-  onToggleMusic,
-  onSelectMix,
-}: RailProps) {
-  const noteTitle = pinnedNote ? 'Pinned to the desk' : dailyCard.title
-  const filingCabinetActive = isArchiveView || activePanel === 'upload' || activePanel === 'paste' || activePanel === 'prompts' || activePanel === 'sync' || activePanel === 'timer' || activePanel === 'stats'
-
-  return (
-    <div className="desk-rail-stack">
-      {continueFile && (
-        <UtilityBookplate tone="butter" kicker="Continue Studying" title={humanTitle(continueFile.name)}>
-          <p className="rail-copy">{continueFile.className} · {continueFile.resourceType}</p>
-          <button type="button" className="bookplate-action" onClick={() => onOpenFile(continueFile)} style={{ marginTop: 12 }}>
-            Back to the books
-          </button>
-        </UtilityBookplate>
-      )}
-
-      <UtilityBookplate tone="blush" kicker={pinnedNote ? 'Pinned Note' : dailyCard.kicker} title={noteTitle}>
-        <p className="rail-copy">{pinnedNote ? pinnedNote.text : dailyCard.body}</p>
-        {pinnedNote ? (
-          <div className="rail-note-meta">Set down {formatLongDate(new Date(pinnedNote.updatedAt))}.</div>
-        ) : (
-          <>
-            {dailyCard.source && <div className="rail-note-meta">{dailyCard.source}</div>}
-            {dailyCard.href ? (
-              <a href={dailyCard.href} target="_blank" rel="noreferrer" className="desk-tool-link desk-link-button" style={{ display: 'inline-block', marginTop: 12 }}>
-                Read the full passage
-              </a>
-            ) : null}
-          </>
-        )}
-      </UtilityBookplate>
-
-      <UtilityBookplate tone="powder" kicker="Recent Activity" title="Recently opened">
-        <div className="archive-activity-list">
-          {recentActivity.length === 0 ? (
-            <p className="rail-copy">Open a file or add a note and the desk will start keeping track for you.</p>
-          ) : (
-            recentActivity.map((file: StudyFile) => (
-              <button key={file.id} type="button" className="archive-activity-item" onClick={() => onOpenFile(file)}>
-                <span className="archive-activity-title">{humanTitle(file.name)}</span>
-                <span className="archive-activity-meta">{shortCourseName(file.className)} · {formatActivityDate(file.updatedAt)}</span>
-              </button>
-            ))
-          )}
-        </div>
-      </UtilityBookplate>
-
-      <UtilityBookplate tone="sage" kicker="Notes · To-Do · Sticky" title="Notebook">
-        <div className="rail-button-stack">
-          <button type="button" className={`bookplate-action ${activePanel === 'notebook' ? 'active' : ''}`} onClick={() => onTogglePanel('notebook')}>
-            Open the notebook
-          </button>
-        </div>
-      </UtilityBookplate>
-
-      <UtilityBookplate tone="cream" kicker="PARLOUR MUSIC" title={musicPlaying ? 'Now playing' : ''}>
-        <div className="music-drawer-row">
-          <button type="button" className="bookplate-action compact" onClick={onToggleMusic}>
-            {musicActionLabel}
-          </button>
-          <div className="music-mix-row">
-            {studyMixes.map((mix) => (
-              <button
-                key={mix.key}
-                type="button"
-                className={`music-mix-chip ${activeMixKey === mix.key ? 'active' : ''}`}
-                onClick={() => onSelectMix(mix)}
-              >
-                {mix.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </UtilityBookplate>
-
-      <UtilityBookplate tone="lilac" kicker="The Filing Cabinet" title="File this away">
-        <div className="rail-button-stack">
-          <button type="button" className={`bookplate-action ${activePanel === 'upload' ? 'active' : ''}`} onClick={() => onTogglePanel('upload')}>
-            Place in the cabinet
-          </button>
-          <button type="button" className={`bookplate-action ${activePanel === 'paste' ? 'active' : ''}`} onClick={() => onTogglePanel('paste')}>
-            Slip from Claude
-          </button>
-          <button type="button" className={`bookplate-action ${activePanel === 'prompts' ? 'active' : ''}`} onClick={() => onTogglePanel('prompts')}>
-            Prompt Drawer
-          </button>
-          <button type="button" className={`bookplate-action ${activePanel === 'timer' ? 'active' : ''}`} onClick={() => onTogglePanel('timer')}>
-            Desk Clock
-          </button>
-          <button type="button" className={`bookplate-action ${activePanel === 'stats' ? 'active' : ''}`} onClick={() => onTogglePanel('stats')}>
-            The Ledger
-          </button>
-          <button type="button" className={`bookplate-action ${activePanel === 'sync' ? 'active' : ''}`} onClick={() => onTogglePanel('sync')}>
-            {syncLabel}
-          </button>
-        </div>
-      </UtilityBookplate>
-    </div>
-  )
-}
-
-function JotGlossRailContent({
-  continueFile,
-  recentActivity,
-  pinnedNote,
-  activePanel,
-  isArchiveView,
-  clipboardOpen,
-  cabinetOpen,
-  musicOpen,
-  onTogglePanel,
-  onOpenFile,
-  onOpenArchive,
-  onClipboardToggle,
-  onCabinetToggle,
-  onMusicToggle,
-  syncLabel,
-  studyMixes,
-  activeMixKey,
-  musicPlaying,
-  musicActionLabel,
-  onToggleMusic,
-  onSelectMix,
-}: RailProps) {
-  const filingCabinetActive = cabinetOpen || isArchiveView || activePanel === 'upload' || activePanel === 'paste' || activePanel === 'prompts' || activePanel === 'sync' || activePanel === 'timer' || activePanel === 'stats'
-
-  return (
-    <div className="desk-rail-stack">
-      <UtilityBookplate tone="sage" kicker="Pen & Paper" title="Notebook">
-        <p className="rail-copy">
-          {pinnedNote
-            ? pinnedNote.text
-            : 'Keep one working page beside the desk so notes, checklists, and loose thoughts stay in the room.'}
-        </p>
-        <div className="rail-note-meta">
-          {pinnedNote ? `Set down ${formatLongDate(new Date(pinnedNote.updatedAt))}.` : 'Open the notebook to save notes and to-do slips.'}
-        </div>
-        <div className="rail-button-stack" style={{ marginTop: 12 }}>
-          <button type="button" className={`bookplate-action ${activePanel === 'notebook' ? 'active' : ''}`} onClick={() => onTogglePanel('notebook')}>
-            Open the notebook
-          </button>
-        </div>
-      </UtilityBookplate>
-
-      <UtilityBookplate tone="butter" kicker="Where You Left Off" title={continueFile ? humanTitle(continueFile.name) : 'Pick up where you left off.'}>
-        <p className="rail-copy">
-          {continueFile ? `${continueFile.className} · ${continueFile.resourceType}` : 'Open a folio and the clipboard will hold your place.'}
-        </p>
-        {continueFile && (
-          <button type="button" className="bookplate-action" onClick={() => onOpenFile(continueFile)} style={{ marginTop: 12 }}>
-            Back to the books
-          </button>
-        )}
-
-        <div className="desk-cabinet-section">
-          <div className="desk-cabinet-heading">Recent Activity</div>
-          <div className="archive-activity-list">
-            {recentActivity.length === 0 ? (
-              <p className="rail-copy">Resume a folio or save a note and the clipboard will start keeping a trail for you.</p>
-            ) : (
-              recentActivity.map((file: StudyFile) => (
-                <button key={file.id} type="button" className="archive-activity-item" onClick={() => onOpenFile(file)}>
-                  <span className="archive-activity-title">{humanTitle(file.name)}</span>
-                  <span className="archive-activity-meta">{shortCourseName(file.className)} · {formatActivityDate(file.updatedAt)}</span>
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-      </UtilityBookplate>
-
-      <UtilityBookplate tone="cream" kicker="Parlour Music" title="The Gramophone">
-        <div className="music-drawer-row">
-          <button type="button" className="bookplate-action compact" onClick={onToggleMusic}>
-            {musicActionLabel}
-          </button>
-          <div className="music-mix-row">
-            {studyMixes.map((mix) => (
-              <button
-                key={mix.key}
-                type="button"
-                className={`music-mix-chip ${activeMixKey === mix.key ? 'active' : ''}`}
-                onClick={() => onSelectMix(mix)}
-              >
-                {mix.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </UtilityBookplate>
-
-      <UtilityBookplate tone="lilac" kicker="Archive & Sundries" title="Archive and versions">
-        <div className="rail-button-stack">
-          <button type="button" className={`bookplate-action ${isArchiveView ? 'active' : ''}`} onClick={onOpenArchive}>
-            Open Versions
-          </button>
-          <button type="button" className={`bookplate-action ${activePanel === 'upload' ? 'active' : ''}`} onClick={() => onTogglePanel('upload')}>
-            File this away
-          </button>
-          <button type="button" className={`bookplate-action ${activePanel === 'paste' ? 'active' : ''}`} onClick={() => onTogglePanel('paste')}>
-            Slip from Claude
-          </button>
-        </div>
-
-        <details className="desk-cabinet-details" open={filingCabinetActive ? true : undefined}>
-          <summary className="desk-cabinet-summary">More cabinet drawers</summary>
-          <div className="desk-cabinet-content">
-            <div className="rail-button-stack">
-              <button type="button" className={`bookplate-action ${activePanel === 'prompts' ? 'active' : ''}`} onClick={() => onTogglePanel('prompts')}>
-                Prompt Drawer
-              </button>
-              <button type="button" className={`bookplate-action ${activePanel === 'timer' ? 'active' : ''}`} onClick={() => onTogglePanel('timer')}>
-                Desk Clock
-              </button>
-              <button type="button" className={`bookplate-action ${activePanel === 'stats' ? 'active' : ''}`} onClick={() => onTogglePanel('stats')}>
-                The Ledger
-              </button>
-              <button type="button" className={`bookplate-action ${activePanel === 'sync' ? 'active' : ''}`} onClick={() => onTogglePanel('sync')}>
-                {syncLabel}
-              </button>
-            </div>
-          </div>
-        </details>
-      </UtilityBookplate>
-    </div>
-  )
-}
 
 function JotGlossStudyRail({
   continueFile,
@@ -618,11 +375,11 @@ function JotGlossStudyRail({
         closeLabel="Leave the cabinet"
       >
         <details className="desk-cabinet-details rail-drawer" open={filingCabinetActive} onToggle={(event) => onCabinetToggle((event.currentTarget as HTMLDetailsElement).open)}>
-          <summary className="desk-cabinet-summary">{filingCabinetActive ? 'Close the cabinet' : 'Open the filing cabinet'}</summary>
+          <summary className="desk-cabinet-summary">{filingCabinetActive ? 'Latch the cabinet' : 'Open the filing cabinet'}</summary>
           <div className="desk-cabinet-content">
             <div className="rail-button-stack">
               <button type="button" className={`bookplate-action ${isArchiveView ? 'active' : ''}`} onClick={onOpenArchive}>
-                Open Versions
+                Browse the versions
               </button>
               <button type="button" className={`bookplate-action ${activePanel === 'upload' ? 'active' : ''}`} onClick={() => onTogglePanel('upload')}>
                 Place in the cabinet
@@ -694,7 +451,7 @@ export default function App() {
 
   const [pinnedNote, setPinnedNote] = useState<{ text: string; updatedAt: number } | null>(null)
   const [dailyCard, setDailyCard] = useState<{ kicker: string; title: string; body: string; href?: string; source?: string }>({
-    kicker: 'Today’s Quote',
+    kicker: "Today's Quote",
     title: '',
     body: '',
   })
@@ -1055,7 +812,7 @@ export default function App() {
   useEffect(() => {
     const today = new Date()
     const fallback = {
-      kicker: 'Today’s Quote',
+      kicker: "Today's Quote",
       title: formatLongDate(today),
       body: DAILY_QUOTES[getDayOfYear(today) % DAILY_QUOTES.length],
     }
@@ -1076,7 +833,7 @@ export default function App() {
 
         const cleanedTitle = title.replace(/^Daily Hukamnama\s*-\s*/i, '')
         setDailyCard({
-          kicker: 'Today’s Hukamnama',
+          kicker: "Today's Hukamnama",
           title: cleanedTitle || formatLongDate(today),
           body,
           href,
@@ -1320,7 +1077,7 @@ export default function App() {
                               tabIndex={0}
                               onClick={() => openCourseIndex(course)}
                             >
-                              {course.replace(/\s*[\u2014\u2013-]\s*/, ' Â· ')}
+                              {course.replace(/\s*[\u2014\u2013-]\s*/, ' · ')}
                             </div>
                           ))}
                         </div>
@@ -1620,7 +1377,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* Gramophone audio is managed by useGramophone hook — no DOM element needed */}
+      {/* Gramophone audio is managed by useGramophone hook -- no DOM element needed */}
       <ClipboardWatcher classes={classes} onSave={handleDirectSave} />
       {viewing && (
         <FileViewer

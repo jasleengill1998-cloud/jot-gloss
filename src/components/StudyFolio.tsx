@@ -26,7 +26,7 @@ export default function StudyFolio({
   const tint = accent === 'oxblood' || accent === 'blush' ? 'butter' : accent
   const stampColor = accent === 'oxblood' ? '#6e3040' : '#c97c8a'
   const surfaceByTint: Record<Exclude<Accent, 'oxblood' | 'blush'> | 'butter', string> = {
-    powder: 'rgba(214, 228, 237, 0.92)',
+    powder: 'rgba(212, 228, 208, 0.92)',
     butter: 'rgba(245, 230, 184, 0.92)',
     lilac: 'rgba(221, 212, 236, 0.92)',
     sage: 'rgba(212, 228, 208, 0.92)',

@@ -1,6 +1,6 @@
 export type AppNav = 'home' | 'all' | 'versions' | 'library'
 export type AppPanelKey = 'notebook' | 'cabinet' | null
-export type FocusedObject = null | 'notebook' | 'clipboard' | 'cabinet' | 'folio'
+export type FocusedObject = null | 'notebook' | 'clipboard' | 'cabinet' | 'folio' | 'music'
 
 export interface AppSessionState {
   nav: AppNav
