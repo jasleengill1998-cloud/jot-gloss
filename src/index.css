@@ -936,11 +936,7 @@
 @layer components {
   body {
     background-color: var(--color-wall);
-    background-image: linear-gradient(rgba(250, 246, 240, 0.36), rgba(250, 246, 240, 0.36)), url('/chinoiserie-wallpaper.png');
-    background-size: 806px auto;
-    background-repeat: repeat;
-    background-position: center top;
-    background-attachment: scroll;
+    background-image: none;
   }
 
   .portal-shell {
@@ -948,14 +944,37 @@
   }
 
   .archive-rail {
-    background: transparent;
+    background: var(--color-parchment) !important;
+    background-image: none !important;
     border-right: none;
-    box-shadow: none;
+    box-shadow: none !important;
   }
 
   .main-desk {
-    background: transparent;
+    position: relative;
+    isolation: isolate;
+    background-color: var(--color-wall) !important;
+    background-image: none !important;
     border-right: none;
+  }
+
+  .main-desk::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/chinoiserie-wallpaper-wide.png');
+    background-size: 1800px auto;
+    background-repeat: repeat;
+    background-position: center top;
+    opacity: 0.65;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .main-desk > * {
+    position: relative;
+    z-index: 1;
   }
 
   .main-desk-inner {
@@ -970,7 +989,8 @@
     overflow: visible;
     align-self: start;
     padding: 22px 18px 32px;
-    background: transparent;
+    background: var(--color-parchment) !important;
+    background-image: none !important;
   }
 
   .desk-rail-inline {
@@ -990,8 +1010,9 @@
 
   .hero-note,
   .rail-copy {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 12px;
+    font-family: 'EB Garamond', 'Cormorant Garamond', Georgia, serif;
+    font-size: 13.5px;
+    font-weight: 400;
     line-height: 1.45;
     color: rgba(90,62,75,0.82);
   }
@@ -1341,8 +1362,8 @@
 
   .rail-note-meta {
     margin-top: 12px;
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 11px;
+    font-family: 'EB Garamond', 'Cormorant Garamond', Georgia, serif;
+    font-size: 12px;
     font-style: italic;
     color: rgba(90,62,75,0.66);
   }
@@ -2167,45 +2188,21 @@
     position: relative;
     min-height: 100vh;
     isolation: isolate;
-    background: #f6e7e7;
+    background: var(--color-wall);
   }
 
   .world-frame::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background-image: url('/chinoiserie-wallpaper-wide.png');
-    background-position: center top;
-    background-repeat: repeat-y;
-    background-size: 100% auto;
-    opacity: 0.94;
-    filter: saturate(0.4) brightness(1.08);
-    transform: translateZ(0);
+    content: none;
   }
 
   .world-frame::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background: linear-gradient(180deg, rgba(255, 247, 244, 0.4), rgba(255, 246, 243, 0.44));
+    content: none;
   }
 
   .world-frame-inner,
   .portal-shell {
     position: relative;
     z-index: 1;
-  }
-
-  .archive-rail,
-  .main-desk,
-  .desk-rail {
-    background: transparent !important;
-    background-image: none !important;
-    box-shadow: none !important;
   }
 
   .archive-rail {
@@ -2577,6 +2574,30 @@
 .bookplate-tone-butter   { background: rgba(245,230,184,0.95) !important; }
 .bookplate-tone-parchment { background: rgba(255,248,242,0.95) !important; }
 .bookplate-tone-lavender { background: rgba(221,212,236,0.95) !important; }
+
+.desk-rail-stack > .rail-focus-shell:nth-child(1),
+.desk-rail-stack > .rail-focus-shell:nth-child(1) > .rail-focus-card {
+  background: var(--color-sage) !important;
+  border: 1px solid rgba(184, 156, 120, 0.3) !important;
+}
+
+.desk-rail-stack > .rail-focus-shell:nth-child(3),
+.desk-rail-stack > .rail-focus-shell:nth-child(3) > .rail-focus-card {
+  background: var(--color-butter) !important;
+  border: 1px solid rgba(178, 148, 88, 0.35) !important;
+}
+
+.desk-rail-stack > .rail-focus-shell:nth-child(5),
+.desk-rail-stack > .rail-focus-shell:nth-child(5) > .rail-focus-card {
+  background: var(--color-parchment) !important;
+  border: 1px solid rgba(180, 140, 135, 0.3) !important;
+}
+
+.desk-rail-stack > .rail-focus-shell:nth-child(7),
+.desk-rail-stack > .rail-focus-shell:nth-child(7) > .rail-focus-card {
+  background: var(--color-lavender) !important;
+  border: 1px solid rgba(155, 140, 175, 0.28) !important;
+}
 
 /* ── DIAMOND DIVIDER ── */
 .diamond-divider {

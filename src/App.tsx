@@ -283,7 +283,7 @@ function DeskRailContent({
         </div>
       </UtilityBookplate>
 
-      <UtilityBookplate tone="cream" kicker="The Gramophone" title={musicPlaying ? 'Now playing' : ''}>
+      <UtilityBookplate tone="cream" kicker="PARLOUR MUSIC" title={musicPlaying ? 'Now playing' : ''}>
         <div className="music-drawer-row">
           <button type="button" className="bookplate-action compact" onClick={onToggleMusic}>
             {musicActionLabel}
@@ -399,7 +399,7 @@ function JotGlossRailContent({
         </div>
       </UtilityBookplate>
 
-      <UtilityBookplate tone="cream" kicker="The Gramophone" title={musicPlaying ? 'Now playing' : ''}>
+      <UtilityBookplate tone="cream" kicker="PARLOUR MUSIC" title={musicPlaying ? 'Now playing' : ''}>
         <div className="music-drawer-row">
           <button type="button" className="bookplate-action compact" onClick={onToggleMusic}>
             {musicActionLabel}
@@ -571,7 +571,7 @@ function JotGlossStudyRail({
 
       <FocusableRailSection
         tone="cream"
-        kicker="The Gramophone"
+        kicker="PARLOUR MUSIC"
         title="The Gramophone"
         objectKey="music"
         focusedObject={focusedObject}
