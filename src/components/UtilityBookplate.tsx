@@ -14,12 +14,12 @@ interface Props {
 }
 
 const TONES: Record<Tone, { background: string; wash: string; line: string }> = {
-  cream: { background: 'rgba(255, 248, 240, 0.95)', wash: 'rgba(255, 252, 248, 0.92)', line: 'rgba(184, 160, 144, 0.5)' },
-  blush: { background: 'rgba(255, 234, 230, 0.95)', wash: 'rgba(255, 243, 239, 0.92)', line: 'rgba(201, 124, 138, 0.5)' },
-  powder: { background: 'rgba(228, 238, 248, 0.95)', wash: 'rgba(241, 246, 251, 0.92)', line: 'rgba(149, 174, 204, 0.5)' },
-  butter: { background: 'rgba(240, 232, 194, 0.95)', wash: 'rgba(248, 242, 216, 0.92)', line: 'rgba(194, 167, 108, 0.52)' },
-  lilac: { background: 'rgba(235, 228, 244, 0.95)', wash: 'rgba(244, 240, 250, 0.92)', line: 'rgba(164, 143, 191, 0.5)' },
-  sage: { background: 'rgba(230, 242, 232, 0.95)', wash: 'rgba(239, 247, 240, 0.92)', line: 'rgba(144, 177, 145, 0.52)' },
+  cream: { background: 'rgba(255, 248, 242, 0.95)', wash: 'rgba(255, 252, 248, 0.84)', line: 'rgba(180, 140, 135, 0.30)' },
+  blush: { background: '#F2D0CC', wash: 'rgba(248, 226, 223, 0.82)', line: 'rgba(201, 124, 138, 0.32)' },
+  powder: { background: 'rgba(212, 228, 208, 0.95)', wash: 'rgba(229, 239, 226, 0.84)', line: 'rgba(184, 156, 120, 0.30)' },
+  butter: { background: 'rgba(245, 230, 184, 0.95)', wash: 'rgba(249, 239, 204, 0.84)', line: 'rgba(178, 148, 88, 0.35)' },
+  lilac: { background: 'rgba(221, 212, 236, 0.95)', wash: 'rgba(241, 236, 247, 0.84)', line: 'rgba(155, 140, 175, 0.28)' },
+  sage: { background: '#D4E4D0', wash: 'rgba(229, 239, 226, 0.82)', line: 'rgba(184, 156, 120, 0.30)' },
 }
 
 export default function UtilityBookplate({
@@ -35,7 +35,7 @@ export default function UtilityBookplate({
   const palette = TONES[tone]
   const isBare = surface === 'bare'
   const isVeil = surface === 'veil'
-  const outerFrame = 'rgba(169, 151, 141, 0.24)'
+  const outerFrame = palette.line
   const midFrame = 'rgba(221, 210, 194, 0.62)'
   const innerFrame = 'rgba(167, 151, 150, 0.18)'
   const frameBorder = isBare ? 'none' : isVeil ? '1px solid rgba(184, 149, 106, 0.16)' : `1px solid ${outerFrame}`

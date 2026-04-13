@@ -118,12 +118,8 @@
 
   /* ═══ SIDEBAR — wallpaper with soft veil, not plain rectangle ═══ */
   .archive-rail {
-    background-color: #FFE8EE;
-    background-image: url("/chinoiserie-wallpaper.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center top;
-    background-attachment: fixed;
+    background-color: #FFF8F2;
+    background-image: none;
     display: flex;
     flex-direction: column;
     color: #5A3E4B;
@@ -148,7 +144,7 @@
       border-bottom: 1.5px solid rgba(200,168,140,0.25);
       border-right: none;
       scrollbar-width: none;
-      background-color: #FFE8EE;
+      background-color: #FFF8F2;
       background-image: none;
       padding: 0;
       height: auto;
@@ -338,12 +334,7 @@
      overflow-y + min-height:0 are REQUIRED so content scrolls inside the
      viewport-height grid cell. DO NOT remove them. */
   .main-desk {
-    background-color: #FFE8EE;
-    background-image: url('/chinoiserie-wallpaper.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center top;
-    background-attachment: fixed;
+    background-color: #faf6f0;
     position: relative;
     overflow: visible;
     min-height: 100vh;
@@ -953,16 +944,16 @@
   .main-desk {
     position: relative;
     isolation: isolate;
-    background-color: var(--color-wall) !important;
+    background-color: #faf6f0 !important;
     background-image: none !important;
     border-right: none;
   }
 
   .main-desk::before {
     content: '';
-    position: absolute;
+    position: fixed;
     inset: 0;
-    background-image: url('/chinoiserie-wallpaper-wide.png');
+    background-image: url('/chinoiserie-wallpaper.png');
     background-size: 1800px auto;
     background-repeat: repeat;
     background-position: center top;

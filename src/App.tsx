@@ -62,8 +62,8 @@ const COURSE_ACCENT: Record<string, Accent> = {
   General: 'blush',
 }
 
-const PINNED_NOTE_STORAGE_KEY = 'studybloom-pinned-note'
-const DESK_META_PREFIX = '__studybloom-'
+const PINNED_NOTE_STORAGE_KEY = 'jot-gloss-pinned-note'
+const DESK_META_PREFIX = '__jot-gloss-'
 const DESK_NOTE_FILE = `${DESK_META_PREFIX}notes.md`
 const DESK_TASKS_FILE = `${DESK_META_PREFIX}tasks.md`
 const STUDY_MIXES: StudyMix[] = [
@@ -372,7 +372,7 @@ function JotGlossRailContent({
         </div>
       </UtilityBookplate>
 
-      <UtilityBookplate tone="powder" kicker="Where You Left Off" title={continueFile ? humanTitle(continueFile.name) : 'Pick up where you left off.'}>
+      <UtilityBookplate tone="butter" kicker="Where You Left Off" title={continueFile ? humanTitle(continueFile.name) : 'Pick up where you left off.'}>
         <p className="rail-copy">
           {continueFile ? `${continueFile.className} · ${continueFile.resourceType}` : 'Open a folio and the clipboard will hold your place.'}
         </p>
@@ -399,7 +399,7 @@ function JotGlossRailContent({
         </div>
       </UtilityBookplate>
 
-      <UtilityBookplate tone="cream" kicker="PARLOUR MUSIC" title={musicPlaying ? 'Now playing' : ''}>
+      <UtilityBookplate tone="cream" kicker="Parlour Music" title="The Gramophone">
         <div className="music-drawer-row">
           <button type="button" className="bookplate-action compact" onClick={onToggleMusic}>
             {musicActionLabel}
@@ -419,7 +419,7 @@ function JotGlossRailContent({
         </div>
       </UtilityBookplate>
 
-      <UtilityBookplate tone="butter" kicker="Archive & Sundries" title="Archive and versions">
+      <UtilityBookplate tone="lilac" kicker="Archive & Sundries" title="Archive and versions">
         <div className="rail-button-stack">
           <button type="button" className={`bookplate-action ${isArchiveView ? 'active' : ''}`} onClick={onOpenArchive}>
             Open Versions
@@ -571,7 +571,7 @@ function JotGlossStudyRail({
 
       <FocusableRailSection
         tone="cream"
-        kicker="PARLOUR MUSIC"
+        kicker="Parlour Music"
         title="The Gramophone"
         objectKey="music"
         focusedObject={focusedObject}
