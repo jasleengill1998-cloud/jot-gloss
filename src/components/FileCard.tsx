@@ -54,7 +54,7 @@ export default function FileCard({
   onDelete,
 }: Props) {
   const title = humanTitle(file.name)
-  const background = TINT_BG[index % TINT_BG.length]
+  const background = TINT_BG[index % TINT_BG.length].replace('0.84', '0.8').replace('0.82', '0.78')
   const spine = TINT_STRIPE[index % TINT_STRIPE.length]
 
   return (
@@ -74,23 +74,24 @@ export default function FileCard({
         display: 'flex',
         alignItems: 'stretch',
         gap: 16,
-        padding: '16px 18px',
-        marginBottom: 10,
+        padding: '17px 20px',
+        marginBottom: 0,
         cursor: 'pointer',
         background,
-        border: '1px solid rgba(184, 149, 106, 0.22)',
-        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.45)',
+        border: '1px solid rgba(184, 149, 106, 0.2)',
+        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.42), 0 10px 18px rgba(90,62,75,0.04)',
+        backdropFilter: 'blur(2px)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         width: '100%',
         textAlign: 'left',
       }}
       onMouseEnter={(event) => {
-        event.currentTarget.style.transform = 'translateY(-1px)'
-        event.currentTarget.style.boxShadow = 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 10px 20px rgba(90,62,75,0.07)'
+        event.currentTarget.style.transform = 'translateY(-2px)'
+        event.currentTarget.style.boxShadow = 'inset 0 0 0 1px rgba(255,255,255,0.56), 0 14px 26px rgba(90,62,75,0.08)'
       }}
       onMouseLeave={(event) => {
         event.currentTarget.style.transform = ''
-        event.currentTarget.style.boxShadow = 'inset 0 0 0 1px rgba(255,255,255,0.45)'
+        event.currentTarget.style.boxShadow = 'inset 0 0 0 1px rgba(255,255,255,0.42), 0 10px 18px rgba(90,62,75,0.04)'
       }}
     >
       <div
@@ -108,7 +109,7 @@ export default function FileCard({
           <div
             style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 10,
+                fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
@@ -122,7 +123,7 @@ export default function FileCard({
               fontFamily: "'Cormorant Garamond', Georgia, serif",
               fontSize: 10,
               fontStyle: 'italic',
-              color: 'rgba(90,62,75,0.58)',
+                color: 'rgba(90,62,75,0.66)',
             }}
           >
             {fmtDate(file.updatedAt)}
@@ -132,11 +133,11 @@ export default function FileCard({
         <h3
           style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: 17,
-            fontWeight: 700,
-            color: '#5A3E4B',
-            lineHeight: 1.2,
-            marginBottom: 8,
+              fontSize: 17.5,
+              fontWeight: 700,
+              color: '#5A3E4B',
+              lineHeight: 1.16,
+              marginBottom: 8,
           }}
           title={file.name}
         >

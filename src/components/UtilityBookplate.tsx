@@ -16,7 +16,7 @@ interface Props {
 const TONES: Record<Tone, { background: string; wash: string; line: string }> = {
   parchment: { background: 'rgba(255, 248, 242, 0.95)', wash: 'rgba(255, 252, 248, 0.92)', line: 'rgba(184, 160, 144, 0.5)' },
   blush: { background: 'rgba(255, 234, 230, 0.95)', wash: 'rgba(255, 243, 239, 0.92)', line: 'rgba(201, 124, 138, 0.5)' },
-  powder: { background: 'rgba(212, 228, 208, 0.95)', wash: 'rgba(228, 240, 226, 0.92)', line: 'rgba(144, 177, 145, 0.5)' },
+  powder: { background: 'rgba(214, 231, 248, 0.94)', wash: 'rgba(232, 242, 252, 0.9)', line: 'rgba(146, 167, 199, 0.42)' },
   butter: { background: 'rgba(245, 230, 184, 0.95)', wash: 'rgba(250, 240, 210, 0.92)', line: 'rgba(194, 167, 108, 0.52)' },
   lavender: { background: 'rgba(221, 212, 236, 0.95)', wash: 'rgba(234, 228, 246, 0.92)', line: 'rgba(164, 143, 191, 0.5)' },
   sage: { background: 'rgba(212, 228, 208, 0.95)', wash: 'rgba(228, 240, 226, 0.92)', line: 'rgba(144, 177, 145, 0.52)' },
@@ -36,19 +36,19 @@ export default function UtilityBookplate({
   const isBare = surface === 'bare'
   const isVeil = surface === 'veil'
   const outerFrame = palette.line
-  const midFrame = 'rgba(221, 210, 194, 0.62)'
-  const innerFrame = 'rgba(167, 151, 150, 0.18)'
-  const frameBorder = isBare ? 'none' : isVeil ? '1px solid rgba(184, 149, 106, 0.16)' : `1px solid ${outerFrame}`
-  const frameShadow = isBare || isVeil ? 'none' : '0 8px 20px rgba(90, 62, 75, 0.05)'
+  const midFrame = 'rgba(221, 210, 194, 0.46)'
+  const innerFrame = 'rgba(167, 151, 150, 0.14)'
+  const frameBorder = isBare ? 'none' : isVeil ? '1px solid rgba(184, 149, 106, 0.12)' : `1px solid ${outerFrame}`
+  const frameShadow = isBare || isVeil ? 'none' : '0 10px 18px rgba(90, 62, 75, 0.035)'
   const frameBackground = isBare
     ? 'transparent'
     : isVeil
-    ? `linear-gradient(180deg, ${palette.wash.replace('0.92', '0.28')}, rgba(255, 250, 246, 0.12) 62%, rgba(255, 248, 244, 0.08))`
+    ? `linear-gradient(180deg, ${palette.wash.replace('0.92', '0.2')}, rgba(255, 250, 246, 0.08) 62%, rgba(255, 248, 244, 0.04))`
     : palette.background
   const washBackground = isBare
     ? 'transparent'
     : isVeil
-    ? `linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04) 58%, transparent)`
+    ? `linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03) 58%, transparent)`
     : `linear-gradient(180deg, ${palette.wash}, transparent 58%)`
 
   return (
@@ -59,30 +59,30 @@ export default function UtilityBookplate({
         background: frameBackground,
         boxShadow: frameShadow,
         border: frameBorder,
-        padding: isBare ? '0' : '16px 16px 15px',
+        padding: isBare ? '0' : '12px 12px 11px',
         overflow: isBare ? 'visible' : 'hidden',
         backdropFilter: isVeil ? 'blur(1.5px)' : undefined,
         ...style,
       }}
     >
+      {/* Double-inset Victorian frame borders */}
       {!isBare && (
         <>
           <div
             aria-hidden="true"
             style={{
               position: 'absolute',
-              inset: 6,
+              inset: 4,
               border: isVeil ? '1px solid rgba(255, 255, 255, 0.18)' : `1px solid ${midFrame}`,
               background: washBackground,
               pointerEvents: 'none',
             }}
           />
-
           <div
             aria-hidden="true"
             style={{
               position: 'absolute',
-              inset: 11,
+              inset: 8,
               border: `1px solid ${isVeil ? 'rgba(184, 149, 106, 0.12)' : innerFrame}`,
               pointerEvents: 'none',
             }}
@@ -100,7 +100,7 @@ export default function UtilityBookplate({
                     fontFamily: "'Cormorant Garamond', Georgia, serif",
                     fontSize: 10,
                     fontWeight: 700,
-                    letterSpacing: '0.22em',
+                    letterSpacing: '0.12em',
                     textTransform: 'uppercase',
                     color: '#c97c8a',
                     marginBottom: 4,
@@ -113,9 +113,9 @@ export default function UtilityBookplate({
                 <h3
                   style={{
                     fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: 700,
-                    lineHeight: 1.1,
+                    lineHeight: 1.12,
                     color: '#5A3E4B',
                   }}
                 >

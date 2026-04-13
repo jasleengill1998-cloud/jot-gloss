@@ -31,7 +31,7 @@ export default function FilterBar({
         <input
           id="sb-search"
           type="search"
-          placeholder="Search files..."
+          placeholder="Look through the archive..."
           value={filters.search}
           onChange={e => set({ search: e.target.value })}
           className="w-full input-warm"

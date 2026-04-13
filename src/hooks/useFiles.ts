@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { StudyFile, FileType, DuplicateAction, StudySource } from '../types'
 import * as db from '../db/indexeddb'
-import { SAMPLE_FILES } from '../db/sample-data'
+import { SAMPLE_FILES, SAMPLE_VERSION } from '../db/sample-data'
+
+const SAMPLE_VERSION_KEY = 'jg-sample-version'
 import { getBaseName } from '../utils/studyFiles'
 import { useSync } from './useSync'
 
@@ -43,6 +45,9 @@ export function useFiles() {
   useEffect(() => {
     ;(async () => {
       const all = await db.getAllFiles()
+      const storedVersion = Number(localStorage.getItem(SAMPLE_VERSION_KEY) || '0')
+      const needsReseed = storedVersion < SAMPLE_VERSION
+
       if (all.length === 0) {
         for (const sample of SAMPLE_FILES) {
           await db.putFile({ ...sample, createdAt: Date.now(), updatedAt: Date.now() })
@@ -50,11 +55,13 @@ export function useFiles() {
       } else {
         const existingIds = new Set(all.map(f => f.id))
         for (const sample of SAMPLE_FILES) {
-          if (!existingIds.has(sample.id)) {
+          if (!existingIds.has(sample.id) || needsReseed) {
             await db.putFile({ ...sample, createdAt: Date.now(), updatedAt: Date.now() })
           }
         }
       }
+
+      localStorage.setItem(SAMPLE_VERSION_KEY, String(SAMPLE_VERSION))
       await refresh()
     })()
   }, [refresh])

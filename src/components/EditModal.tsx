@@ -47,7 +47,7 @@ export default function EditModal({ file, classes, onSave, onClose }: Props) {
 
         <label style={{
           display: 'block', fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.2em',
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
           textTransform: 'uppercase' as const, color: 'rgba(90,62,75,0.5)',
           marginBottom: 6,
         }}>Filename</label>
@@ -74,7 +74,7 @@ export default function EditModal({ file, classes, onSave, onClose }: Props) {
 
         <label style={{
           display: 'block', fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.2em',
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
           textTransform: 'uppercase' as const, color: 'rgba(90,62,75,0.5)',
           marginBottom: 6, marginTop: 12,
         }}>Class</label>
@@ -90,7 +90,7 @@ export default function EditModal({ file, classes, onSave, onClose }: Props) {
 
         <label style={{
           display: 'block', fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.2em',
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
           textTransform: 'uppercase' as const, color: 'rgba(90,62,75,0.5)',
           marginBottom: 6,
         }}>Resource Type</label>

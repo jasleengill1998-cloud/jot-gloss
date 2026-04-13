@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { ArchCard } from './ArchCard'
 
 export type Accent = 'oxblood' | 'powder' | 'butter' | 'lilac' | 'blush' | 'sage'
 
@@ -6,6 +7,7 @@ interface Props {
   title: string
   subtitle?: string
   stamp?: string
+  note?: string
   metaLeft?: string
   metaRight?: string
   accent?: Accent
@@ -17,57 +19,47 @@ export default function StudyFolio({
   title,
   subtitle,
   stamp = 'Continue Studying',
+  note,
   metaLeft,
   metaRight,
   accent = 'butter',
   onOpen,
   children,
 }: Props) {
-  const tint = accent === 'oxblood' || accent === 'blush' ? 'butter' : accent
-  const stampColor = accent === 'oxblood' ? '#6e3040' : '#c97c8a'
-  const surfaceByTint: Record<Exclude<Accent, 'oxblood' | 'blush'> | 'butter', string> = {
-    powder: 'rgba(212, 228, 208, 0.92)',
-    butter: 'rgba(245, 230, 184, 0.92)',
-    lilac: 'rgba(221, 212, 236, 0.92)',
-    sage: 'rgba(212, 228, 208, 0.92)',
-  }
+  const stampColor = accent === 'oxblood' ? 'var(--color-ink-light)' : 'var(--color-accent)'
 
   return (
     <article style={{ width: '100%' }}>
-      <button
-        type="button"
+      <ArchCard
+        uid="featured-folio"
+        variant="featured"
+        surface="var(--color-butter)"
+        className="study-folio-arch"
         onClick={onOpen}
-        style={{
-          width: '100%',
-          minHeight: 320,
-          background: surfaceByTint[tint],
-          border: '1px solid rgba(169, 151, 141, 0.28)',
-          boxShadow: '0 18px 34px rgba(86, 60, 68, 0.08)',
-          cursor: onOpen ? 'pointer' : 'default',
-          padding: 0,
-          textAlign: 'center',
-          position: 'relative',
-        }}
       >
         <div
-          aria-hidden="true"
           style={{
-            position: 'absolute',
-            inset: 'var(--space-sm)',
-            border: '1px solid rgba(199, 183, 157, 0.52)',
-            pointerEvents: 'none',
+            padding: '4px var(--space-xl) var(--space-lg)',
+            textAlign: 'center',
+            maxWidth: 560,
+            margin: '0 auto',
+            position: 'relative',
+            height: '100%',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
           }}
-        />
-        <div style={{ padding: 'var(--space-2xl) var(--space-xl) var(--space-lg)', textAlign: 'center', maxWidth: 620, margin: '0 auto', position: 'relative' }}>
+        >
           <div
             style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 10,
+              fontFamily: 'var(--font-display)',
+              fontSize: 9,
               fontWeight: 700,
-              letterSpacing: '0.24em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: stampColor,
-              marginBottom: 10,
+              marginBottom: 14,
             }}
           >
             {'\u2726'} {stamp} {'\u2726'}
@@ -75,11 +67,12 @@ export default function StudyFolio({
 
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 28,
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(22px, 5vw, 32px)',
               fontWeight: 700,
-              color: '#3A2830',
-              lineHeight: 1.08,
+              color: 'var(--color-ink)',
+              lineHeight: 1.02,
+              letterSpacing: '0.01em',
             }}
           >
             {title}
@@ -88,28 +81,44 @@ export default function StudyFolio({
           {subtitle && (
             <p
               style={{
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontFamily: 'var(--font-body)',
                 fontSize: 13,
                 fontStyle: 'italic',
-                color: '#5A3E4B',
-                marginTop: 8,
+                color: 'var(--color-ink-light)',
+                marginTop: 10,
               }}
             >
               {subtitle}
             </p>
           )}
 
-          <div style={{ width: 40, borderTop: '1.5px solid rgba(184, 160, 144, 0.34)', margin: '14px auto 12px' }} />
+          {note && (
+            <p
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 12,
+                fontStyle: 'italic',
+                color: 'color-mix(in srgb, var(--color-ink-light) 70%, transparent)',
+                marginTop: subtitle ? 10 : 0,
+                maxWidth: 360,
+                alignSelf: 'center',
+              }}
+            >
+              {note}
+            </p>
+          )}
+
+          <div style={{ width: 56, borderTop: '1.2px solid color-mix(in srgb, var(--color-rule) 62%, transparent)', margin: '20px auto 12px' }} />
 
           {(metaLeft || metaRight) && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
               {metaLeft && (
                 <span
                   style={{
-                    fontFamily: "'Cormorant Garamond', Georgia, serif",
+                    fontFamily: 'var(--font-body)',
                     fontSize: 11,
                     fontStyle: 'italic',
-                    color: '#5A3E4B',
+                    color: 'var(--color-ink-light)',
                   }}
                 >
                   {metaLeft}
@@ -118,10 +127,10 @@ export default function StudyFolio({
               {metaRight && (
                 <span
                   style={{
-                    fontFamily: "'Cormorant Garamond', Georgia, serif",
+                    fontFamily: 'var(--font-body)',
                     fontSize: 11,
                     fontStyle: 'italic',
-                    color: 'rgba(90, 62, 75, 0.72)',
+                    color: 'color-mix(in srgb, var(--color-ink-light) 72%, transparent)',
                   }}
                 >
                   {metaRight}
@@ -132,7 +141,7 @@ export default function StudyFolio({
 
           {children && <div style={{ marginTop: 18 }}>{children}</div>}
         </div>
-      </button>
+      </ArchCard>
     </article>
   )
 }

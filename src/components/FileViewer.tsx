@@ -58,16 +58,17 @@ function buildSandboxHtml(rawCode: string, componentName: string, fallbacks: str
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <style>
   :root {
-    --sb-bg: #FFF4F0;
-    --sb-card: #FFEAE6;
+    --sb-bg: #FFF8F2;
+    --sb-card: rgba(255,248,242,0.95);
     --sb-text: #5A3E4B;
     --sb-text-muted: rgba(90,62,75,0.5);
-    --sb-border: rgba(200,136,152,0.2);
-    --sb-accent: #F0849C;
+    --sb-border: rgba(184,149,106,0.24);
+    --sb-accent: #C97C8A;
     --sb-gold: #C8A878;
-    --sb-rose: #FFB8C8;
+    --sb-rose: rgba(201,124,138,0.35);
     --sb-heading-font: 'Cormorant Garamond', Georgia, serif;
-    --sb-body-font: 'Outfit', system-ui, sans-serif;
+    --sb-body-font: 'EB Garamond', 'Cormorant Garamond', Georgia, serif;
+    --sb-rule: rgba(184,149,106,0.18);
   }
 
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -78,6 +79,7 @@ function buildSandboxHtml(rawCode: string, componentName: string, fallbacks: str
     color: var(--sb-text);
     padding: 20px;
     line-height: 1.6;
+    font-size: 15px;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -86,24 +88,45 @@ function buildSandboxHtml(rawCode: string, componentName: string, fallbacks: str
     color: var(--sb-text);
     font-weight: 700;
   }
-  h1 { font-size: 28px; letter-spacing: 0.02em; }
-  h2 { font-size: 22px; }
-  h3 { font-size: 18px; }
+  h1 { font-size: 26px; letter-spacing: 0.04em; }
+  h2 { font-size: 21px; }
+  h3 { font-size: 17px; }
+
+  p { line-height: 1.55; }
 
   button {
-    font-family: var(--sb-body-font);
+    font-family: var(--sb-heading-font);
     cursor: pointer;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
   }
 
-  #loading{text-align:center;padding:40px;color:var(--sb-text-muted);font-size:14px;font-family:var(--sb-body-font)}
-  #error{color:#8a4040;background:#fdf0ee;border:1px solid rgba(180,100,100,0.3);border-radius:4px;padding:12px;font-size:13px;margin-bottom:12px;white-space:pre-wrap;display:none;font-family:var(--sb-body-font)}
+  hr { border: none; border-top: 1px solid var(--sb-rule); margin: 18px 0; }
+
+  a { color: var(--sb-accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th { font-family: var(--sb-heading-font); font-weight: 700; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sb-accent); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--sb-rule); }
+  td { padding: 7px 10px; border-bottom: 1px solid rgba(184,149,106,0.1); vertical-align: top; }
+
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 4px; }
+
+  code { font-size: 0.9em; background: rgba(184,149,106,0.08); padding: 1px 5px; border-radius: 2px; }
+  pre { background: rgba(184,149,106,0.06); padding: 14px; border-radius: 2px; border: 1px solid var(--sb-rule); overflow-x: auto; font-size: 13px; }
+
+  blockquote { border-left: 3px solid var(--sb-gold); padding-left: 14px; color: rgba(90,62,75,0.7); font-style: italic; margin: 14px 0; }
+
+  #loading{text-align:center;padding:40px;color:var(--sb-text-muted);font-size:14px;font-style:italic;font-family:var(--sb-body-font)}
+  #error{color:#8a4040;background:rgba(253,240,238,0.9);border:1px solid rgba(180,100,100,0.2);border-radius:2px;padding:12px;font-size:13px;margin-bottom:12px;white-space:pre-wrap;display:none;font-family:var(--sb-body-font)}
 
   @media print {
     body { background: white; padding: 0; }
     @page { margin: 1cm; }
   }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="loading">Loading component...</div>
@@ -361,7 +384,7 @@ function JsxViewer({
         sandbox="allow-scripts allow-same-origin"
         title="JSX Preview"
         className="flex-1 w-full min-h-[400px]"
-        style={{ border: '1px solid rgba(200,136,152,0.2)', background: '#FFF4F0', borderRadius: 4 }}
+        style={{ border: '1px solid rgba(184,149,106,0.18)', background: '#FFF8F2', borderRadius: 2 }}
       />
       <div>
         <button
@@ -373,7 +396,7 @@ function JsxViewer({
         </button>
         {showSource && (
           <pre className="mt-2 p-4 overflow-x-auto text-[11px] leading-relaxed"
-               style={{ background: '#5A3E4B', color: '#FFEAE6', borderRadius: 4 }}>
+               style={{ background: '#5A3E4B', color: '#FFF8F2', borderRadius: 2 }}>
             <code>{code}</code>
           </pre>
         )}
@@ -382,14 +405,32 @@ function JsxViewer({
   )
 }
 
+const HTML_BASE_STYLE = `<style data-jotgloss-base>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+body { font-family: 'EB Garamond', 'Cormorant Garamond', Georgia, serif; color: #5A3E4B; background: #FFF8F2; line-height: 1.55; font-size: 15px; -webkit-font-smoothing: antialiased; }
+h1,h2,h3,h4,h5,h6 { font-family: 'Cormorant Garamond', Georgia, serif; color: #5A3E4B; font-weight: 700; }
+button { font-family: 'Cormorant Garamond', Georgia, serif; border-radius: 2px; cursor: pointer; letter-spacing: 0.04em; }
+a { color: #C97C8A; }
+table { border-collapse: collapse; } th { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C97C8A; border-bottom: 1px solid rgba(184,149,106,0.18); padding: 8px 10px; text-align: left; } td { padding: 7px 10px; border-bottom: 1px solid rgba(184,149,106,0.1); }
+hr { border: none; border-top: 1px solid rgba(184,149,106,0.18); }
+code { background: rgba(184,149,106,0.08); padding: 1px 5px; border-radius: 2px; font-size: 0.9em; }
+blockquote { border-left: 3px solid #C8A878; padding-left: 14px; color: rgba(90,62,75,0.7); font-style: italic; }
+</style>`
+
+function injectBaseStyle(html: string): string {
+  if (html.includes('<head>')) return html.replace('<head>', '<head>' + HTML_BASE_STYLE)
+  if (html.includes('<html>')) return html.replace('<html>', '<html><head>' + HTML_BASE_STYLE + '</head>')
+  return HTML_BASE_STYLE + html
+}
+
 function HtmlViewer({ html }: { html: string }) {
   return (
     <iframe
-      srcDoc={html}
+      srcDoc={injectBaseStyle(html)}
       sandbox="allow-scripts"
       title="HTML Preview"
       className="w-full h-[70dvh]"
-      style={{ border: '1px solid rgba(200,136,152,0.2)', background: '#FFF4F0', borderRadius: 4 }}
+      style={{ border: '1px solid rgba(184,149,106,0.18)', background: '#FFF8F2', borderRadius: 2 }}
     />
   )
 }
@@ -400,7 +441,7 @@ function PdfViewer({ dataUrl }: { dataUrl: string }) {
       src={dataUrl}
       title="PDF Preview"
       className="w-full h-[70dvh]"
-      style={{ border: '1px solid rgba(200,136,152,0.15)', borderRadius: 4 }}
+      style={{ border: '1px solid rgba(184,149,106,0.14)', borderRadius: 2 }}
     />
   )
 }
@@ -423,7 +464,7 @@ function MarkdownViewer({ content }: { content: string }) {
 
   if (!MD) {
     return (
-      <div className="p-6" style={{ background: '#FFF4F0', border: '1px solid rgba(200,136,152,0.12)', borderRadius: 4 }}>
+      <div className="p-6" style={{ background: '#FFF8F2', border: '1px solid rgba(184,149,106,0.14)', borderRadius: 2 }}>
         <p className="font-heading text-[13px] italic" style={{ color: 'rgba(200,136,152,0.5)' }}>Loading markdown viewer...</p>
       </div>
     )
@@ -431,7 +472,7 @@ function MarkdownViewer({ content }: { content: string }) {
 
   return (
     <div className="prose prose-sm max-w-none p-6 overflow-auto max-h-[70dvh]"
-         style={{ fontSize: 14, color: '#5A3E4B', fontFamily: "'Outfit', system-ui, sans-serif", background: '#FFF4F0', border: '1px solid rgba(200,136,152,0.08)', borderRadius: 4 }}>
+         style={{ fontSize: 15, color: '#5A3E4B', fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif", lineHeight: 1.55, background: '#FFF8F2', border: '1px solid rgba(184,149,106,0.14)', borderRadius: 2 }}>
       <MD>{content}</MD>
     </div>
   )
@@ -503,45 +544,23 @@ export default function FileViewer({
       aria-label={`Viewing ${file.name}`}
     >
       <div
-        className="flex flex-col overflow-hidden animate-scaleIn"
+        className="flex flex-col overflow-hidden"
         style={{
           width: '100%',
           height: '100%',
-          background: 'rgba(255, 246, 240, 0.98)',
-          border: '1px solid rgba(169, 151, 141, 0.28)',
-          boxShadow: '0 8px 32px rgba(90, 62, 75, 0.08)',
+          background: 'var(--color-parchment, #faf6f0)',
+          borderBottom: '1px solid rgba(169, 151, 141, 0.18)',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
         }}
       >
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 8,
-            border: '1px solid rgba(221, 210, 194, 0.9)',
-            pointerEvents: 'none',
-          }}
-        />
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 14,
-            border: '1px solid rgba(167, 151, 150, 0.16)',
-            pointerEvents: 'none',
-          }}
-        />
 
         <div
           className="flex flex-col sm:flex-row sm:items-start sm:justify-between px-5 sm:px-8 py-4 sm:py-5 gap-3"
           style={{ borderBottom: '1px solid rgba(169, 151, 141, 0.16)', background: 'rgba(255, 246, 240, 0.94)', position: 'relative', zIndex: 1 }}
         >
           <div className="min-w-0 flex-1">
-            <div className="font-heading text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: '#c97c8a', marginBottom: 6 }}>
-              Open folio
-            </div>
             <h2 className="font-heading text-[19px] sm:text-[22px] font-bold text-[#5A3E4B] truncate">{title}</h2>
             <p className="font-heading text-[11px] sm:text-[12px] italic mt-1" style={{ color: 'rgba(90,62,75,0.62)' }}>
               {file.className} · {file.resourceType}

@@ -333,7 +333,7 @@ function MetricCard({ label, value, sub }: { label: string; value: string | numb
       </div>
       <div style={{
         fontFamily: "'Cormorant Garamond', Georgia, serif",
-        fontSize: 10, fontWeight: 700, letterSpacing: '0.2em',
+        fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
         textTransform: 'uppercase' as const,
         color: '#C88898', marginTop: 4,
       }}>
@@ -429,7 +429,7 @@ export default function StudyStats({ classes, files = [], onClose }: Props) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <span style={{
           fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: 13, fontWeight: 700, letterSpacing: '0.25em',
+          fontSize: 13, fontWeight: 700, letterSpacing: '0.12em',
           textTransform: 'uppercase' as const, color: '#5A3E4B',
         }}>Study Ledger</span>
         <button onClick={onClose} style={{
@@ -460,7 +460,7 @@ export default function StudyStats({ classes, files = [], onClose }: Props) {
       <div style={{ marginBottom: 18 }}>
         <div style={{
           fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.2em',
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
           textTransform: 'uppercase' as const, color: '#5A3E4B', marginBottom: 8,
         }}>Activity</div>
         <CalendarHeatmap activityMap={activityMap} colorKey={colorKey} />
@@ -493,7 +493,7 @@ export default function StudyStats({ classes, files = [], onClose }: Props) {
         <div style={{ marginBottom: 14 }}>
           <div style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: 10, fontWeight: 700, letterSpacing: '0.2em',
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
             textTransform: 'uppercase' as const, color: '#5A3E4B', marginBottom: 8,
           }}>By Course</div>
           {courseBreakdown.map(([courseName, secs]) => {
@@ -543,7 +543,7 @@ export default function StudyStats({ classes, files = [], onClose }: Props) {
         <div>
           <div style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: 10, fontWeight: 700, letterSpacing: '0.2em',
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
             textTransform: 'uppercase' as const, color: '#5A3E4B', marginBottom: 6,
           }}>Daily Log</div>
           {dayBreakdown.slice(0, 14).map(([date, secs]) => (

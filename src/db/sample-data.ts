@@ -1,5 +1,8 @@
 import type { StudyFile } from '../types'
 
+/** Bump this when sample content changes to force re-seed on existing installs. */
+export const SAMPLE_VERSION = 3
+
 function makeSample(id: string, name: string, content: string): StudyFile {
   return {
     id,
@@ -74,14 +77,14 @@ const TOPIC1 = `function Topic1CueCards() {
   const prev = () => { setFlipped(false); setIdx(i => (i - 1 + total) % total); };
   const mark = (v) => { setKnown(k => ({ ...k, [idx]: v })); next(); };
 
-  const COLOR = "#065A82";
+  const COLOR = "#C4DAE8";
 
   return React.createElement("div", {
-    style: { fontFamily: "'Outfit', system-ui, sans-serif", maxWidth: 540, margin: "0 auto", padding: 20 }
+    style: { fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif", maxWidth: 540, margin: "0 auto", padding: 20 }
   },
     React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
       React.createElement("h2", {
-        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#2a2220", margin: 0 }
+        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#5A3E4B", margin: 0 }
       }, "Topic 1: Demand, Supply & Markets"),
       React.createElement("p", {
         style: { fontSize: 12, color: "#a89a88", marginTop: 4 }
@@ -98,22 +101,22 @@ const TOPIC1 = `function Topic1CueCards() {
     React.createElement("div", {
       onClick: function() { setFlipped(!flipped); },
       style: {
-        background: flipped ? "#f4f6f2" : COLOR,
+        background: flipped ? "#FFF8F2" : COLOR,
         border: flipped ? "2px solid " + COLOR : "2px solid transparent",
-        borderRadius: 14, padding: "32px 24px", minHeight: 220,
+        borderRadius: 4, padding: "32px 24px", minHeight: 220,
         display: "flex", flexDirection: "column", justifyContent: "center",
         cursor: "pointer", transition: "all 0.25s",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 14px rgba(90,62,75,0.06)",
       }
     },
       React.createElement("div", {
-        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(255,255,255,0.5)", marginBottom: 12 }
+        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(58,40,48,0.45)", marginBottom: 12 }
       }, flipped ? "Answer" : "Question"),
       React.createElement("div", {
-        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#fff", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
+        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#3A2830", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
       }, flipped ? card.a : card.q),
       !flipped && React.createElement("div", {
-        style: { fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 14, textAlign: "center" }
+        style: { fontSize: 11, color: "rgba(58,40,48,0.35)", marginTop: 14, textAlign: "center", fontStyle: "italic" }
       }, "Tap to reveal answer")
     ),
 
@@ -122,12 +125,12 @@ const TOPIC1 = `function Topic1CueCards() {
     },
       React.createElement("button", {
         onClick: function() { mark(false); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "2px solid #c4929f", background: "transparent", color: "#c4929f", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "10px 24px", borderRadius: 2, border: "1px solid rgba(201,124,138,0.4)", background: "transparent", color: "#C97C8A", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Review Again"),
       React.createElement("button", {
         onClick: function() { mark(true); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
-      }, "Got It ✓")
+        style: { padding: "10px 24px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
+      }, "Got It")
     ),
 
     !flipped && React.createElement("div", {
@@ -135,11 +138,11 @@ const TOPIC1 = `function Topic1CueCards() {
     },
       React.createElement("button", {
         onClick: prev,
-        style: { padding: "8px 20px", borderRadius: 10, border: "1px solid rgba(200,136,152,0.25)", background: "#FFF4F0", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "1px solid rgba(184,149,106,0.24)", background: "rgba(255,248,242,0.8)", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "← Prev"),
       React.createElement("button", {
         onClick: next,
-        style: { padding: "8px 20px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Next →")
     )
   );
@@ -191,14 +194,14 @@ const TOPIC2 = `function Topic2CueCards() {
   const prev = () => { setFlipped(false); setIdx(i => (i - 1 + total) % total); };
   const mark = (v) => { setKnown(k => ({ ...k, [idx]: v })); next(); };
 
-  const COLOR = "#1C7293";
+  const COLOR = "#D0E2EE";
 
   return React.createElement("div", {
-    style: { fontFamily: "'Outfit', system-ui, sans-serif", maxWidth: 540, margin: "0 auto", padding: 20 }
+    style: { fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif", maxWidth: 540, margin: "0 auto", padding: 20 }
   },
     React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
       React.createElement("h2", {
-        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#2a2220", margin: 0 }
+        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#5A3E4B", margin: 0 }
       }, "Topic 2: Markets & Government"),
       React.createElement("p", {
         style: { fontSize: 12, color: "#a89a88", marginTop: 4 }
@@ -215,22 +218,22 @@ const TOPIC2 = `function Topic2CueCards() {
     React.createElement("div", {
       onClick: function() { setFlipped(!flipped); },
       style: {
-        background: flipped ? "#f4f6f2" : COLOR,
+        background: flipped ? "#FFF8F2" : COLOR,
         border: flipped ? "2px solid " + COLOR : "2px solid transparent",
-        borderRadius: 14, padding: "32px 24px", minHeight: 220,
+        borderRadius: 4, padding: "32px 24px", minHeight: 220,
         display: "flex", flexDirection: "column", justifyContent: "center",
         cursor: "pointer", transition: "all 0.25s",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 14px rgba(90,62,75,0.06)",
       }
     },
       React.createElement("div", {
-        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(255,255,255,0.5)", marginBottom: 12 }
+        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(58,40,48,0.45)", marginBottom: 12 }
       }, flipped ? "Answer" : "Question"),
       React.createElement("div", {
-        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#fff", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
+        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#3A2830", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
       }, flipped ? card.a : card.q),
       !flipped && React.createElement("div", {
-        style: { fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 14, textAlign: "center" }
+        style: { fontSize: 11, color: "rgba(58,40,48,0.35)", marginTop: 14, textAlign: "center", fontStyle: "italic" }
       }, "Tap to reveal answer")
     ),
 
@@ -239,12 +242,12 @@ const TOPIC2 = `function Topic2CueCards() {
     },
       React.createElement("button", {
         onClick: function() { mark(false); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "2px solid #c4929f", background: "transparent", color: "#c4929f", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "10px 24px", borderRadius: 2, border: "1px solid rgba(201,124,138,0.4)", background: "transparent", color: "#C97C8A", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Review Again"),
       React.createElement("button", {
         onClick: function() { mark(true); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
-      }, "Got It ✓")
+        style: { padding: "10px 24px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
+      }, "Got It")
     ),
 
     !flipped && React.createElement("div", {
@@ -252,11 +255,11 @@ const TOPIC2 = `function Topic2CueCards() {
     },
       React.createElement("button", {
         onClick: prev,
-        style: { padding: "8px 20px", borderRadius: 10, border: "1px solid rgba(200,136,152,0.25)", background: "#FFF4F0", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "1px solid rgba(184,149,106,0.24)", background: "rgba(255,248,242,0.8)", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "← Prev"),
       React.createElement("button", {
         onClick: next,
-        style: { padding: "8px 20px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Next →")
     )
   );
@@ -316,14 +319,14 @@ const TOPIC3 = `function Topic3CueCards() {
   const prev = () => { setFlipped(false); setIdx(i => (i - 1 + total) % total); };
   const mark = (v) => { setKnown(k => ({ ...k, [idx]: v })); next(); };
 
-  const COLOR = "#2C5F2D";
+  const COLOR = "#C8E0CA";
 
   return React.createElement("div", {
-    style: { fontFamily: "'Outfit', system-ui, sans-serif", maxWidth: 540, margin: "0 auto", padding: 20 }
+    style: { fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif", maxWidth: 540, margin: "0 auto", padding: 20 }
   },
     React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
       React.createElement("h2", {
-        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#2a2220", margin: 0 }
+        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#5A3E4B", margin: 0 }
       }, "Topic 3: The AD/AS Model"),
       React.createElement("p", {
         style: { fontSize: 12, color: "#a89a88", marginTop: 4 }
@@ -340,22 +343,22 @@ const TOPIC3 = `function Topic3CueCards() {
     React.createElement("div", {
       onClick: function() { setFlipped(!flipped); },
       style: {
-        background: flipped ? "#f4f6f2" : COLOR,
+        background: flipped ? "#FFF8F2" : COLOR,
         border: flipped ? "2px solid " + COLOR : "2px solid transparent",
-        borderRadius: 14, padding: "32px 24px", minHeight: 220,
+        borderRadius: 4, padding: "32px 24px", minHeight: 220,
         display: "flex", flexDirection: "column", justifyContent: "center",
         cursor: "pointer", transition: "all 0.25s",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 14px rgba(90,62,75,0.06)",
       }
     },
       React.createElement("div", {
-        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(255,255,255,0.5)", marginBottom: 12 }
+        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(58,40,48,0.45)", marginBottom: 12 }
       }, flipped ? "Answer" : "Question"),
       React.createElement("div", {
-        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#fff", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
+        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#3A2830", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
       }, flipped ? card.a : card.q),
       !flipped && React.createElement("div", {
-        style: { fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 14, textAlign: "center" }
+        style: { fontSize: 11, color: "rgba(58,40,48,0.35)", marginTop: 14, textAlign: "center", fontStyle: "italic" }
       }, "Tap to reveal answer")
     ),
 
@@ -364,12 +367,12 @@ const TOPIC3 = `function Topic3CueCards() {
     },
       React.createElement("button", {
         onClick: function() { mark(false); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "2px solid #c4929f", background: "transparent", color: "#c4929f", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "10px 24px", borderRadius: 2, border: "1px solid rgba(201,124,138,0.4)", background: "transparent", color: "#C97C8A", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Review Again"),
       React.createElement("button", {
         onClick: function() { mark(true); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
-      }, "Got It ✓")
+        style: { padding: "10px 24px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
+      }, "Got It")
     ),
 
     !flipped && React.createElement("div", {
@@ -377,11 +380,11 @@ const TOPIC3 = `function Topic3CueCards() {
     },
       React.createElement("button", {
         onClick: prev,
-        style: { padding: "8px 20px", borderRadius: 10, border: "1px solid rgba(200,136,152,0.25)", background: "#FFF4F0", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "1px solid rgba(184,149,106,0.24)", background: "rgba(255,248,242,0.8)", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "← Prev"),
       React.createElement("button", {
         onClick: next,
-        style: { padding: "8px 20px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Next →")
     )
   );
@@ -425,14 +428,14 @@ const TOPIC4 = `function Topic4CueCards() {
   const prev = () => { setFlipped(false); setIdx(i => (i - 1 + total) % total); };
   const mark = (v) => { setKnown(k => ({ ...k, [idx]: v })); next(); };
 
-  const COLOR = "#4a6a3a";
+  const COLOR = "#D4E8D2";
 
   return React.createElement("div", {
-    style: { fontFamily: "'Outfit', system-ui, sans-serif", maxWidth: 540, margin: "0 auto", padding: 20 }
+    style: { fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif", maxWidth: 540, margin: "0 auto", padding: 20 }
   },
     React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
       React.createElement("h2", {
-        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#2a2220", margin: 0 }
+        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#5A3E4B", margin: 0 }
       }, "Topic 4: Macro Shocks & Gov Policy"),
       React.createElement("p", {
         style: { fontSize: 12, color: "#a89a88", marginTop: 4 }
@@ -449,22 +452,22 @@ const TOPIC4 = `function Topic4CueCards() {
     React.createElement("div", {
       onClick: function() { setFlipped(!flipped); },
       style: {
-        background: flipped ? "#f4f6f2" : COLOR,
+        background: flipped ? "#FFF8F2" : COLOR,
         border: flipped ? "2px solid " + COLOR : "2px solid transparent",
-        borderRadius: 14, padding: "32px 24px", minHeight: 220,
+        borderRadius: 4, padding: "32px 24px", minHeight: 220,
         display: "flex", flexDirection: "column", justifyContent: "center",
         cursor: "pointer", transition: "all 0.25s",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 14px rgba(90,62,75,0.06)",
       }
     },
       React.createElement("div", {
-        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(255,255,255,0.5)", marginBottom: 12 }
+        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(58,40,48,0.45)", marginBottom: 12 }
       }, flipped ? "Answer" : "Question"),
       React.createElement("div", {
-        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#fff", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
+        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#3A2830", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
       }, flipped ? card.a : card.q),
       !flipped && React.createElement("div", {
-        style: { fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 14, textAlign: "center" }
+        style: { fontSize: 11, color: "rgba(58,40,48,0.35)", marginTop: 14, textAlign: "center", fontStyle: "italic" }
       }, "Tap to reveal answer")
     ),
 
@@ -473,12 +476,12 @@ const TOPIC4 = `function Topic4CueCards() {
     },
       React.createElement("button", {
         onClick: function() { mark(false); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "2px solid #c4929f", background: "transparent", color: "#c4929f", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "10px 24px", borderRadius: 2, border: "1px solid rgba(201,124,138,0.4)", background: "transparent", color: "#C97C8A", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Review Again"),
       React.createElement("button", {
         onClick: function() { mark(true); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
-      }, "Got It ✓")
+        style: { padding: "10px 24px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
+      }, "Got It")
     ),
 
     !flipped && React.createElement("div", {
@@ -486,11 +489,11 @@ const TOPIC4 = `function Topic4CueCards() {
     },
       React.createElement("button", {
         onClick: prev,
-        style: { padding: "8px 20px", borderRadius: 10, border: "1px solid rgba(200,136,152,0.25)", background: "#FFF4F0", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "1px solid rgba(184,149,106,0.24)", background: "rgba(255,248,242,0.8)", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "← Prev"),
       React.createElement("button", {
         onClick: next,
-        style: { padding: "8px 20px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Next →")
     )
   );
@@ -538,14 +541,14 @@ const TOPIC5 = `function Topic5CueCards() {
   const prev = () => { setFlipped(false); setIdx(i => (i - 1 + total) % total); };
   const mark = (v) => { setKnown(k => ({ ...k, [idx]: v })); next(); };
 
-  const COLOR = "#B85042";
+  const COLOR = "#ECDADD";
 
   return React.createElement("div", {
-    style: { fontFamily: "'Outfit', system-ui, sans-serif", maxWidth: 540, margin: "0 auto", padding: 20 }
+    style: { fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif", maxWidth: 540, margin: "0 auto", padding: 20 }
   },
     React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
       React.createElement("h2", {
-        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#2a2220", margin: 0 }
+        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#5A3E4B", margin: 0 }
       }, "Topic 5: 'Should I?' & 'How Many?'"),
       React.createElement("p", {
         style: { fontSize: 12, color: "#a89a88", marginTop: 4 }
@@ -562,22 +565,22 @@ const TOPIC5 = `function Topic5CueCards() {
     React.createElement("div", {
       onClick: function() { setFlipped(!flipped); },
       style: {
-        background: flipped ? "#f4f6f2" : COLOR,
+        background: flipped ? "#FFF8F2" : COLOR,
         border: flipped ? "2px solid " + COLOR : "2px solid transparent",
-        borderRadius: 14, padding: "32px 24px", minHeight: 220,
+        borderRadius: 4, padding: "32px 24px", minHeight: 220,
         display: "flex", flexDirection: "column", justifyContent: "center",
         cursor: "pointer", transition: "all 0.25s",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 14px rgba(90,62,75,0.06)",
       }
     },
       React.createElement("div", {
-        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(255,255,255,0.5)", marginBottom: 12 }
+        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(58,40,48,0.45)", marginBottom: 12 }
       }, flipped ? "Answer" : "Question"),
       React.createElement("div", {
-        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#fff", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
+        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#3A2830", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
       }, flipped ? card.a : card.q),
       !flipped && React.createElement("div", {
-        style: { fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 14, textAlign: "center" }
+        style: { fontSize: 11, color: "rgba(58,40,48,0.35)", marginTop: 14, textAlign: "center", fontStyle: "italic" }
       }, "Tap to reveal answer")
     ),
 
@@ -586,12 +589,12 @@ const TOPIC5 = `function Topic5CueCards() {
     },
       React.createElement("button", {
         onClick: function() { mark(false); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "2px solid #c4929f", background: "transparent", color: "#c4929f", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "10px 24px", borderRadius: 2, border: "1px solid rgba(201,124,138,0.4)", background: "transparent", color: "#C97C8A", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Review Again"),
       React.createElement("button", {
         onClick: function() { mark(true); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
-      }, "Got It ✓")
+        style: { padding: "10px 24px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
+      }, "Got It")
     ),
 
     !flipped && React.createElement("div", {
@@ -599,11 +602,11 @@ const TOPIC5 = `function Topic5CueCards() {
     },
       React.createElement("button", {
         onClick: prev,
-        style: { padding: "8px 20px", borderRadius: 10, border: "1px solid rgba(200,136,152,0.25)", background: "#FFF4F0", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "1px solid rgba(184,149,106,0.24)", background: "rgba(255,248,242,0.8)", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "← Prev"),
       React.createElement("button", {
         onClick: next,
-        style: { padding: "8px 20px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Next →")
     )
   );
@@ -655,14 +658,14 @@ const TOPIC6 = `function Topic6CueCards() {
   const prev = () => { setFlipped(false); setIdx(i => (i - 1 + total) % total); };
   const mark = (v) => { setKnown(k => ({ ...k, [idx]: v })); next(); };
 
-  const COLOR = "#6D2E46";
+  const COLOR = "#E2CCD8";
 
   return React.createElement("div", {
-    style: { fontFamily: "'Outfit', system-ui, sans-serif", maxWidth: 540, margin: "0 auto", padding: 20 }
+    style: { fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif", maxWidth: 540, margin: "0 auto", padding: 20 }
   },
     React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
       React.createElement("h2", {
-        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#2a2220", margin: 0 }
+        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#5A3E4B", margin: 0 }
       }, "Topic 6: Fundamental Managerial Decisions"),
       React.createElement("p", {
         style: { fontSize: 12, color: "#a89a88", marginTop: 4 }
@@ -679,22 +682,22 @@ const TOPIC6 = `function Topic6CueCards() {
     React.createElement("div", {
       onClick: function() { setFlipped(!flipped); },
       style: {
-        background: flipped ? "#f4f6f2" : COLOR,
+        background: flipped ? "#FFF8F2" : COLOR,
         border: flipped ? "2px solid " + COLOR : "2px solid transparent",
-        borderRadius: 14, padding: "32px 24px", minHeight: 220,
+        borderRadius: 4, padding: "32px 24px", minHeight: 220,
         display: "flex", flexDirection: "column", justifyContent: "center",
         cursor: "pointer", transition: "all 0.25s",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 14px rgba(90,62,75,0.06)",
       }
     },
       React.createElement("div", {
-        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(255,255,255,0.5)", marginBottom: 12 }
+        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(58,40,48,0.45)", marginBottom: 12 }
       }, flipped ? "Answer" : "Question"),
       React.createElement("div", {
-        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#fff", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
+        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#3A2830", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
       }, flipped ? card.a : card.q),
       !flipped && React.createElement("div", {
-        style: { fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 14, textAlign: "center" }
+        style: { fontSize: 11, color: "rgba(58,40,48,0.35)", marginTop: 14, textAlign: "center", fontStyle: "italic" }
       }, "Tap to reveal answer")
     ),
 
@@ -703,12 +706,12 @@ const TOPIC6 = `function Topic6CueCards() {
     },
       React.createElement("button", {
         onClick: function() { mark(false); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "2px solid #c4929f", background: "transparent", color: "#c4929f", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "10px 24px", borderRadius: 2, border: "1px solid rgba(201,124,138,0.4)", background: "transparent", color: "#C97C8A", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Review Again"),
       React.createElement("button", {
         onClick: function() { mark(true); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
-      }, "Got It ✓")
+        style: { padding: "10px 24px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
+      }, "Got It")
     ),
 
     !flipped && React.createElement("div", {
@@ -716,11 +719,11 @@ const TOPIC6 = `function Topic6CueCards() {
     },
       React.createElement("button", {
         onClick: prev,
-        style: { padding: "8px 20px", borderRadius: 10, border: "1px solid rgba(200,136,152,0.25)", background: "#FFF4F0", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "1px solid rgba(184,149,106,0.24)", background: "rgba(255,248,242,0.8)", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "← Prev"),
       React.createElement("button", {
         onClick: next,
-        style: { padding: "8px 20px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Next →")
     )
   );
@@ -764,14 +767,14 @@ const TOPIC7 = `function Topic7CueCards() {
   const prev = () => { setFlipped(false); setIdx(i => (i - 1 + total) % total); };
   const mark = (v) => { setKnown(k => ({ ...k, [idx]: v })); next(); };
 
-  const COLOR = "#028090";
+  const COLOR = "#C2E0E4";
 
   return React.createElement("div", {
-    style: { fontFamily: "'Outfit', system-ui, sans-serif", maxWidth: 540, margin: "0 auto", padding: 20 }
+    style: { fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif", maxWidth: 540, margin: "0 auto", padding: 20 }
   },
     React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
       React.createElement("h2", {
-        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#2a2220", margin: 0 }
+        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#5A3E4B", margin: 0 }
       }, "Topic 7: Pricing with Market Power"),
       React.createElement("p", {
         style: { fontSize: 12, color: "#a89a88", marginTop: 4 }
@@ -788,22 +791,22 @@ const TOPIC7 = `function Topic7CueCards() {
     React.createElement("div", {
       onClick: function() { setFlipped(!flipped); },
       style: {
-        background: flipped ? "#f4f6f2" : COLOR,
+        background: flipped ? "#FFF8F2" : COLOR,
         border: flipped ? "2px solid " + COLOR : "2px solid transparent",
-        borderRadius: 14, padding: "32px 24px", minHeight: 220,
+        borderRadius: 4, padding: "32px 24px", minHeight: 220,
         display: "flex", flexDirection: "column", justifyContent: "center",
         cursor: "pointer", transition: "all 0.25s",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 14px rgba(90,62,75,0.06)",
       }
     },
       React.createElement("div", {
-        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(255,255,255,0.5)", marginBottom: 12 }
+        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(58,40,48,0.45)", marginBottom: 12 }
       }, flipped ? "Answer" : "Question"),
       React.createElement("div", {
-        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#fff", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
+        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#3A2830", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
       }, flipped ? card.a : card.q),
       !flipped && React.createElement("div", {
-        style: { fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 14, textAlign: "center" }
+        style: { fontSize: 11, color: "rgba(58,40,48,0.35)", marginTop: 14, textAlign: "center", fontStyle: "italic" }
       }, "Tap to reveal answer")
     ),
 
@@ -812,12 +815,12 @@ const TOPIC7 = `function Topic7CueCards() {
     },
       React.createElement("button", {
         onClick: function() { mark(false); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "2px solid #c4929f", background: "transparent", color: "#c4929f", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "10px 24px", borderRadius: 2, border: "1px solid rgba(201,124,138,0.4)", background: "transparent", color: "#C97C8A", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Review Again"),
       React.createElement("button", {
         onClick: function() { mark(true); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
-      }, "Got It ✓")
+        style: { padding: "10px 24px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
+      }, "Got It")
     ),
 
     !flipped && React.createElement("div", {
@@ -825,11 +828,11 @@ const TOPIC7 = `function Topic7CueCards() {
     },
       React.createElement("button", {
         onClick: prev,
-        style: { padding: "8px 20px", borderRadius: 10, border: "1px solid rgba(200,136,152,0.25)", background: "#FFF4F0", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "1px solid rgba(184,149,106,0.24)", background: "rgba(255,248,242,0.8)", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "← Prev"),
       React.createElement("button", {
         onClick: next,
-        style: { padding: "8px 20px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Next →")
     )
   );
@@ -877,14 +880,14 @@ const TOPIC8 = `function Topic8CueCards() {
   const prev = () => { setFlipped(false); setIdx(i => (i - 1 + total) % total); };
   const mark = (v) => { setKnown(k => ({ ...k, [idx]: v })); next(); };
 
-  const COLOR = "#990011";
+  const COLOR = "#EACDD2";
 
   return React.createElement("div", {
-    style: { fontFamily: "'Outfit', system-ui, sans-serif", maxWidth: 540, margin: "0 auto", padding: 20 }
+    style: { fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif", maxWidth: 540, margin: "0 auto", padding: 20 }
   },
     React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
       React.createElement("h2", {
-        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#2a2220", margin: 0 }
+        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#5A3E4B", margin: 0 }
       }, "Topic 8: Game Theory I"),
       React.createElement("p", {
         style: { fontSize: 12, color: "#a89a88", marginTop: 4 }
@@ -901,22 +904,22 @@ const TOPIC8 = `function Topic8CueCards() {
     React.createElement("div", {
       onClick: function() { setFlipped(!flipped); },
       style: {
-        background: flipped ? "#f4f6f2" : COLOR,
+        background: flipped ? "#FFF8F2" : COLOR,
         border: flipped ? "2px solid " + COLOR : "2px solid transparent",
-        borderRadius: 14, padding: "32px 24px", minHeight: 220,
+        borderRadius: 4, padding: "32px 24px", minHeight: 220,
         display: "flex", flexDirection: "column", justifyContent: "center",
         cursor: "pointer", transition: "all 0.25s",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 14px rgba(90,62,75,0.06)",
       }
     },
       React.createElement("div", {
-        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(255,255,255,0.5)", marginBottom: 12 }
+        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(58,40,48,0.45)", marginBottom: 12 }
       }, flipped ? "Answer" : "Question"),
       React.createElement("div", {
-        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#fff", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
+        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#3A2830", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
       }, flipped ? card.a : card.q),
       !flipped && React.createElement("div", {
-        style: { fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 14, textAlign: "center" }
+        style: { fontSize: 11, color: "rgba(58,40,48,0.35)", marginTop: 14, textAlign: "center", fontStyle: "italic" }
       }, "Tap to reveal answer")
     ),
 
@@ -925,12 +928,12 @@ const TOPIC8 = `function Topic8CueCards() {
     },
       React.createElement("button", {
         onClick: function() { mark(false); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "2px solid #c4929f", background: "transparent", color: "#c4929f", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "10px 24px", borderRadius: 2, border: "1px solid rgba(201,124,138,0.4)", background: "transparent", color: "#C97C8A", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Review Again"),
       React.createElement("button", {
         onClick: function() { mark(true); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
-      }, "Got It ✓")
+        style: { padding: "10px 24px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
+      }, "Got It")
     ),
 
     !flipped && React.createElement("div", {
@@ -938,11 +941,11 @@ const TOPIC8 = `function Topic8CueCards() {
     },
       React.createElement("button", {
         onClick: prev,
-        style: { padding: "8px 20px", borderRadius: 10, border: "1px solid rgba(200,136,152,0.25)", background: "#FFF4F0", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "1px solid rgba(184,149,106,0.24)", background: "rgba(255,248,242,0.8)", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "← Prev"),
       React.createElement("button", {
         onClick: next,
-        style: { padding: "8px 20px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Next →")
     )
   );
@@ -990,14 +993,14 @@ const TOPIC9 = `function Topic9CueCards() {
   const prev = () => { setFlipped(false); setIdx(i => (i - 1 + total) % total); };
   const mark = (v) => { setKnown(k => ({ ...k, [idx]: v })); next(); };
 
-  const COLOR = "#36454F";
+  const COLOR = "#D0D8E0";
 
   return React.createElement("div", {
-    style: { fontFamily: "'Outfit', system-ui, sans-serif", maxWidth: 540, margin: "0 auto", padding: 20 }
+    style: { fontFamily: "'EB Garamond', 'Cormorant Garamond', Georgia, serif", maxWidth: 540, margin: "0 auto", padding: 20 }
   },
     React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
       React.createElement("h2", {
-        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#2a2220", margin: 0 }
+        style: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: "#5A3E4B", margin: 0 }
       }, "Topic 9: Game Theory II — Strategies Over Time"),
       React.createElement("p", {
         style: { fontSize: 12, color: "#a89a88", marginTop: 4 }
@@ -1014,22 +1017,22 @@ const TOPIC9 = `function Topic9CueCards() {
     React.createElement("div", {
       onClick: function() { setFlipped(!flipped); },
       style: {
-        background: flipped ? "#f4f6f2" : COLOR,
+        background: flipped ? "#FFF8F2" : COLOR,
         border: flipped ? "2px solid " + COLOR : "2px solid transparent",
-        borderRadius: 14, padding: "32px 24px", minHeight: 220,
+        borderRadius: 4, padding: "32px 24px", minHeight: 220,
         display: "flex", flexDirection: "column", justifyContent: "center",
         cursor: "pointer", transition: "all 0.25s",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+        boxShadow: "0 4px 14px rgba(90,62,75,0.06)",
       }
     },
       React.createElement("div", {
-        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(255,255,255,0.5)", marginBottom: 12 }
+        style: { fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: flipped ? COLOR : "rgba(58,40,48,0.45)", marginBottom: 12 }
       }, flipped ? "Answer" : "Question"),
       React.createElement("div", {
-        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#fff", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
+        style: { fontSize: flipped ? 15 : 19, lineHeight: 1.6, color: flipped ? "#2a2220" : "#3A2830", fontWeight: flipped ? 400 : 500, whiteSpace: "pre-line" }
       }, flipped ? card.a : card.q),
       !flipped && React.createElement("div", {
-        style: { fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 14, textAlign: "center" }
+        style: { fontSize: 11, color: "rgba(58,40,48,0.35)", marginTop: 14, textAlign: "center", fontStyle: "italic" }
       }, "Tap to reveal answer")
     ),
 
@@ -1038,12 +1041,12 @@ const TOPIC9 = `function Topic9CueCards() {
     },
       React.createElement("button", {
         onClick: function() { mark(false); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "2px solid #c4929f", background: "transparent", color: "#c4929f", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "10px 24px", borderRadius: 2, border: "1px solid rgba(201,124,138,0.4)", background: "transparent", color: "#C97C8A", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Review Again"),
       React.createElement("button", {
         onClick: function() { mark(true); },
-        style: { padding: "10px 24px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
-      }, "Got It ✓")
+        style: { padding: "10px 24px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
+      }, "Got It")
     ),
 
     !flipped && React.createElement("div", {
@@ -1051,11 +1054,11 @@ const TOPIC9 = `function Topic9CueCards() {
     },
       React.createElement("button", {
         onClick: prev,
-        style: { padding: "8px 20px", borderRadius: 10, border: "1px solid rgba(200,136,152,0.25)", background: "#FFF4F0", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "1px solid rgba(184,149,106,0.24)", background: "rgba(255,248,242,0.8)", color: "#5A3E4B", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "← Prev"),
       React.createElement("button", {
         onClick: next,
-        style: { padding: "8px 20px", borderRadius: 10, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Outfit', sans-serif" }
+        style: { padding: "8px 20px", borderRadius: 2, border: "none", background: "#8a9a7b", color: "#fff", cursor: "pointer", fontSize: 13, fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.06em" }
       }, "Next →")
     )
   );

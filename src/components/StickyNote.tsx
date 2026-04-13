@@ -18,6 +18,8 @@ export default function StickyNote({ id, text, colorIndex, x, y, pinned, onUpdat
   const [pos, setPos] = useState({ x, y })
   const dragging = useRef(false)
   const origin = useRef({ mx: 0, my: 0, nx: 0, ny: 0 })
+  const noteLineHeight = 24
+  const noteTopInset = 8
 
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     if (pinned) return
@@ -72,6 +74,7 @@ export default function StickyNote({ id, text, colorIndex, x, y, pinned, onUpdat
           borderBottom: `1px solid ${color.border}`,
           cursor: pinned ? 'default' : 'grab',
           display: 'flex',
+          flexDirection: 'row-reverse',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0 6px',
@@ -108,32 +111,37 @@ export default function StickyNote({ id, text, colorIndex, x, y, pinned, onUpdat
         >◈</button>
       </div>
 
-      <textarea
-        value={text}
-        onChange={e => onUpdate(id, { text: e.target.value })}
-        style={{
-          width: '100%',
-          height: 164,
-          padding: '8px 10px',
-          boxSizing: 'border-box',
-          background: `repeating-linear-gradient(
-            to bottom,
-            transparent,
-            transparent 21px,
-            ${color.line} 21px,
-            ${color.line} 22px
-          )`,
-          border: 'none',
-          outline: 'none',
-          resize: 'none',
-          fontFamily: "'Cormorant Garamond',Georgia,serif",
-          fontSize: 13,
-          lineHeight: '22px',
-          color: '#3A2830',
-          backgroundColor: 'transparent',
-        }}
-        placeholder="Jot it here…"
-      />
+        <textarea
+          value={text}
+          onChange={e => onUpdate(id, { text: e.target.value })}
+          style={{
+            width: '100%',
+            height: 164,
+            padding: `${noteTopInset}px 10px 12px`,
+            boxSizing: 'border-box',
+            backgroundImage: `linear-gradient(
+              to bottom,
+              transparent ${noteLineHeight - 1}px,
+              ${color.line} ${noteLineHeight - 1}px,
+              ${color.line} ${noteLineHeight}px,
+              transparent ${noteLineHeight}px
+            )`,
+            backgroundSize: `100% ${noteLineHeight}px`,
+            backgroundPosition: `0 ${noteTopInset}px`,
+            backgroundRepeat: 'repeat',
+            border: 'none',
+            outline: 'none',
+            resize: 'none',
+            fontFamily: "'Cormorant Garamond',Georgia,serif",
+            fontSize: 15,
+            lineHeight: `${noteLineHeight}px`,
+            color: '#3A2830',
+            backgroundColor: 'transparent',
+            textAlign: 'left',
+            verticalAlign: 'top',
+          }}
+          placeholder="Jot it here…"
+        />
     </div>
   )
 }

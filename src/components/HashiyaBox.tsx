@@ -433,7 +433,7 @@ export default function HashiyaBox({ children, title, subtitle, style, className
               fontFamily: "'Cormorant Garamond', Georgia, serif",
               fontSize: 13,
               fontWeight: 700,
-              letterSpacing: '0.25em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase' as const,
               color: '#5A3E4B',
             }}>

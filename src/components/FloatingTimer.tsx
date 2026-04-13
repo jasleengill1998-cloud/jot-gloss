@@ -75,10 +75,10 @@ export default function FloatingTimer({ timer, onOpenPanel }: Props) {
           fontFamily: "'Cormorant Garamond', Georgia, serif",
           fontSize: 9, fontWeight: 700, letterSpacing: '0.15em',
           textTransform: 'uppercase' as const,
-          color: '#C88898', background: 'none',
+          color: '#5A3E4B', background: 'rgba(201,124,138,0.18)',
           border: '1px solid rgba(200,136,152,0.4)',
           cursor: 'pointer', padding: '3px 12px',
-        }}>Lift the needle</button>
+        }}>Pause</button>
       ) : (
         <button onClick={start} style={{
           fontFamily: "'Cormorant Garamond', Georgia, serif",

@@ -9,13 +9,26 @@ interface Props {
 }
 
 const PINNED_KEY = 'jg-todo-pinned'
+const MOBILE_BP = 1024
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(() => window.innerWidth <= MOBILE_BP)
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${MOBILE_BP}px)`)
+    const handler = (e: MediaQueryListEvent) => setMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+  return mobile
+}
 
 export default function DeskTodoPanel({ tasks, onAddTask, onToggleTask, onRemoveTask }: Props) {
   const [open, setOpen] = useState(false)
   const [pinned, setPinned] = useState(() => localStorage.getItem(PINNED_KEY) === 'true')
   const [newTask, setNewTask] = useState('')
+  const isMobile = useIsMobile()
 
-  const isVisible = open || pinned
+  const isVisible = open || (pinned && !isMobile)
 
   useEffect(() => {
     localStorage.setItem(PINNED_KEY, String(pinned))
@@ -31,20 +44,21 @@ export default function DeskTodoPanel({ tasks, onAddTask, onToggleTask, onRemove
           onClick={() => setOpen(true)}
           style={{
             position: 'fixed',
-            left: 260,
-            top: '50%',
-            transform: 'translateY(-50%)',
+            left: isMobile ? 0 : 260,
+            top: isMobile ? 'auto' : '50%',
+            bottom: isMobile ? 12 : 'auto',
+            transform: isMobile ? 'none' : 'translateY(-50%)',
             zIndex: 400,
             background: 'rgba(212,228,208,0.95)',
             border: '1px solid rgba(144,177,145,0.45)',
-            borderLeft: 'none',
-            width: 18,
-            height: 64,
+            borderLeft: isMobile ? '1px solid rgba(144,177,145,0.45)' : 'none',
+            width: isMobile ? 40 : 18,
+            height: isMobile ? 40 : 64,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            borderRadius: '0 4px 4px 0',
+            borderRadius: isMobile ? '0 4px 4px 0' : '0 4px 4px 0',
             boxShadow: '2px 0 6px rgba(58,40,48,0.08)',
           }}
           title="Open to-do list"
@@ -84,14 +98,17 @@ export default function DeskTodoPanel({ tasks, onAddTask, onToggleTask, onRemove
       {isVisible && (
         <div style={{
           position: 'fixed',
-          left: 260,
-          top: 0,
+          left: isMobile ? 0 : 260,
+          top: isMobile ? 'auto' : 0,
           bottom: 0,
-          width: 240,
+          right: isMobile ? 0 : 'auto',
+          width: isMobile ? '100%' : 240,
+          maxHeight: isMobile ? '60vh' : '100vh',
           zIndex: 400,
           background: 'rgba(255,248,242,0.98)',
-          borderRight: '1px solid rgba(199,183,157,0.4)',
-          boxShadow: '4px 0 16px rgba(58,40,48,0.08)',
+          borderRight: isMobile ? 'none' : '1px solid rgba(199,183,157,0.4)',
+          borderTop: isMobile ? '1px solid rgba(199,183,157,0.4)' : 'none',
+          boxShadow: isMobile ? '0 -4px 16px rgba(58,40,48,0.08)' : '4px 0 16px rgba(58,40,48,0.08)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',

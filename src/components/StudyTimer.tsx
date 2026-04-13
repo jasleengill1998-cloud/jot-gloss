@@ -28,9 +28,9 @@ export default function StudyTimer({ timer, classes, onClose }: Props) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <span style={{
           fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: 11, fontWeight: 700, letterSpacing: '0.25em',
+          fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
           textTransform: 'uppercase' as const, color: '#5A3E4B',
-        }}>Study Clock</span>
+        }}>Study Timer</span>
         <button onClick={onClose} style={{
           fontFamily: "'Cormorant Garamond', Georgia, serif",
           fontSize: 10, color: '#E8B8C0', background: 'none', border: 'none', cursor: 'pointer',
@@ -81,7 +81,7 @@ export default function StudyTimer({ timer, classes, onClose }: Props) {
             {elapsed > 0 ? 'Resume' : 'Begin'}
           </button>
         ) : (
-          <button onClick={pause} className="btn-primary" style={{ minWidth: 80 }}>Lift the needle</button>
+          <button onClick={pause} className="btn-primary" style={{ minWidth: 80 }}>Pause</button>
         )}
         {elapsed > 0 && (
           <>
@@ -100,7 +100,7 @@ export default function StudyTimer({ timer, classes, onClose }: Props) {
         <div style={{ borderTop: '1px solid rgba(240,160,180,0.15)', paddingTop: 10 }}>
           <div style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: 10, fontWeight: 700, letterSpacing: '0.2em',
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
             textTransform: 'uppercase' as const, color: '#5A3E4B', marginBottom: 6,
           }}>Today — {fmtTime(todayTotal)}</div>
           {todayEntries.map((e, i) => (

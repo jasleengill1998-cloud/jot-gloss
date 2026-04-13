@@ -7,11 +7,12 @@ import { useStudyTimer } from './hooks/useStudyTimer'
 import { useGramophone } from './hooks/useGramophone'
 import type { MoodKey } from './hooks/useGramophone'
 import BookplateLogo from './components/BookplateLogo'
+import { ArchCard } from './components/ArchCard'
 import ClassFolder from './components/ClassFolder'
 import ClipboardWatcher from './components/ClipboardWatcher'
 import DeskTodoPanel from './components/DeskTodoPanel'
 import DuplicateModal from './components/DuplicateModal'
-import DeskNotebook, { type DeskTask } from './components/DeskNotebook'
+import DeskNotebook, { type DeskTask, type NotebookPage } from './components/DeskNotebook'
 import { DiamondDivider } from './components/DiamondDivider'
 import EditModal from './components/EditModal'
 import FileCard from './components/FileCard'
@@ -26,7 +27,7 @@ import type { Accent } from './components/StudyFolio'
 import StudyStats from './components/StudyStats'
 import StudyTimer from './components/StudyTimer'
 import SyncPanel from './components/SyncPanel'
-import { ArchDivider, FloralBorder, JaliStrip, MughalCorner } from './components/Ornaments'
+import { ArchDivider, FloralBorder, MughalCorner } from './components/Ornaments'
 import UtilityBookplate from './components/UtilityBookplate'
 import { loadAppSession, saveAppSession, type AppNav, type FocusedObject } from './utils/appSession'
 import { getVersionGroup, getVersionSummary } from './utils/studyFiles'
@@ -45,6 +46,8 @@ function humanTitle(name: string) {
   base = base.replace(/^m[-_]b[-_]a[-_]s[-_]?(\d{3})/i, 'mbas$1')
   base = base.replace(/^mbas[-_]?\d{3}[-_]/i, '')
   base = base.replace(/([a-z])([A-Z])/g, '$1 $2')
+  base = base.replace(/([A-Za-z])(\d)/g, '$1 $2')
+  base = base.replace(/(\d)([A-Za-z])/g, '$1 $2')
   base = base.replace(/[-_]+/g, ' ')
   return base.replace(/\b\w/g, (char) => char.toUpperCase()).trim()
 }
@@ -72,6 +75,7 @@ const PINNED_NOTE_STORAGE_KEY = 'jot-gloss-pinned-note'
 const DESK_META_PREFIX = '__jot-gloss-'
 const DESK_NOTE_FILE = `${DESK_META_PREFIX}notes.md`
 const DESK_TASKS_FILE = `${DESK_META_PREFIX}tasks.md`
+const DESK_NOTEBOOK_PAGES_FILE = `${DESK_META_PREFIX}notebook-pages.json`
 const STUDY_MIXES: StudyMix[] = [
   { key: 'library',   label: 'Sunlight through the stacks', startIndex: 0 },
   { key: 'night',     label: 'After hours',                 startIndex: 10 },
@@ -108,9 +112,9 @@ function DeskCalculator() {
     setFresh(false)
   }
 
-  const btn = (label: string, type: 'num' | 'op' | 'eq' | 'clear') => (
+  const btn = (label: string, type: 'num' | 'op' | 'eq' | 'clear', keySuffix = label || 'blank') => (
     <button
-      key={label}
+      key={label === '' ? `${type}-${keySuffix}-${Math.random().toString(36).slice(2, 7)}` : `${type}-${keySuffix}`}
       type="button"
       onClick={() => press(label)}
       style={{
@@ -203,6 +207,26 @@ function serializeTaskChecklist(tasks: DeskTask[]) {
 
 function formatLongDate(value: Date) {
   return value.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
+}
+
+function formatWeekdayDate(value: Date) {
+  return value.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+}
+
+function coerceWeekdayDateLabel(value: string | undefined, fallback: Date) {
+  if (!value) return formatWeekdayDate(fallback)
+  const normalized = value.replace(/(\d+)(st|nd|rd|th)\b/gi, '$1').trim()
+  const parsed = new Date(normalized)
+  if (Number.isNaN(parsed.getTime())) return formatWeekdayDate(fallback)
+  return formatWeekdayDate(parsed)
+}
+
+function formatClockTime(value: Date) {
+  return value.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+}
+
+function formatClockSeconds(value: Date) {
+  return value.toLocaleTimeString(undefined, { second: '2-digit' })
 }
 
 function getFolioAccent(className: string): Accent {
@@ -326,33 +350,156 @@ function JotGlossStudyRail({
   onAddStickyNote,
 }: RailProps) {
   const filingCabinetActive = cabinetOpen || isArchiveView || activePanel === 'upload' || activePanel === 'paste' || activePanel === 'prompts' || activePanel === 'sync' || activePanel === 'timer' || activePanel === 'stats'
+  const activeMix = studyMixes.find((mix) => mix.key === activeMixKey) ?? studyMixes[0]
+  const [railNow, setRailNow] = useState(() => new Date())
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => setRailNow(new Date()), 1000)
+    return () => window.clearInterval(intervalId)
+  }, [])
 
   return (
     <div className="desk-rail-stack">
       <div style={{
-        background: 'rgba(245,230,184,0.95)',
-        border: '1px solid rgba(194,167,108,0.52)',
-        padding: '14px 16px 12px',
-        position: 'relative',
+        textAlign: 'center',
+        padding: '10px 12px 9px',
+        fontFamily: "'Cormorant Garamond',Georgia,serif",
+        lineHeight: 1.3,
+        background: 'rgba(255,248,242,0.6)',
+        border: '1px solid rgba(184,149,106,0.14)',
       }}>
-        <div aria-hidden="true" style={{
-          position: 'absolute', inset: 5,
-          border: '1px solid rgba(194,167,108,0.28)',
-          pointerEvents: 'none',
-        }} />
+        <div style={{ fontSize: 15, color: '#5A3E4B', fontWeight: 700, letterSpacing: '0.04em' }}>
+          {railNow.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+        </div>
+        <div style={{ fontSize: 13, fontWeight: 400, color: 'rgba(90,62,75,0.6)', letterSpacing: '0.02em', marginTop: 2, fontStyle: 'italic' }}>
+          {formatClockTime(railNow)}
+        </div>
+      </div>
+
+      <div
+        className="desk-rail-hukamnama"
+        style={{
+          background: 'rgba(255, 244, 240, 0.9)',
+          border: '1px solid rgba(201,124,138,0.22)',
+          boxShadow: '0 10px 18px rgba(90, 62, 75, 0.035)',
+          padding: '12px 13px 12px',
+          position: 'relative',
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 5,
+            border: '1px solid rgba(201,124,138,0.16)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div
+            style={{
+              fontFamily: "'Cormorant Garamond',Georgia,serif",
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: '#C97C8A',
+              marginBottom: 8,
+            }}
+          >
+            {dailyCard.kicker}
+          </div>
+
+          {dailyCard.title && (
+            <div
+              style={{
+                fontFamily: "'Cormorant Garamond',Georgia,serif",
+                fontSize: 18,
+                fontWeight: 700,
+                lineHeight: 1.08,
+                color: '#5A3E4B',
+                marginBottom: 8,
+              }}
+            >
+              {dailyCard.title}
+            </div>
+          )}
+
+          <p className="rail-copy" style={{ marginBottom: dailyCard.source ? 8 : 12 }}>
+            {dailyCard.body}
+          </p>
+
+          {dailyCard.source && (
+            <p
+              className="rail-copy"
+              style={{
+                marginBottom: dailyCard.href ? 10 : 0,
+                fontStyle: 'italic',
+                fontSize: 12,
+                opacity: 0.76,
+              }}
+            >
+              {dailyCard.source}
+            </p>
+          )}
+
+          {dailyCard.href && (
+            <a
+              href={dailyCard.href}
+              target="_blank"
+              rel="noreferrer"
+              className="desk-tool-link"
+              style={{ display: 'inline-block', marginTop: 2 }}
+            >
+              Read the full passage
+            </a>
+          )}
+        </div>
+      </div>
+
+      <div
+        className="desk-rail-clipboard"
+        style={{
+          padding: '12px 13px 10px',
+          position: 'relative',
+        }}
+      >
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{
             fontFamily: "'Cormorant Garamond',Georgia,serif",
             fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
             textTransform: 'uppercase', color: '#C97C8A', marginBottom: 8,
           }}>
-            Where You Left Off
+            Recent
           </div>
+
+          {continueFile ? (
+            <>
+              <div style={{
+                fontFamily: "'Cormorant Garamond',Georgia,serif",
+                fontSize: 20,
+                fontWeight: 700,
+                lineHeight: 1.04,
+                color: '#5A3E4B',
+                marginBottom: 4,
+              }}>
+                {humanTitle(continueFile.name)}
+              </div>
+
+              <p className="rail-copy" style={{ marginBottom: 10, fontStyle: 'italic' }}>
+                {shortCourseName(continueFile.className)} · {continueFile.resourceType}
+              </p>
+            </>
+          ) : (
+            <p className="rail-copy" style={{ marginBottom: 10, fontStyle: 'italic', opacity: 0.72 }}>
+              Open a folio and it will wait here for you.
+            </p>
+          )}
 
           {continueFile && (
             <button type="button" className="bookplate-action" onClick={() => onOpenFile(continueFile)}
               style={{ marginBottom: 10, width: '100%' }}>
-              Back to the books
+              Resume
             </button>
           )}
 
@@ -380,19 +527,19 @@ function JotGlossStudyRail({
 
       <FocusableRailSection
         tone="sage"
-        kicker="Stationery"
-        title=""
+        kicker="Stationery Drawer"
+        title="Pen & Paper"
         objectKey="notebook"
         focusedObject={focusedObject}
         onSpineClick={() => onFocusObject('notebook')}
         onClearFocus={onClearFocus}
-        closeLabel="Leave the stationery"
+        closeLabel="Close"
       >
         <div className="rail-button-stack">
           <button type="button"
             className={`bookplate-action ${activePanel === 'notebook' ? 'active' : ''}`}
             onClick={() => { onFocusObject('notebook'); onTogglePanel('notebook') }}>
-            Open the notebook
+            Notebook
           </button>
 
           {viewing && (
@@ -400,7 +547,7 @@ function JotGlossStudyRail({
               type="button"
               className={`bookplate-action ${activePanel === 'notebook' ? 'active' : ''}`}
               onClick={() => onTogglePanel('notebook')}>
-              Open beside the folio
+              Notebook + Folio
             </button>
           )}
 
@@ -415,7 +562,7 @@ function JotGlossStudyRail({
               <line x1="3" y1="7" x2="11" y2="7" stroke="#C7B79D" strokeWidth="0.6"/>
               <line x1="3" y1="9.5" x2="9" y2="9.5" stroke="#C7B79D" strokeWidth="0.6"/>
             </svg>
-            Place a sticky note
+            Sticky Note
           </button>
 
           <button type="button"
@@ -446,65 +593,174 @@ function JotGlossStudyRail({
         title=""
         objectKey="music"
         focusedObject={focusedObject}
-        onSpineClick={onClearFocus}
+        onSpineClick={() => onFocusObject('music')}
         wrapperClassName={musicPlaying ? 'gramophone-playing' : 'gramophone-resting'}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '4px 0 8px' }}>
-          <svg width="68" height="56" viewBox="0 0 72 60" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
-            <path d="M 36 52 L 8 12 Q 6 8 10 6 Q 14 4 18 8 L 44 48"
-                  fill="rgba(200,169,110,0.18)" stroke="#C8A96E" strokeWidth="1.2" strokeLinecap="round"/>
-            <path d="M 8 12 Q 4 4 12 2 Q 22 0 28 8 L 44 48"
-                  fill="rgba(200,169,110,0.08)" stroke="#C8A96E" strokeWidth="0.7" strokeLinecap="round" opacity="0.6"/>
-            <ellipse cx="12" cy="8" rx="8" ry="5"
-                     fill="rgba(200,169,110,0.12)" stroke="#C8A96E" strokeWidth="1" transform="rotate(-20, 12, 8)"/>
-            <line x1="44" y1="48" x2="52" y2="52" stroke="#A9978D" strokeWidth="1.5" strokeLinecap="round"/>
-            <ellipse cx="56" cy="54" rx="13" ry="5" fill="rgba(58,40,48,0.08)" stroke="#A9978D" strokeWidth="0.8"/>
-            <ellipse cx="56" cy="54" rx="9" ry="3.5" fill="rgba(90,62,75,0.06)" stroke="#C8A96E" strokeWidth="0.5" opacity="0.7"/>
-            <circle cx="56" cy="54" r="1.5" fill="#C8A96E" opacity="0.5"/>
-          </svg>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
-            <button type="button" onClick={onToggleMusic} aria-label={musicActionLabel}
-              style={{
-                width: 30, height: 30, borderRadius: '50%', flexShrink: 0, cursor: 'pointer',
-                background: musicPlaying ? 'rgba(201,124,138,0.18)' : 'rgba(200,169,110,0.12)',
-                border: `1px solid ${musicPlaying ? 'rgba(201,124,138,0.4)' : 'rgba(200,169,110,0.35)'}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'all 0.2s ease',
-              }}>
-              {musicPlaying
-                ? <svg width="9" height="11" viewBox="0 0 9 11" fill="none" aria-hidden="true">
-                    <rect x="1" y="1" width="2.5" height="9" rx="0.8" fill="#5A3E4B" opacity="0.7"/>
-                    <rect x="5.5" y="1" width="2.5" height="9" rx="0.8" fill="#5A3E4B" opacity="0.7"/>
-                  </svg>
-                : <svg width="9" height="11" viewBox="0 0 9 11" fill="none" aria-hidden="true">
-                    <path d="M2 1L8 5.5L2 10Z" fill="#5A3E4B" opacity="0.7"/>
-                  </svg>
-              }
-            </button>
-            <span style={{
-              fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 12, fontStyle: 'italic',
-              color: 'rgba(90,62,75,0.7)', flex: 1, overflow: 'hidden',
-              textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}>
-              {studyMixes.find(m => m.key === activeMixKey)?.label ?? '—'}
-            </span>
+        <div className="gramophone-panel">
+          <div className="gramophone-head">
+            <div className="gramophone-kicker">Study Music</div>
+            <div className="gramophone-title">{musicPlaying ? activeMix.label : 'Music paused'}</div>
           </div>
 
-          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+          <div className="gramophone-stage" aria-hidden="true">
+            <div className={`gramophone-wave gramophone-wave-a ${musicPlaying ? 'is-playing' : ''}`} />
+            <div className={`gramophone-wave gramophone-wave-b ${musicPlaying ? 'is-playing' : ''}`} />
+            <svg className="gramophone-illustration" viewBox="0 0 200 200" fill="none" role="presentation">
+              <defs>
+                <linearGradient id="cabinet-face" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#D4B896" />
+                  <stop offset="50%" stopColor="#C8A878" />
+                  <stop offset="100%" stopColor="#B89B72" />
+                </linearGradient>
+                <linearGradient id="cabinet-top" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#E8D5B8" />
+                  <stop offset="100%" stopColor="#D4C4A8" />
+                </linearGradient>
+                <linearGradient id="horn-fill" x1="0.2" y1="0" x2="0.8" y2="1">
+                  <stop offset="0%" stopColor="#E8D5B0" />
+                  <stop offset="40%" stopColor="#D4BC8E" />
+                  <stop offset="100%" stopColor="#C8A96E" />
+                </linearGradient>
+                <linearGradient id="horn-inner" x1="0.3" y1="0" x2="0.7" y2="1">
+                  <stop offset="0%" stopColor="#C8A878" />
+                  <stop offset="100%" stopColor="#B89860" />
+                </linearGradient>
+                <radialGradient id="platter-felt" cx="0.5" cy="0.45" r="0.5">
+                  <stop offset="0%" stopColor="#5A4A42" />
+                  <stop offset="100%" stopColor="#4A3A32" />
+                </radialGradient>
+                <radialGradient id="vinyl-sheen" cx="0.42" cy="0.38" r="0.6">
+                  <stop offset="0%" stopColor="rgba(90,70,75,0.18)" />
+                  <stop offset="100%" stopColor="transparent" />
+                </radialGradient>
+              </defs>
+
+              {/* Soft shadow */}
+              <ellipse cx="100" cy="188" rx="52" ry="6" fill="rgba(90,62,75,0.08)" />
+
+              {/* Cabinet body — front face */}
+              <path d="M52 148 L52 176 Q52 180 56 180 L144 180 Q148 180 148 176 L148 148 Z" fill="url(#cabinet-face)" stroke="#B89B72" strokeWidth="1.2" />
+              {/* Cabinet inset panel */}
+              <rect x="60" y="152" width="80" height="24" rx="2" fill="none" stroke="#C8A96E" strokeWidth="0.7" opacity="0.5" />
+              {/* Rose scroll decoration */}
+              <path d="M85 164 C88 160 92 158 96 160 C98 162 100 162 102 160 C106 158 110 160 113 164" fill="none" stroke="#E8B8C0" strokeWidth="0.8" opacity="0.5" />
+              {/* Brass knobs */}
+              <circle cx="72" cy="164" r="3" fill="#C8A96E" stroke="#B89B72" strokeWidth="0.5" />
+              <circle cx="72" cy="164" r="1.5" fill="#DBC48E" />
+              <circle cx="86" cy="164" r="2.5" fill="#C8A96E" stroke="#B89B72" strokeWidth="0.5" />
+              <circle cx="86" cy="164" r="1.2" fill="#DBC48E" />
+              {/* Winding crank */}
+              <path d="M148 162 L156 162 L156 158 L162 164 L156 170 L156 166 L148 166" fill="#C8A96E" stroke="#B89B72" strokeWidth="0.8" />
+
+              {/* Cabinet top surface */}
+              <path d="M48 148 L52 140 L148 140 L152 148 Z" fill="url(#cabinet-top)" stroke="#C8A96E" strokeWidth="0.8" />
+
+              {/* Cabinet feet */}
+              <rect x="54" y="180" width="10" height="5" rx="1.5" fill="#B89B72" stroke="#9D8C7D" strokeWidth="0.5" />
+              <rect x="136" y="180" width="10" height="5" rx="1.5" fill="#B89B72" stroke="#9D8C7D" strokeWidth="0.5" />
+
+              {/* Wood grain lines */}
+              <line x1="58" y1="155" x2="142" y2="155" stroke="#C8A878" strokeWidth="0.3" opacity="0.3" />
+              <line x1="58" y1="159" x2="142" y2="159" stroke="#C8A878" strokeWidth="0.25" opacity="0.25" />
+              <line x1="58" y1="170" x2="142" y2="170" stroke="#C8A878" strokeWidth="0.3" opacity="0.2" />
+
+              {/* Turntable rim */}
+              <ellipse cx="100" cy="128" rx="42" ry="15" fill="#D4C4A8" stroke="#C8A96E" strokeWidth="1.2" />
+              <ellipse cx="100" cy="126" rx="39" ry="13.5" fill="#E0D0B4" stroke="#C8A96E" strokeWidth="0.6" opacity="0.7" />
+              {/* Felt platter surface */}
+              <ellipse cx="100" cy="125" rx="34" ry="12" fill="url(#platter-felt)" stroke="#4A3A32" strokeWidth="0.8" />
+
+              {/* Spinning vinyl record */}
+              <g className={`gramophone-record ${musicPlaying ? 'is-playing' : ''}`}>
+                <ellipse cx="100" cy="124" rx="30" ry="10.5" fill="rgba(38,28,32,0.94)" stroke="rgba(200,169,110,0.35)" strokeWidth="0.8" />
+                <ellipse cx="100" cy="124" rx="27" ry="9.4" fill="none" stroke="rgba(70,55,60,0.3)" strokeWidth="0.35" />
+                <ellipse cx="100" cy="124" rx="24" ry="8.4" fill="none" stroke="rgba(70,55,60,0.25)" strokeWidth="0.3" />
+                <ellipse cx="100" cy="124" rx="21" ry="7.3" fill="none" stroke="rgba(70,55,60,0.2)" strokeWidth="0.35" />
+                <ellipse cx="100" cy="124" rx="18" ry="6.3" fill="none" stroke="rgba(70,55,60,0.18)" strokeWidth="0.3" />
+                <ellipse cx="100" cy="124" rx="15" ry="5.2" fill="none" stroke="rgba(70,55,60,0.15)" strokeWidth="0.25" />
+                <ellipse cx="100" cy="124" rx="12" ry="4.2" fill="none" stroke="rgba(70,55,60,0.12)" strokeWidth="0.3" />
+                {/* Label */}
+                <ellipse cx="100" cy="124" rx="8" ry="2.8" fill="rgba(201,164,108,0.88)" stroke="rgba(200,169,110,0.5)" strokeWidth="0.5" />
+                <ellipse cx="100" cy="124" rx="5" ry="1.8" fill="rgba(240,228,200,0.9)" />
+                <ellipse cx="100" cy="124" rx="1.5" ry="0.6" fill="rgba(90,62,75,0.5)" />
+                {/* Sheen */}
+                <ellipse cx="100" cy="124" rx="30" ry="10.5" fill="url(#vinyl-sheen)" />
+                <ellipse cx="96" cy="121" rx="18" ry="5" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="0.6" />
+              </g>
+
+              {/* Horn neck — curved brass tube */}
+              <path d="M78 128 C74 118 66 100 56 82 C50 70 44 55 40 42" fill="none" stroke="#C8A96E" strokeWidth="4" strokeLinecap="round" />
+              <path d="M78 128 C74 118 66 100 56 82 C50 70 44 55 40 42" fill="none" stroke="#DBC48E" strokeWidth="1.8" strokeLinecap="round" opacity="0.5" />
+              {/* Horn neck joint rings */}
+              <ellipse cx="78" cy="128" rx="4" ry="2" fill="#C8A96E" stroke="#B89B72" strokeWidth="0.5" />
+              <ellipse cx="56" cy="82" rx="3.5" ry="1.5" fill="#C8A96E" stroke="#B89B72" strokeWidth="0.4" opacity="0.8" />
+
+              {/* Horn bell — scalloped flare */}
+              <path d="M40 42 C32 28 18 14 8 10 C4 8 2 12 4 18 C8 28 14 36 22 44 C28 50 34 52 40 50 C46 52 52 50 58 44 C66 36 72 28 76 18 C78 12 76 8 72 10 C62 14 48 28 40 42 Z"
+                fill="url(#horn-fill)" stroke="#C8A96E" strokeWidth="1.2" />
+              {/* Horn inner opening */}
+              <path d="M40 42 C36 34 28 24 20 18 C26 22 34 30 40 38 C46 30 54 22 60 18 C52 24 44 34 40 42 Z"
+                fill="url(#horn-inner)" opacity="0.6" />
+              {/* Horn scallop lines */}
+              <path d="M20 18 C28 26 34 36 38 42" fill="none" stroke="#B89860" strokeWidth="0.5" opacity="0.4" />
+              <path d="M30 14 C34 24 38 34 40 42" fill="none" stroke="#B89860" strokeWidth="0.5" opacity="0.35" />
+              <path d="M50 14 C46 24 42 34 40 42" fill="none" stroke="#B89860" strokeWidth="0.5" opacity="0.35" />
+              <path d="M60 18 C52 26 46 36 42 42" fill="none" stroke="#B89860" strokeWidth="0.5" opacity="0.4" />
+              {/* Horn highlight */}
+              <path d="M14 14 C22 12 30 16 36 24" fill="none" stroke="rgba(255,248,240,0.4)" strokeWidth="1.2" strokeLinecap="round" />
+              {/* Horn rim */}
+              <path d="M8 10 C4 8 2 12 4 18 C8 28 14 36 22 44 C28 50 34 52 40 50 C46 52 52 50 58 44 C66 36 72 28 76 18 C78 12 76 8 72 10"
+                fill="none" stroke="#B89860" strokeWidth="1.4" />
+
+              {/* Tonearm pivot base */}
+              <ellipse cx="134" cy="130" rx="5" ry="2.2" fill="#C8A96E" stroke="#B89B72" strokeWidth="0.6" />
+              <circle cx="134" cy="129" r="2.8" fill="#DBC48E" stroke="#C8A96E" strokeWidth="0.5" />
+              {/* Tonearm */}
+              <path d="M134 129 L138 108 L122 96" fill="none" stroke="#9D8C7D" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M134 129 L138 108 L122 96" fill="none" stroke="#B8A88C" strokeWidth="0.9" strokeLinecap="round" opacity="0.5" />
+              {/* Headshell */}
+              <path d="M122 96 L115 92" fill="none" stroke="#9D8C7D" strokeWidth="1.8" strokeLinecap="round" />
+              <rect x="111" y="89" width="5.5" height="3.5" rx="0.8" fill="#9D8C7D" stroke="#7A6A5A" strokeWidth="0.4" transform="rotate(-22 114 91)" />
+              {/* Counterweight */}
+              <ellipse cx="138" cy="108" rx="3" ry="1.8" fill="#9D8C7D" stroke="#7A6A5A" strokeWidth="0.4" />
+            </svg>
+          </div>
+
+          <div className="gramophone-now-playing">
+            <div className="gramophone-now-label">{musicPlaying ? 'Playing' : 'Paused'}</div>
+            <div className="gramophone-now-title">{activeMix.label}</div>
+            <div className="gramophone-now-meta">
+              {musicPlaying ? '' : 'Pick a track to start.'}
+            </div>
+          </div>
+
+          <div className="gramophone-controls">
+            <button type="button" className={`gramophone-toggle ${musicPlaying ? 'is-playing' : ''}`} onClick={onToggleMusic} aria-label={musicActionLabel}>
+              {musicPlaying ? (
+                <svg width="11" height="14" viewBox="0 0 11 14" fill="none" aria-hidden="true">
+                  <rect x="1" y="1" width="3" height="12" rx="1" fill="currentColor" />
+                  <rect x="7" y="1" width="3" height="12" rx="1" fill="currentColor" />
+                </svg>
+              ) : (
+                <svg width="11" height="14" viewBox="0 0 11 14" fill="none" aria-hidden="true">
+                  <path d="M2 1 L10 7 L2 13 Z" fill="currentColor" />
+                </svg>
+              )}
+              <span>{musicPlaying ? 'Pause' : 'Play'}</span>
+            </button>
+          </div>
+
+          <div className="gramophone-mix-grid">
             {studyMixes.map((mix) => (
-              <button key={mix.key} type="button" onClick={() => onSelectMix(mix)} title={mix.label}
-                style={{
-                  padding: '2px 8px', cursor: 'pointer', borderRadius: 2,
-                  fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 10,
-                  letterSpacing: '0.06em', whiteSpace: 'nowrap',
-                  background: activeMixKey === mix.key ? 'rgba(201,124,138,0.16)' : 'rgba(200,169,110,0.07)',
-                  border: `1px solid ${activeMixKey === mix.key ? 'rgba(201,124,138,0.4)' : 'rgba(200,169,110,0.22)'}`,
-                  color: activeMixKey === mix.key ? '#5A3E4B' : 'rgba(90,62,75,0.5)',
-                  maxWidth: 112, overflow: 'hidden', textOverflow: 'ellipsis',
-                  transition: 'all 0.15s ease',
-                }}>
-                {mix.label}
+              <button
+                key={mix.key}
+                type="button"
+                onClick={() => onSelectMix(mix)}
+                title={mix.label}
+                className={`gramophone-mix-card ${activeMixKey === mix.key ? 'is-active' : ''}`}
+              >
+                <span className="gramophone-mix-index">{String(mix.startIndex / 10 + 1).padStart(2, '0')}</span>
+                <span className="gramophone-mix-label">{mix.label}</span>
               </button>
             ))}
           </div>
@@ -539,19 +795,19 @@ function JotGlossStudyRail({
           <div className="desk-cabinet-content">
             <div className="rail-button-stack">
               <button type="button" className={`bookplate-action ${isArchiveView ? 'active' : ''}`} onClick={onOpenArchive}>
-                Browse the versions
+                Versions
               </button>
               <button type="button" className={`bookplate-action ${activePanel === 'upload' ? 'active' : ''}`} onClick={() => onTogglePanel('upload')}>
-                Place in the cabinet
+                Upload
               </button>
               <button type="button" className={`bookplate-action ${activePanel === 'paste' ? 'active' : ''}`} onClick={() => onTogglePanel('paste')}>
-                Slip from Claude
+                Clipboard
               </button>
               <button type="button" className={`bookplate-action ${activePanel === 'prompts' ? 'active' : ''}`} onClick={() => onTogglePanel('prompts')}>
-                Prompt Drawer
+                Prompts
               </button>
               <button type="button" className={`bookplate-action ${activePanel === 'stats' ? 'active' : ''}`} onClick={() => onTogglePanel('stats')}>
-                The Ledger
+                Ledger
               </button>
               <button type="button" className={`bookplate-action ${activePanel === 'sync' ? 'active' : ''}`} onClick={() => onTogglePanel('sync')}>
                 {syncLabel}
@@ -641,7 +897,34 @@ export default function App() {
   const visibleFiles = useMemo(() => files.filter((file) => !isDeskMetaFile(file)), [files])
   const noteFile = useMemo(() => files.find((file) => file.name === DESK_NOTE_FILE) || null, [files])
   const taskFile = useMemo(() => files.find((file) => file.name === DESK_TASKS_FILE) || null, [files])
+  const pagesFile = useMemo(() => files.find((file) => file.name === DESK_NOTEBOOK_PAGES_FILE) || null, [files])
   const [notebookTasks, setNotebookTasks] = useState<DeskTask[]>([])
+  const [notebookPages, setNotebookPages] = useState<NotebookPage[]>(() => {
+    const now = Date.now()
+    return [{ id: 'page-1', title: 'Page 1', content: '', createdAt: now, updatedAt: now }]
+  })
+  const [activePageId, setActivePageId] = useState('page-1')
+  const [pagesMigrated, setPagesMigrated] = useState(false)
+
+  useEffect(() => {
+    if (pagesMigrated) return
+    if (loading) return
+    if (pagesFile?.content) {
+      try {
+        const parsed = JSON.parse(pagesFile.content) as NotebookPage[]
+        if (parsed.length > 0) {
+          setNotebookPages(parsed)
+          setActivePageId(parsed[0].id)
+        }
+      } catch { /* ignore bad JSON */ }
+    } else if (noteFile?.content) {
+      const now = Date.now()
+      const migrated: NotebookPage = { id: 'page-1', title: 'Page 1', content: noteFile.content, createdAt: now, updatedAt: now }
+      setNotebookPages([migrated])
+      setActivePageId('page-1')
+    }
+    setPagesMigrated(true)
+  }, [loading, pagesFile?.content, noteFile?.content, pagesMigrated])
 
   useEffect(() => {
     setNotebookTasks(parseTaskChecklist(taskFile?.content || ''))
@@ -672,7 +955,8 @@ export default function App() {
   const selectedCourse = selectedClass && selectedClass !== '' ? selectedClass : null
   const isAllEntriesView = selectedClass === ''
   const showFolders = nav === 'library' && selectedClass === null && !filters.search && !filters.className
-  const notebookOverlayActive = activePanel === 'notebook'
+  const notebookMode = activePanel === 'notebook' ? (viewing ? 'side-panel' : 'center-desk') : null
+  const notebookOverlayActive = false // no longer hides content
   const focusModeActive = focusedObject !== null
   const deskFocusOnRail = focusedObject === 'clipboard' || focusedObject === 'cabinet'
   const deskFocusOnFolio = focusedObject === 'folio'
@@ -948,12 +1232,49 @@ export default function App() {
     await addFile(new File([blob], name, { type: 'text/markdown' }), 'General', resourceType, undefined, 'quick-add')
   }, [addFile, files, updateFile])
 
-  const handleNotebookSave = useCallback(async (notes: string, tasks: DeskTask[]) => {
+  const persistPages = useCallback((pages: NotebookPage[]) => {
+    void upsertDeskMetaFile(DESK_NOTEBOOK_PAGES_FILE, JSON.stringify(pages), 'Notebook Pages')
+  }, [upsertDeskMetaFile])
+
+  const handleSavePage = useCallback((pageId: string, content: string) => {
+    setNotebookPages((current) => {
+      const updated = current.map((p) => p.id === pageId ? { ...p, content, updatedAt: Date.now() } : p)
+      persistPages(updated)
+      return updated
+    })
+  }, [persistPages])
+
+  const handleAddPage = useCallback(() => {
+    const now = Date.now()
+    const id = `page-${now.toString(36)}`
+    const newPage: NotebookPage = { id, title: `Page ${notebookPages.length + 1}`, content: '', createdAt: now, updatedAt: now }
+    setNotebookPages((current) => {
+      const updated = [...current, newPage]
+      persistPages(updated)
+      return updated
+    })
+    setActivePageId(id)
+  }, [notebookPages.length, persistPages])
+
+  const handleDeletePage = useCallback((pageId: string) => {
+    setNotebookPages((current) => {
+      const updated = current.filter((p) => p.id !== pageId)
+      if (updated.length === 0) {
+        const now = Date.now()
+        const fallback: NotebookPage = { id: 'page-1', title: 'Page 1', content: '', createdAt: now, updatedAt: now }
+        persistPages([fallback])
+        setActivePageId('page-1')
+        return [fallback]
+      }
+      persistPages(updated)
+      if (activePageId === pageId) setActivePageId(updated[0].id)
+      return updated
+    })
+  }, [activePageId, persistPages])
+
+  const handleSaveTasks = useCallback((tasks: DeskTask[]) => {
     setNotebookTasks(tasks)
-    await Promise.all([
-      upsertDeskMetaFile(DESK_NOTE_FILE, notes, 'Desk Notes'),
-      upsertDeskMetaFile(DESK_TASKS_FILE, serializeTaskChecklist(tasks), 'Desk Tasks'),
-    ])
+    void upsertDeskMetaFile(DESK_TASKS_FILE, serializeTaskChecklist(tasks), 'Desk Tasks')
   }, [upsertDeskMetaFile])
 
   const addTodoTask = useCallback((text: string) => {
@@ -1012,7 +1333,7 @@ export default function App() {
     const today = new Date()
     const fallback = {
       kicker: "Today's Quote",
-      title: formatLongDate(today),
+      title: '',
       body: DAILY_QUOTES[getDayOfYear(today) % DAILY_QUOTES.length],
     }
 
@@ -1033,7 +1354,7 @@ export default function App() {
         const cleanedTitle = title.replace(/^Daily Hukamnama\s*-\s*/i, '')
         setDailyCard({
           kicker: "Today's Hukamnama",
-          title: cleanedTitle || formatLongDate(today),
+          title: '',
           body,
           href,
           source: 'Source: Sri Guru Granth Sahib (SGGS).',
@@ -1052,40 +1373,23 @@ export default function App() {
   }, [gramophone])
 
   const titleBlock = (
-    <div
-      style={{
-        minHeight: 228,
-        background: 'rgba(214, 228, 237, 0.78)',
-        border: '1px solid rgba(169, 151, 141, 0.28)',
-        boxShadow: '0 18px 34px rgba(86, 60, 68, 0.08)',
-        position: 'relative',
-      }}
+    <ArchCard
+      uid="hero"
+      variant="hero"
+      surface="rgba(214,231,248,0.8)"
+      className="bloom-title-block"
     >
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 'var(--space-sm)',
-          border: '1px solid rgba(199, 183, 157, 0.52)',
-          pointerEvents: 'none',
-        }}
-      />
-      <div style={{ padding: 'calc(var(--space-2xl) * 1.5) var(--space-xl) var(--space-lg)', textAlign: 'center', maxWidth: 620, margin: '0 auto', position: 'relative' }}>
+      <div className="hero-wordmark-shell">
         {showFolders && !showArchive && (
           <>
-            <div className="wordmark-lockup">
-              <span className="wordmark-jot">JOT</span>
-              <div className="wordmark-rule" />
-              <span className="wordmark-gloss">Gloss</span>
-              <span className="wordmark-sub">notes in the margin</span>
+            <div className="hero-wordmark">
+              <span className="hero-wordmark-jot">Jot</span>{' '}
+              <span className="hero-wordmark-gloss">Gloss</span>
             </div>
-            <div style={{ margin: '8px auto 0', width: '60%', opacity: 0.7 }}>
-              <JaliStrip color="#C7B79D" width="100%" />
-            </div>
-            <div className="bloom-stats">
-              <span className="collection-stat">{active.length} live pages</span>
-              <span className="collection-stat">{classes.length} course folios</span>
-              <span className="collection-stat">{archived.length} saved versions</span>
+            <div className="hero-wordmark-rule" aria-hidden="true" />
+            <div className="hero-wordmark-note">notes in the margin</div>
+            <div className="hero-wordmark-meta">
+              {active.length} active entries · {classes.length} course folios · {archived.length} archived
             </div>
           </>
         )}
@@ -1094,11 +1398,7 @@ export default function App() {
           <>
             <button type="button" onClick={() => setSelectedClass(null)} className="desk-tool-link" style={{ marginBottom: 10 }}>Back to Course Folios</button>
             <h1 className="bloom-title">{selectedCourse}</h1>
-            {courseFileCount > 0 && (
-              <div className="bloom-stats">
-                {courseFileCount > 0 && <span className="collection-stat">{courseFileCount} pages</span>}
-              </div>
-            )}
+            {courseFileCount > 0 && <div className="bloom-stats"><span className="collection-stat">{courseFileCount} pages</span></div>}
           </>
         )}
 
@@ -1116,7 +1416,7 @@ export default function App() {
           </>
         )}
       </div>
-    </div>
+    </ArchCard>
   )
 
   const viewerPanel = viewing ? (
@@ -1133,11 +1433,17 @@ export default function App() {
 
   const notebookPanel = (
     <DeskNotebook
-      notes={noteFile?.content || ''}
+      mode={notebookMode || 'center-desk'}
+      pages={notebookPages}
+      activePageId={activePageId}
       tasks={notebookTasks}
       hasPinnedNote={Boolean(pinnedNote)}
       companionFile={continueFile}
-      onSave={handleNotebookSave}
+      onSavePage={handleSavePage}
+      onAddPage={handleAddPage}
+      onDeletePage={handleDeletePage}
+      onSetActivePage={setActivePageId}
+      onSaveTasks={handleSaveTasks}
       onPin={handlePinNote}
       onClearPin={clearPinnedNote}
       onOpenCompanion={openFileWithFocus}
@@ -1154,18 +1460,46 @@ export default function App() {
         <div className="portal-shell">
           <nav className={`archive-rail ${focusModeActive ? 'archive-rail-muted' : ''}`}>
             <div className="sidebar-arch hidden lg:flex">
-                <div className="sidebar-arch-sides">
-                  <div className="sidebar-arch-content">
-                    <div aria-hidden="true" style={{ position: 'absolute', top: 6, left: 6, pointerEvents: 'none', zIndex: 1 }}>
-                      <MughalCorner size={32} color="#C97C8A" />
-                    </div>
-                    <div aria-hidden="true" style={{ position: 'absolute', top: 6, right: 6, pointerEvents: 'none', zIndex: 1, transform: 'scaleX(-1)' }}>
-                      <MughalCorner size={32} color="#C97C8A" />
-                    </div>
-                    <div className="sidebar-section">
-                      <button type="button" className="desk-tool-link" onClick={goHome} style={{ marginBottom: 0 }}>
-                        Return to the desk
-                      </button>
+              <div className="sidebar-arch-top" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                <ArchCard
+                  uid="sidebar-monogram"
+                  variant="sidebar"
+                  surface="var(--color-parchment)"
+                  style={{ width: '188px', height: '236px', flexShrink: 0 }}
+                >
+                  <button
+                    type="button"
+                    className="sidebar-crest-shell"
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 8, padding: 0, background: 'none', border: 'none', cursor: 'pointer', width: '100%' }}
+                    onClick={() => { closeViewing(); setSelectedClass(null); setActivePanel(null); setFocusedObject(null); setNav('library') }}
+                    aria-label="Return to home"
+                  >
+                    <BookplateLogo size={78} />
+                    <svg width="88" height="18" viewBox="0 0 88 18" aria-hidden="true" style={{ opacity: 0.6 }}>
+                      <path
+                        d="M 0 10 Q 6 4 12 10 Q 18 16 24 10 Q 30 4 36 10 Q 42 16 48 10 Q 54 4 60 10 Q 66 16 72 10 Q 78 4 84 10"
+                        fill="none"
+                        stroke="var(--color-gold)"
+                        strokeWidth="0.9"
+                      />
+                    </svg>
+                    <div className="sidebar-crest-caption">Jot Gloss</div>
+                  </button>
+                </ArchCard>
+              </div>
+
+              <div className="sidebar-arch-sides">
+                <div className="sidebar-arch-content">
+                  <div aria-hidden="true" style={{ position: 'absolute', top: 6, left: 6, pointerEvents: 'none', zIndex: 1 }}>
+                    <MughalCorner size={32} color="var(--color-accent)" />
+                  </div>
+                  <div aria-hidden="true" style={{ position: 'absolute', top: 6, right: 6, pointerEvents: 'none', zIndex: 1, transform: 'scaleX(-1)' }}>
+                    <MughalCorner size={32} color="var(--color-accent)" />
+                  </div>
+                  <div className="sidebar-section">
+                    <button type="button" className="desk-tool-link" onClick={goHome} style={{ marginBottom: 0 }}>
+                      Home
+                    </button>
                   </div>
 
                   <DiamondDivider />
@@ -1225,7 +1559,7 @@ export default function App() {
                           }}
                           className="course-edit-form"
                         >
-                          <input name="new-course" placeholder="New course..." className="input-warm" />
+                          <input name="new-course" placeholder="Name a new course..." className="input-warm" />
                           <button type="submit" className="bookplate-action compact">Add</button>
                         </form>
                       </div>
@@ -1234,6 +1568,26 @@ export default function App() {
                 </div>
               </div>
 
+              <div className="sidebar-arch-bottom" style={{ width: '100%', padding: '0 12px', marginTop: 'auto' }}>
+                <svg width="100%" viewBox="0 0 236 40" aria-hidden="true" style={{ display: 'block' }}>
+                  <path
+                    d="M 0 40 Q 15 18 30 40 Q 45 18 60 40 Q 75 18 90 40 Q 105 18 118 40 Q 131 18 146 40 Q 161 18 176 40 Q 191 18 206 40 Q 221 18 236 40"
+                    fill="none"
+                    stroke="var(--color-gold)"
+                    strokeWidth="1"
+                    opacity="0.55"
+                  />
+                  {[15, 45, 75, 105, 131, 161, 191, 221].map((x) => (
+                    <circle key={x} cx={x} cy="20" r="1.8" fill="var(--color-gold)" opacity="0.4" />
+                  ))}
+                  {[0, 60, 118, 176, 236].map((x, i) => (
+                    <g key={i} transform={`translate(${x}, 40)`}>
+                      <circle cx="0" cy="0" r="2.5" fill="var(--color-accent)" opacity="0.3" />
+                      <circle cx="0" cy="0" r="1" fill="var(--color-gold)" opacity="0.5" />
+                    </g>
+                  ))}
+                </svg>
+              </div>
             </div>
 
             <div className="mobile-study-door-bar lg:hidden">
@@ -1284,7 +1638,7 @@ export default function App() {
 
                         <div className="sidebar-section">
                           <button type="button" className="desk-tool-link" onClick={goHome}>
-                            Return to the desk
+                            Home
                           </button>
                         </div>
 
@@ -1344,7 +1698,7 @@ export default function App() {
                                 }}
                                 className="course-edit-form"
                               >
-                                <input name="new-course" placeholder="New course..." className="input-warm" />
+                                <input name="new-course" placeholder="Name a new course..." className="input-warm" />
                                 <button type="submit" className="bookplate-action compact">Add</button>
                               </form>
                             </div>
@@ -1368,12 +1722,12 @@ export default function App() {
 
           <main className={`main-desk ${focusModeActive ? 'main-desk-focused' : ''} ${deskFocusOnRail ? 'main-desk-cleared' : ''} ${deskFocusOnFolio ? 'main-desk-folio' : ''}`}>
             <div className={`main-desk-inner ${focusModeActive ? 'main-desk-inner-focused' : ''}`}>
-              {viewing && activePanel === 'notebook' ? (
+              {viewing && notebookMode === 'side-panel' ? (
                 <div style={{ display: 'flex', height: '100%', minHeight: 0 }}>
-                  <div style={{ flex: '0 0 55%', overflowY: 'auto', borderRight: '1px solid rgba(199,183,157,0.3)', paddingRight: 0 }}>
+                  <div style={{ flex: '1 1 auto', overflowY: 'auto', minWidth: 0 }}>
                     {viewerPanel}
                   </div>
-                  <div style={{ flex: '0 0 45%', overflowY: 'auto', paddingLeft: 0 }}>
+                  <div style={{ flex: '0 0 320px', maxWidth: '35%', overflowY: 'auto' }}>
                     {notebookPanel}
                   </div>
                 </div>
@@ -1383,19 +1737,6 @@ export default function App() {
                 <>
                   {!notebookOverlayActive && <div className={`bloom-title-block ${deskFocusOnRail ? 'desk-panel-resting' : ''}`}>{titleBlock}</div>}
 
-                  {!notebookOverlayActive && showFolders && featured && (
-                    <div className={`hero-panel ${deskFocusOnRail ? 'desk-panel-resting' : ''}`}>
-                      <StudyFolio
-                        title={humanTitle(featured.name)}
-                        subtitle={`${featured.className} · ${featured.resourceType}`}
-                        stamp="Latest Entry"
-                        accent={getFolioAccent(featured.className)}
-                        onOpen={() => openFileWithFocus(featured)}
-                      >
-                        <p className="hero-note">Pick up where you left off.</p>
-                      </StudyFolio>
-                    </div>
-                  )}
 
                   {!notebookOverlayActive && (
                     <div className={`desk-rail-inline ${deskFocusOnFolio ? 'desk-rail-inline-resting' : ''}`}>
@@ -1463,9 +1804,22 @@ export default function App() {
                     }} />}
                   </div>
 
+                  {!notebookOverlayActive && showFolders && featured && (
+                    <div className="featured-folio-wrap">
+                      <StudyFolio
+                        title={humanTitle(featured.name)}
+                        subtitle={`${featured.className} · ${featured.resourceType}`}
+                        stamp="Latest Entry"
+                        accent={getFolioAccent(featured.className)}
+                        note="Resume exactly where you left off."
+                        onOpen={() => openFileWithFocus(featured)}
+                      />
+                    </div>
+                  )}
+
                   {!notebookOverlayActive && (!showFolders || showArchive || selectedClass !== null) && (
                     <UtilityBookplate tone="parchment" surface="bare" kicker="Index" className={`search-filter-shell ${deskFocusOnRail ? 'desk-panel-resting' : ''}`}>
-                      <input type="search" placeholder="Search notes and folios..." value={filters.search} onChange={(event) => setFilters({ ...filters, search: event.target.value })} className="index-search" />
+                      <input type="search" placeholder="Find a folio or page..." value={filters.search} onChange={(event) => setFilters({ ...filters, search: event.target.value })} className="index-search" />
 
                       <div className="search-filter-controls">
                         <div className="sort-link-row">
@@ -1497,13 +1851,13 @@ export default function App() {
                   {!notebookOverlayActive && <div className={`center-content-stack ${deskFocusOnRail ? 'desk-panel-resting' : ''} ${deskFocusOnFolio ? 'center-content-stack-focused' : ''}`}>
                     {loading ? (
                       <UtilityBookplate tone="parchment" surface="bare" kicker="Opening" title="Opening your desk">
-                        <p className="rail-copy">The folios are being gathered now.</p>
+                        <p className="rail-copy">Gathering the folios...</p>
                       </UtilityBookplate>
                     ) : showFolders ? (
                       <>
                         <FloralBorder />
-                        <UtilityBookplate tone="parchment" surface="bare" kicker="Course Folios" title="By course" footer={`${folders.length} folios · ${active.length} live pages`}>
-                          <div className="folio-sort-row">
+                        <UtilityBookplate tone="parchment" surface="bare" kicker="Course Folios" title="Browse by course">
+                          <div className="folio-sort-row course-folio-sort-row">
                             <span className="folio-sort-label">Sort by</span>
                             <div className="sort-link-row">
                               {([
@@ -1522,9 +1876,16 @@ export default function App() {
                               ))}
                             </div>
                           </div>
-                          <div className="card-grid">
+                          <div className="card-grid course-folio-grid">
                             {sortedFolders.map((folder, index) => (
-                              <ClassFolder key={folder.name} className={folder.name} files={folder.files} onClick={() => setSelectedClass(folder.name)} index={index} />
+                              <ClassFolder
+                                key={folder.name}
+                                index={index}
+                                title={folder.name}
+                                kicker="Course Folio"
+                                entryCount={folder.files.length}
+                                onClick={() => setSelectedClass(folder.name)}
+                              />
                             ))}
                           </div>
                         </UtilityBookplate>
@@ -1532,9 +1893,10 @@ export default function App() {
 
                         <ArchDivider width="48%" />
 
-                        <UtilityBookplate tone="parchment" surface="bare" kicker="Recent Pages">
-                          <div>
-                            {recent.slice(1, 7).map((file, index) => (
+                        <UtilityBookplate className="recent-pages-field" tone="parchment" surface="veil" kicker="Recent Pages">
+                          <p className="recent-pages-note">Freshly opened folios, still warm on the desk.</p>
+                          <div className="recent-pages-list">
+                            {recent.slice(1, 6).map((file, index) => (
                               <FileCard
                                 key={file.id}
                                 file={file}
@@ -1551,7 +1913,7 @@ export default function App() {
                         </UtilityBookplate>
 
                         <div className="browse-all-wrap">
-                          <button type="button" onClick={() => setSelectedClass('')} className="desk-tool-link browse-all-link">Browse all entries</button>
+                          <button type="button" onClick={() => setSelectedClass('')} className="desk-tool-link browse-all-link">See everything on the desk</button>
                         </div>
                       </>
                     ) : (
@@ -1563,7 +1925,7 @@ export default function App() {
                         footer={`${filtered.length} visible in this view`}
                       >
                         {filtered.length === 0 ? (
-                          <p className="rail-copy">No entries are visible in this view yet. Add a folio or clear the current filters to repopulate the desk.</p>
+                          <p className="rail-copy">The desk is clear. Add a folio or loosen the filters to see your pages again.</p>
                         ) : (
                           filtered.map((file, index) => (
                             <FileCard

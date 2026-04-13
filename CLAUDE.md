@@ -163,7 +163,16 @@ Do not silently replace these with a new generic component library or dashboard 
 - Rail designs that give utility widgets equal visual weight with the main desk
 - Feature work that resets session context without a strong reason
 
-## 15. Definition of Done
+## 15. Protected Files — Do Not Rewrite
+
+The following files contain hand-tuned SVG geometry, ornamental detail, or design constants that must NOT be simplified, refactored, or "cleaned up" by automated tools:
+
+- `src/components/ArchCard.tsx` — The `PATHS` object contains hand-tuned Mughal ogee arch geometry. The `CornerBotanical`, `RoseBud`, and `ForgetMeNot` functions contain detailed Victorian/Mughal floral SVG ornaments with layered petals, veined leaves, and curling tendrils. Do NOT replace these with simplified circles or basic stems. Do NOT change the arch path coordinates, `BELLY_TOP`, or `BELLY_INSET` values.
+- `src/components/UtilityBookplate.tsx` — Uses a double-inset Victorian frame (midFrame at inset 4px, innerFrame at inset 8px) with wash gradients. Do NOT replace with a single arch SVG or simplified borders.
+- `src/components/DiamondDivider.tsx` — Uses a layered ornamental diamond rule with double lines, petal accents, and flanking dots. Do NOT simplify to basic line/diamond/circle.
+- `src/components/Ornaments.tsx` — Contains `FloralBorder` and `MughalCorner` with rich multi-element SVG ornaments. Do NOT simplify.
+
+## 16. Definition of Done
 
 Before considering a UI change complete, verify that:
 
