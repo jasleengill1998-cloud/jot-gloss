@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps, type ReactNode } from 'react'
 import type { DuplicateAction, Filters, SortDir, SortField, StudyFile, StudySource } from './types'
 import { useClasses } from './hooks/useClasses'
@@ -69,13 +70,88 @@ const DESK_META_PREFIX = '__jot-gloss-'
 const DESK_NOTE_FILE = `${DESK_META_PREFIX}notes.md`
 const DESK_TASKS_FILE = `${DESK_META_PREFIX}tasks.md`
 const STUDY_MIXES: StudyMix[] = [
-  { key: 'library', label: 'The reading hour', startIndex: 0 },
-  { key: 'night', label: 'Past midnight', startIndex: 10 },
-  { key: 'rain', label: 'Rain on glass', startIndex: 20 },
+  { key: 'library',   label: 'Sunlight through the stacks', startIndex: 0 },
+  { key: 'night',     label: 'After hours',                 startIndex: 10 },
+  { key: 'rain',      label: 'The window seat',             startIndex: 20 },
+  { key: 'static',    label: 'The B-side',                  startIndex: 30 },
+  { key: 'courtyard', label: 'The courtyard',               startIndex: 40 },
+  { key: 'dust',      label: 'Dust and strings',            startIndex: 50 },
 ]
 
 function isCabinetPanel(panel: Exclude<PanelKey, null>) {
   return panel !== 'notebook'
+}
+
+function DeskCalculator() {
+  const [display, setDisplay] = React.useState('0')
+  const [prev, setPrev] = React.useState<number | null>(null)
+  const [op, setOp] = React.useState<string | null>(null)
+  const [fresh, setFresh] = React.useState(true)
+
+  const press = (val: string) => {
+    if (val === 'C') { setDisplay('0'); setPrev(null); setOp(null); setFresh(true); return }
+    if (['+', '−', '×', '÷'].includes(val)) {
+      setPrev(parseFloat(display)); setOp(val); setFresh(true); return
+    }
+    if (val === '=') {
+      if (prev === null || !op) return
+      const cur = parseFloat(display)
+      const result = op === '+' ? prev + cur : op === '−' ? prev - cur : op === '×' ? prev * cur : cur !== 0 ? prev / cur : 0
+      setDisplay(String(parseFloat(result.toFixed(10))))
+      setPrev(null); setOp(null); setFresh(true); return
+    }
+    if (val === '.' && display.includes('.') && !fresh) return
+    setDisplay(fresh ? (val === '.' ? '0.' : val) : display === '0' && val !== '.' ? val : display + val)
+    setFresh(false)
+  }
+
+  const btn = (label: string, type: 'num' | 'op' | 'eq' | 'clear') => (
+    <button
+      key={label}
+      type="button"
+      onClick={() => press(label)}
+      style={{
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: 13,
+        padding: '6px 0',
+        background: type === 'eq' ? 'rgba(201,124,138,0.15)' : type === 'op' ? 'rgba(199,183,157,0.2)' : type === 'clear' ? 'rgba(201,124,138,0.08)' : 'rgba(255,248,242,0.8)',
+        border: '1px solid rgba(199,183,157,0.3)',
+        color: type === 'op' ? '#5A3E4B' : type === 'eq' ? '#C97C8A' : '#3A2830',
+        cursor: 'pointer',
+        borderRadius: 2,
+      }}
+    >
+      {label}
+    </button>
+  )
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: 18,
+        textAlign: 'right',
+        padding: '6px 10px',
+        background: 'rgba(255,248,242,0.9)',
+        border: '1px solid rgba(199,183,157,0.3)',
+        color: '#3A2830',
+        letterSpacing: '0.04em',
+        minHeight: 36,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}>
+        {display}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+        {btn('C','clear')}{btn('','op')}{btn('','op')}{btn('÷','op')}
+        {btn('7','num')}{btn('8','num')}{btn('9','num')}{btn('×','op')}
+        {btn('4','num')}{btn('5','num')}{btn('6','num')}{btn('−','op')}
+        {btn('1','num')}{btn('2','num')}{btn('3','num')}{btn('+','op')}
+        {btn('0','num')}{btn('.','num')}{btn('=','eq')}
+      </div>
+    </div>
+  )
 }
 
 const DAILY_QUOTES = [
@@ -401,6 +477,10 @@ function JotGlossStudyRail({
               <button type="button" className={`bookplate-action ${activePanel === 'sync' ? 'active' : ''}`} onClick={() => onTogglePanel('sync')}>
                 {syncLabel}
               </button>
+            </div>
+            <div style={{ marginTop: 16, borderTop: '1px solid rgba(199,183,157,0.3)', paddingTop: 14 }}>
+              <div className="desk-cabinet-heading" style={{ marginBottom: 8 }}>The Counting House</div>
+              <DeskCalculator />
             </div>
           </div>
         </details>
