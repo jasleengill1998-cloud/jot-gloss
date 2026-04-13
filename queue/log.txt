@@ -2,3 +2,7 @@
 [2026-04-12 20:56:53] [INFO] Watching: C:\Users\jasle\Desktop\jot-gloss\queue\next-task.txt
 [2026-04-12 20:56:53] [INFO] Poll interval: 3 seconds
 [2026-04-12 20:56:53] [INFO] Press Ctrl+C to stop.
+[2026-04-12 21:19:30] [INFO] File change detected.
+[2026-04-12 21:19:30] [INFO] Task detected. Target: ''. Body length: 0 chars.
+[2026-04-12 21:19:30] [WARN] Unknown TARGET value: ''. Must be 'codex' or 'chatgpt'.
+[2026-04-12 21:19:30] [target] Cannot paste â€

@@ -14,12 +14,12 @@ interface Props {
 }
 
 const TONES: Record<Tone, { background: string; wash: string; line: string }> = {
-  cream: { background: 'rgba(255, 248, 242, 0.95)', wash: 'rgba(255, 252, 248, 0.84)', line: 'rgba(180, 140, 135, 0.30)' },
-  blush: { background: '#F2D0CC', wash: 'rgba(248, 226, 223, 0.82)', line: 'rgba(201, 124, 138, 0.32)' },
-  powder: { background: 'rgba(212, 228, 208, 0.95)', wash: 'rgba(229, 239, 226, 0.84)', line: 'rgba(184, 156, 120, 0.30)' },
-  butter: { background: 'rgba(245, 230, 184, 0.95)', wash: 'rgba(249, 239, 204, 0.84)', line: 'rgba(178, 148, 88, 0.35)' },
-  lilac: { background: 'rgba(221, 212, 236, 0.95)', wash: 'rgba(241, 236, 247, 0.84)', line: 'rgba(155, 140, 175, 0.28)' },
-  sage: { background: '#D4E4D0', wash: 'rgba(229, 239, 226, 0.82)', line: 'rgba(184, 156, 120, 0.30)' },
+  cream: { background: 'rgba(255, 248, 242, 0.95)', wash: 'rgba(255, 252, 248, 0.92)', line: 'rgba(184, 160, 144, 0.5)' },
+  blush: { background: 'rgba(255, 234, 230, 0.95)', wash: 'rgba(255, 243, 239, 0.92)', line: 'rgba(201, 124, 138, 0.5)' },
+  powder: { background: 'rgba(212, 228, 208, 0.95)', wash: 'rgba(228, 240, 226, 0.92)', line: 'rgba(144, 177, 145, 0.5)' },
+  butter: { background: 'rgba(245, 230, 184, 0.95)', wash: 'rgba(250, 240, 210, 0.92)', line: 'rgba(194, 167, 108, 0.52)' },
+  lilac: { background: 'rgba(221, 212, 236, 0.95)', wash: 'rgba(234, 228, 246, 0.92)', line: 'rgba(164, 143, 191, 0.5)' },
+  sage: { background: 'rgba(212, 228, 208, 0.95)', wash: 'rgba(228, 240, 226, 0.92)', line: 'rgba(144, 177, 145, 0.52)' },
 }
 
 export default function UtilityBookplate({
