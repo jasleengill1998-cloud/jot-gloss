@@ -9,6 +9,7 @@ import type { MoodKey } from './hooks/useGramophone'
 import BookplateLogo from './components/BookplateLogo'
 import ClassFolder from './components/ClassFolder'
 import ClipboardWatcher from './components/ClipboardWatcher'
+import DeskTodoPanel from './components/DeskTodoPanel'
 import DuplicateModal from './components/DuplicateModal'
 import DeskNotebook, { type DeskTask } from './components/DeskNotebook'
 import { DiamondDivider } from './components/DiamondDivider'
@@ -19,15 +20,17 @@ import FileViewer from './components/FileViewer'
 import FloatingTimer from './components/FloatingTimer'
 import PromptBank from './components/PromptBank'
 import QuickAdd from './components/QuickAdd'
+import StickyNote from './components/StickyNote'
 import StudyFolio from './components/StudyFolio'
 import type { Accent } from './components/StudyFolio'
 import StudyStats from './components/StudyStats'
 import StudyTimer from './components/StudyTimer'
 import SyncPanel from './components/SyncPanel'
-import { ArchDivider } from './components/Ornaments'
+import { ArchDivider, FloralBorder, JaliStrip, MughalCorner } from './components/Ornaments'
 import UtilityBookplate from './components/UtilityBookplate'
 import { loadAppSession, saveAppSession, type AppNav, type FocusedObject } from './utils/appSession'
 import { getVersionGroup, getVersionSummary } from './utils/studyFiles'
+import { useStickyNotes } from './hooks/useStickyNotes'
 
 type Nav = 'library' | 'archive'
 type PanelKey = 'upload' | 'paste' | 'notebook' | 'prompts' | 'sync' | 'timer' | 'stats' | null
@@ -214,6 +217,7 @@ interface RailProps {
   recentActivity: StudyFile[]
   pinnedNote: { text: string; updatedAt: number } | null
   dailyCard: { kicker: string; title: string; body: string; href?: string; source?: string }
+  viewing: StudyFile | null
   activePanel: PanelKey
   isArchiveView: boolean
   clipboardOpen: boolean
@@ -235,6 +239,7 @@ interface RailProps {
   musicActionLabel: string
   onToggleMusic: () => void
   onSelectMix: (mix: StudyMix) => void
+  onAddStickyNote: () => void
 }
 
 interface FocusableRailSectionProps {
@@ -295,6 +300,8 @@ function JotGlossStudyRail({
   continueFile,
   recentActivity,
   pinnedNote,
+  dailyCard,
+  viewing,
   activePanel,
   isArchiveView,
   clipboardOpen,
@@ -316,120 +323,190 @@ function JotGlossStudyRail({
   musicActionLabel,
   onToggleMusic,
   onSelectMix,
+  onAddStickyNote,
 }: RailProps) {
   const filingCabinetActive = cabinetOpen || isArchiveView || activePanel === 'upload' || activePanel === 'paste' || activePanel === 'prompts' || activePanel === 'sync' || activePanel === 'timer' || activePanel === 'stats'
 
   return (
     <div className="desk-rail-stack">
-      <FocusableRailSection
-        tone="sage"
-        kicker="Pen & Paper"
-        title="Writing Desk"
-        objectKey="notebook"
-        focusedObject={focusedObject}
-        onSpineClick={() => onFocusObject('notebook')}
-        onClearFocus={onClearFocus}
-        closeLabel="Leave the notebook"
-      >
-        <p className="rail-copy">
-          {pinnedNote
-            ? pinnedNote.text
-            : 'Keep one working page beside the desk so notes, checklists, and loose thoughts stay in the room.'}
-        </p>
-        <div className="rail-note-meta">
-          {pinnedNote ? `Set down ${formatLongDate(new Date(pinnedNote.updatedAt))}.` : 'Open the notebook to save notes and to-do slips.'}
+      <div style={{
+        background: 'rgba(245,230,184,0.95)',
+        border: '1px solid rgba(194,167,108,0.52)',
+        padding: '14px 16px 12px',
+        position: 'relative',
+      }}>
+        <div aria-hidden="true" style={{
+          position: 'absolute', inset: 5,
+          border: '1px solid rgba(194,167,108,0.28)',
+          pointerEvents: 'none',
+        }} />
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{
+            fontFamily: "'Cormorant Garamond',Georgia,serif",
+            fontSize: 11, fontWeight: 700, letterSpacing: '0.18em',
+            textTransform: 'uppercase', color: '#C97C8A', marginBottom: 8,
+          }}>
+            Where You Left Off
+          </div>
+
+          {continueFile && (
+            <button type="button" className="bookplate-action" onClick={() => onOpenFile(continueFile)}
+              style={{ marginBottom: 10, width: '100%' }}>
+              Back to the books
+            </button>
+          )}
+
+          <div className="archive-activity-list">
+            {recentActivity.length === 0 ? (
+              <p className="rail-copy" style={{ fontStyle: 'italic', opacity: 0.6 }}>
+                Open a folio and it will wait here for you.
+              </p>
+            ) : (
+              recentActivity.map((file: StudyFile) => (
+                <button key={file.id} type="button" className="archive-activity-item"
+                  onClick={() => onOpenFile(file)}>
+                  <span className="archive-activity-title">{humanTitle(file.name)}</span>
+                  <span className="archive-activity-meta">
+                    {shortCourseName(file.className)} · {formatActivityDate(file.updatedAt)}
+                  </span>
+                </button>
+              ))
+            )}
+          </div>
         </div>
-        <div className="rail-button-stack" style={{ marginTop: 12 }}>
-          <button
-            type="button"
-            className={`bookplate-action ${activePanel === 'notebook' ? 'active' : ''}`}
-            onClick={() => {
-              onFocusObject('notebook')
-              onTogglePanel('notebook')
-            }}
-          >
-            Open the notebook
-          </button>
-        </div>
-      </FocusableRailSection>
+      </div>
 
       <DiamondDivider />
 
       <FocusableRailSection
-        tone="butter"
-        kicker="Where You Left Off"
-        title="The Clipboard"
-        objectKey="clipboard"
+        tone="sage"
+        kicker="Stationery"
+        title=""
+        objectKey="notebook"
         focusedObject={focusedObject}
-        onSpineClick={() => {
-          onFocusObject('clipboard')
-          onClipboardToggle(true)
-        }}
-        onClearFocus={() => {
-          onClipboardToggle(false)
-          onClearFocus()
-        }}
-        closeLabel="Leave the clipboard"
+        onSpineClick={() => onFocusObject('notebook')}
+        onClearFocus={onClearFocus}
+        closeLabel="Leave the stationery"
       >
-        <details className="desk-cabinet-details rail-drawer" open={clipboardOpen} onToggle={(event) => onClipboardToggle((event.currentTarget as HTMLDetailsElement).open)}>
-          <summary className="desk-cabinet-summary">{clipboardOpen ? 'Close the clipboard' : 'Back to the books'}</summary>
-          <div className="desk-cabinet-content">
-            <p className="rail-copy">
-              {continueFile ? `${continueFile.className} · ${continueFile.resourceType}` : 'Nothing on the clipboard yet.'}
-            </p>
-            {continueFile && (
-              <button type="button" className="bookplate-action" onClick={() => onOpenFile(continueFile)} style={{ marginTop: 12 }}>
-                Back to the books
-              </button>
-            )}
+        <div className="rail-button-stack">
+          <button type="button"
+            className={`bookplate-action ${activePanel === 'notebook' ? 'active' : ''}`}
+            onClick={() => { onFocusObject('notebook'); onTogglePanel('notebook') }}>
+            Open the notebook
+          </button>
 
-            <div className="desk-cabinet-section">
-              <div className="desk-cabinet-heading">Recently opened</div>
-              <div className="archive-activity-list">
-                {recentActivity.length === 0 ? (
-                  <p className="rail-copy">Resume a folio or save a note and the clipboard will start keeping a trail for you.</p>
-                ) : (
-                  recentActivity.map((file: StudyFile) => (
-                    <button key={file.id} type="button" className="archive-activity-item" onClick={() => onOpenFile(file)}>
-                      <span className="archive-activity-title">{humanTitle(file.name)}</span>
-                      <span className="archive-activity-meta">{shortCourseName(file.className)} · {formatActivityDate(file.updatedAt)}</span>
-                    </button>
-                  ))
-                )}
-              </div>
-            </div>
+          {viewing && (
+            <button
+              type="button"
+              className={`bookplate-action ${activePanel === 'notebook' ? 'active' : ''}`}
+              onClick={() => onTogglePanel('notebook')}>
+              Open beside the folio
+            </button>
+          )}
+
+          <button type="button"
+            className="bookplate-action"
+            onClick={onAddStickyNote}
+            title="Place a sticky note"
+            style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M1 1 H10 L13 4 V13 H1 Z" stroke="#5A3E4B" strokeWidth="0.9" fill="rgba(245,230,184,0.5)"/>
+              <path d="M10 1 V4 H13" stroke="#5A3E4B" strokeWidth="0.8" fill="none"/>
+              <line x1="3" y1="7" x2="11" y2="7" stroke="#C7B79D" strokeWidth="0.6"/>
+              <line x1="3" y1="9.5" x2="9" y2="9.5" stroke="#C7B79D" strokeWidth="0.6"/>
+            </svg>
+            Place a sticky note
+          </button>
+
+          <button type="button"
+            className={`bookplate-action ${activePanel === 'timer' ? 'active' : ''}`}
+            onClick={() => onTogglePanel('timer')}>
+            Desk Clock
+          </button>
+        </div>
+
+        {pinnedNote && (
+          <div style={{
+            marginTop: 12, paddingTop: 10,
+            borderTop: '1px solid rgba(199,183,157,0.3)',
+            fontFamily: "'EB Garamond',Georgia,serif",
+            fontSize: 12, color: 'rgba(90,62,75,0.7)',
+            fontStyle: 'italic',
+          }}>
+            {pinnedNote.text}
           </div>
-        </details>
+        )}
       </FocusableRailSection>
 
       <DiamondDivider />
 
       <FocusableRailSection
         tone="parchment"
-        kicker="Parlour Music"
-        title="The Gramophone"
+        kicker=""
+        title=""
         objectKey="music"
         focusedObject={focusedObject}
         onSpineClick={onClearFocus}
         wrapperClassName={musicPlaying ? 'gramophone-playing' : 'gramophone-resting'}
       >
-        <div className="desk-cabinet-content">
-          <div className="music-drawer-row">
-            <button type="button" className="bookplate-action compact" onClick={onToggleMusic}>
-              {musicActionLabel}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '4px 0 8px' }}>
+          <svg width="68" height="56" viewBox="0 0 72 60" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+            <path d="M 36 52 L 8 12 Q 6 8 10 6 Q 14 4 18 8 L 44 48"
+                  fill="rgba(200,169,110,0.18)" stroke="#C8A96E" strokeWidth="1.2" strokeLinecap="round"/>
+            <path d="M 8 12 Q 4 4 12 2 Q 22 0 28 8 L 44 48"
+                  fill="rgba(200,169,110,0.08)" stroke="#C8A96E" strokeWidth="0.7" strokeLinecap="round" opacity="0.6"/>
+            <ellipse cx="12" cy="8" rx="8" ry="5"
+                     fill="rgba(200,169,110,0.12)" stroke="#C8A96E" strokeWidth="1" transform="rotate(-20, 12, 8)"/>
+            <line x1="44" y1="48" x2="52" y2="52" stroke="#A9978D" strokeWidth="1.5" strokeLinecap="round"/>
+            <ellipse cx="56" cy="54" rx="13" ry="5" fill="rgba(58,40,48,0.08)" stroke="#A9978D" strokeWidth="0.8"/>
+            <ellipse cx="56" cy="54" rx="9" ry="3.5" fill="rgba(90,62,75,0.06)" stroke="#C8A96E" strokeWidth="0.5" opacity="0.7"/>
+            <circle cx="56" cy="54" r="1.5" fill="#C8A96E" opacity="0.5"/>
+          </svg>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
+            <button type="button" onClick={onToggleMusic} aria-label={musicActionLabel}
+              style={{
+                width: 30, height: 30, borderRadius: '50%', flexShrink: 0, cursor: 'pointer',
+                background: musicPlaying ? 'rgba(201,124,138,0.18)' : 'rgba(200,169,110,0.12)',
+                border: `1px solid ${musicPlaying ? 'rgba(201,124,138,0.4)' : 'rgba(200,169,110,0.35)'}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'all 0.2s ease',
+              }}>
+              {musicPlaying
+                ? <svg width="9" height="11" viewBox="0 0 9 11" fill="none" aria-hidden="true">
+                    <rect x="1" y="1" width="2.5" height="9" rx="0.8" fill="#5A3E4B" opacity="0.7"/>
+                    <rect x="5.5" y="1" width="2.5" height="9" rx="0.8" fill="#5A3E4B" opacity="0.7"/>
+                  </svg>
+                : <svg width="9" height="11" viewBox="0 0 9 11" fill="none" aria-hidden="true">
+                    <path d="M2 1L8 5.5L2 10Z" fill="#5A3E4B" opacity="0.7"/>
+                  </svg>
+              }
             </button>
-            <div className="music-mix-row">
-              {studyMixes.map((mix) => (
-                <button
-                  key={mix.key}
-                  type="button"
-                  className={`music-mix-chip ${activeMixKey === mix.key ? 'active' : ''}`}
-                  onClick={() => onSelectMix(mix)}
-                >
-                  {mix.label}
-                </button>
-              ))}
-            </div>
+            <span style={{
+              fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 12, fontStyle: 'italic',
+              color: 'rgba(90,62,75,0.7)', flex: 1, overflow: 'hidden',
+              textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {studyMixes.find(m => m.key === activeMixKey)?.label ?? '—'}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+            {studyMixes.map((mix) => (
+              <button key={mix.key} type="button" onClick={() => onSelectMix(mix)} title={mix.label}
+                style={{
+                  padding: '2px 8px', cursor: 'pointer', borderRadius: 2,
+                  fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 10,
+                  letterSpacing: '0.06em', whiteSpace: 'nowrap',
+                  background: activeMixKey === mix.key ? 'rgba(201,124,138,0.16)' : 'rgba(200,169,110,0.07)',
+                  border: `1px solid ${activeMixKey === mix.key ? 'rgba(201,124,138,0.4)' : 'rgba(200,169,110,0.22)'}`,
+                  color: activeMixKey === mix.key ? '#5A3E4B' : 'rgba(90,62,75,0.5)',
+                  maxWidth: 112, overflow: 'hidden', textOverflow: 'ellipsis',
+                  transition: 'all 0.15s ease',
+                }}>
+                {mix.label}
+              </button>
+            ))}
           </div>
         </div>
       </FocusableRailSection>
@@ -438,22 +515,27 @@ function JotGlossStudyRail({
 
       <FocusableRailSection
         tone="lavender"
-        kicker="Archive & Sundries"
-        title="The Filing Cabinet"
+        kicker=""
+        title=""
         objectKey="cabinet"
         focusedObject={focusedObject}
-        onSpineClick={() => {
-          onFocusObject('cabinet')
-          onCabinetToggle(true)
-        }}
-        onClearFocus={() => {
-          onCabinetToggle(false)
-          onClearFocus()
-        }}
+        onSpineClick={() => { onFocusObject('cabinet'); onCabinetToggle(true) }}
+        onClearFocus={() => { onCabinetToggle(false); onClearFocus() }}
         closeLabel="Leave the cabinet"
       >
-        <details className="desk-cabinet-details rail-drawer" open={filingCabinetActive} onToggle={(event) => onCabinetToggle((event.currentTarget as HTMLDetailsElement).open)}>
-          <summary className="desk-cabinet-summary">{filingCabinetActive ? 'Latch the cabinet' : 'Open the filing cabinet'}</summary>
+        <details className="desk-cabinet-details rail-drawer"
+          open={filingCabinetActive}
+          onToggle={(event) => onCabinetToggle((event.currentTarget as HTMLDetailsElement).open)}>
+          <summary className="desk-cabinet-summary">
+            <svg width="64" height="20" viewBox="0 0 64 20" fill="none" aria-hidden="true" style={{ display: 'block', margin: '0 auto' }}>
+              <rect x="0" y="9" width="64" height="1.5" rx="0.75" fill="rgba(169,151,141,0.25)"/>
+              <rect x="16" y="3" width="32" height="13" rx="3"
+                    fill="rgba(200,169,110,0.10)" stroke="rgba(200,169,110,0.45)" strokeWidth="1"/>
+              <rect x="22" y="9" width="20" height="2.5" rx="1.2" fill="rgba(200,169,110,0.38)"/>
+              <circle cx="22" cy="10.2" r="1.4" fill="rgba(169,151,141,0.35)"/>
+              <circle cx="42" cy="10.2" r="1.4" fill="rgba(169,151,141,0.35)"/>
+            </svg>
+          </summary>
           <div className="desk-cabinet-content">
             <div className="rail-button-stack">
               <button type="button" className={`bookplate-action ${isArchiveView ? 'active' : ''}`} onClick={onOpenArchive}>
@@ -468,9 +550,6 @@ function JotGlossStudyRail({
               <button type="button" className={`bookplate-action ${activePanel === 'prompts' ? 'active' : ''}`} onClick={() => onTogglePanel('prompts')}>
                 Prompt Drawer
               </button>
-              <button type="button" className={`bookplate-action ${activePanel === 'timer' ? 'active' : ''}`} onClick={() => onTogglePanel('timer')}>
-                Desk Clock
-              </button>
               <button type="button" className={`bookplate-action ${activePanel === 'stats' ? 'active' : ''}`} onClick={() => onTogglePanel('stats')}>
                 The Ledger
               </button>
@@ -479,7 +558,6 @@ function JotGlossStudyRail({
               </button>
             </div>
             <div style={{ marginTop: 16, borderTop: '1px solid rgba(199,183,157,0.3)', paddingTop: 14 }}>
-              <div className="desk-cabinet-heading" style={{ marginBottom: 8 }}>The Counting House</div>
               <DeskCalculator />
             </div>
           </div>
@@ -493,6 +571,7 @@ export default function App() {
   const { files, loading, addFile, updateFile, removeFile, findDuplicates, replaceAllFiles, sync } = useFiles()
   const { classes, addClass, removeClass } = useClasses()
   const timer = useStudyTimer(classes[0] || 'General')
+  const { notes: stickyNotes, addNote: addStickyNote, updateNote: updateStickyNote, removeNote: removeStickyNote } = useStickyNotes()
   const initialSession = useMemo(() => loadAppSession(), [])
   const initialNav: Nav = initialSession.nav === 'versions' ? 'archive' : 'library'
   const initialSelectedClass = initialSession.nav === 'all'
@@ -562,7 +641,11 @@ export default function App() {
   const visibleFiles = useMemo(() => files.filter((file) => !isDeskMetaFile(file)), [files])
   const noteFile = useMemo(() => files.find((file) => file.name === DESK_NOTE_FILE) || null, [files])
   const taskFile = useMemo(() => files.find((file) => file.name === DESK_TASKS_FILE) || null, [files])
-  const notebookTasks = useMemo(() => parseTaskChecklist(taskFile?.content || ''), [taskFile])
+  const [notebookTasks, setNotebookTasks] = useState<DeskTask[]>([])
+
+  useEffect(() => {
+    setNotebookTasks(parseTaskChecklist(taskFile?.content || ''))
+  }, [taskFile?.content])
 
   useEffect(() => {
     if (loading) return
@@ -866,10 +949,40 @@ export default function App() {
   }, [addFile, files, updateFile])
 
   const handleNotebookSave = useCallback(async (notes: string, tasks: DeskTask[]) => {
+    setNotebookTasks(tasks)
     await Promise.all([
       upsertDeskMetaFile(DESK_NOTE_FILE, notes, 'Desk Notes'),
       upsertDeskMetaFile(DESK_TASKS_FILE, serializeTaskChecklist(tasks), 'Desk Tasks'),
     ])
+  }, [upsertDeskMetaFile])
+
+  const addTodoTask = useCallback((text: string) => {
+    setNotebookTasks((current) => {
+      const newTask = {
+        id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+        text,
+        done: false,
+      }
+      const updated = [...current, newTask]
+      void upsertDeskMetaFile(DESK_TASKS_FILE, serializeTaskChecklist(updated), 'Desk Tasks')
+      return updated
+    })
+  }, [upsertDeskMetaFile])
+
+  const toggleTodoTask = useCallback((id: string) => {
+    setNotebookTasks((current) => {
+      const updated = current.map((task) => task.id === id ? { ...task, done: !task.done } : task)
+      void upsertDeskMetaFile(DESK_TASKS_FILE, serializeTaskChecklist(updated), 'Desk Tasks')
+      return updated
+    })
+  }, [upsertDeskMetaFile])
+
+  const removeTodoTask = useCallback((id: string) => {
+    setNotebookTasks((current) => {
+      const updated = current.filter((task) => task.id !== id)
+      void upsertDeskMetaFile(DESK_TASKS_FILE, serializeTaskChecklist(updated), 'Desk Tasks')
+      return updated
+    })
   }, [upsertDeskMetaFile])
 
   const handlePinNote = useCallback((notes: string) => {
@@ -966,6 +1079,9 @@ export default function App() {
               <span className="wordmark-gloss">Gloss</span>
               <span className="wordmark-sub">notes in the margin</span>
             </div>
+            <div style={{ margin: '8px auto 0', width: '60%', opacity: 0.7 }}>
+              <JaliStrip color="#C7B79D" width="100%" />
+            </div>
             <div className="bloom-stats">
               <span className="collection-stat">{active.length} live pages</span>
               <span className="collection-stat">{classes.length} course folios</span>
@@ -1003,18 +1119,53 @@ export default function App() {
     </div>
   )
 
+  const viewerPanel = viewing ? (
+    <FileViewer
+      file={viewing}
+      relatedFiles={viewing.lineageId ? getVersionGroup(visibleFiles, viewing) : undefined}
+      onSelectVersion={openFileWithFocus}
+      onArchiveVersion={(id) => { removeFile(id); closeViewing() }}
+      onRestoreVersion={openFileWithFocus}
+      onPersistState={handlePersistState}
+      onClose={closeViewing}
+    />
+  ) : null
+
+  const notebookPanel = (
+    <DeskNotebook
+      notes={noteFile?.content || ''}
+      tasks={notebookTasks}
+      hasPinnedNote={Boolean(pinnedNote)}
+      companionFile={continueFile}
+      onSave={handleNotebookSave}
+      onPin={handlePinNote}
+      onClearPin={clearPinnedNote}
+      onOpenCompanion={openFileWithFocus}
+      onClose={() => {
+        setActivePanel(null)
+        setFocusedObject(null)
+      }}
+    />
+  )
+
   return (
     <div className="world-frame">
       <div className="world-frame-inner">
         <div className="portal-shell">
           <nav className={`archive-rail ${focusModeActive ? 'archive-rail-muted' : ''}`}>
             <div className="sidebar-arch hidden lg:flex">
-              <div className="sidebar-arch-sides">
-                <div className="sidebar-arch-content">
-                  <div className="sidebar-section">
-                    <button type="button" className="desk-tool-link" onClick={goHome} style={{ marginBottom: 0 }}>
-                      Return to the desk
-                    </button>
+                <div className="sidebar-arch-sides">
+                  <div className="sidebar-arch-content">
+                    <div aria-hidden="true" style={{ position: 'absolute', top: 6, left: 6, pointerEvents: 'none', zIndex: 1 }}>
+                      <MughalCorner size={32} color="#C97C8A" />
+                    </div>
+                    <div aria-hidden="true" style={{ position: 'absolute', top: 6, right: 6, pointerEvents: 'none', zIndex: 1, transform: 'scaleX(-1)' }}>
+                      <MughalCorner size={32} color="#C97C8A" />
+                    </div>
+                    <div className="sidebar-section">
+                      <button type="button" className="desk-tool-link" onClick={goHome} style={{ marginBottom: 0 }}>
+                        Return to the desk
+                      </button>
                   </div>
 
                   <DiamondDivider />
@@ -1208,18 +1359,26 @@ export default function App() {
             )}
           </nav>
 
+          <DeskTodoPanel
+            tasks={notebookTasks}
+            onAddTask={addTodoTask}
+            onToggleTask={toggleTodoTask}
+            onRemoveTask={removeTodoTask}
+          />
+
           <main className={`main-desk ${focusModeActive ? 'main-desk-focused' : ''} ${deskFocusOnRail ? 'main-desk-cleared' : ''} ${deskFocusOnFolio ? 'main-desk-folio' : ''}`}>
             <div className={`main-desk-inner ${focusModeActive ? 'main-desk-inner-focused' : ''}`}>
-              {viewing ? (
-                <FileViewer
-                  file={viewing}
-                  relatedFiles={viewing.lineageId ? getVersionGroup(visibleFiles, viewing) : undefined}
-                  onSelectVersion={openFileWithFocus}
-                  onArchiveVersion={(id) => { removeFile(id); closeViewing() }}
-                  onRestoreVersion={openFileWithFocus}
-                  onPersistState={handlePersistState}
-                  onClose={closeViewing}
-                />
+              {viewing && activePanel === 'notebook' ? (
+                <div style={{ display: 'flex', height: '100%', minHeight: 0 }}>
+                  <div style={{ flex: '0 0 55%', overflowY: 'auto', borderRight: '1px solid rgba(199,183,157,0.3)', paddingRight: 0 }}>
+                    {viewerPanel}
+                  </div>
+                  <div style={{ flex: '0 0 45%', overflowY: 'auto', paddingLeft: 0 }}>
+                    {notebookPanel}
+                  </div>
+                </div>
+              ) : viewing ? (
+                viewerPanel
               ) : (
                 <>
                   {!notebookOverlayActive && <div className={`bloom-title-block ${deskFocusOnRail ? 'desk-panel-resting' : ''}`}>{titleBlock}</div>}
@@ -1245,6 +1404,7 @@ export default function App() {
                         recentActivity={recentActivity}
                         pinnedNote={pinnedNote}
                         dailyCard={dailyCard}
+                        viewing={viewing}
                         activePanel={activePanel}
                         isArchiveView={showArchive}
                         clipboardOpen={clipboardOpen}
@@ -1270,6 +1430,7 @@ export default function App() {
                         musicActionLabel={gramophone.actionLabel}
                         onToggleMusic={gramophone.toggleNeedle}
                         onSelectMix={selectMusicMix}
+                        onAddStickyNote={addStickyNote}
                       />
                     </div>
                   )}
@@ -1283,22 +1444,7 @@ export default function App() {
                       setActivePanel(null)
                       setFocusedObject((current) => current === 'cabinet' ? null : current)
                     }} />}
-                    {activePanel === 'notebook' && (
-                      <DeskNotebook
-                        notes={noteFile?.content || ''}
-                        tasks={notebookTasks}
-                        hasPinnedNote={Boolean(pinnedNote)}
-                        companionFile={continueFile}
-                        onSave={handleNotebookSave}
-                        onPin={handlePinNote}
-                        onClearPin={clearPinnedNote}
-                        onOpenCompanion={openFileWithFocus}
-                        onClose={() => {
-                          setActivePanel(null)
-                          setFocusedObject(null)
-                        }}
-                      />
-                    )}
+                    {activePanel === 'notebook' && notebookPanel}
                     {activePanel === 'prompts' && <PromptBank onClose={() => {
                       setActivePanel(null)
                       setFocusedObject((current) => current === 'cabinet' ? null : current)
@@ -1355,6 +1501,7 @@ export default function App() {
                       </UtilityBookplate>
                     ) : showFolders ? (
                       <>
+                        <FloralBorder />
                         <UtilityBookplate tone="parchment" surface="bare" kicker="Course Folios" title="By course" footer={`${folders.length} folios · ${active.length} live pages`}>
                           <div className="folio-sort-row">
                             <span className="folio-sort-label">Sort by</span>
@@ -1381,6 +1528,7 @@ export default function App() {
                             ))}
                           </div>
                         </UtilityBookplate>
+                        <FloralBorder mirror={true} />
 
                         <ArchDivider width="48%" />
 
@@ -1447,6 +1595,7 @@ export default function App() {
               recentActivity={recentActivity}
               pinnedNote={pinnedNote}
               dailyCard={dailyCard}
+              viewing={viewing}
               activePanel={activePanel}
               isArchiveView={showArchive}
               clipboardOpen={clipboardOpen}
@@ -1472,9 +1621,16 @@ export default function App() {
               musicActionLabel={gramophone.actionLabel}
               onToggleMusic={gramophone.toggleNeedle}
               onSelectMix={selectMusicMix}
+              onAddStickyNote={addStickyNote}
             />
           </aside>
         </div>
+      </div>
+
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 500 }}>
+        {stickyNotes.map((note) => (
+          <StickyNote key={note.id} {...note} onUpdate={updateStickyNote} onDismiss={removeStickyNote} />
+        ))}
       </div>
 
       {/* Gramophone audio is managed by useGramophone hook -- no DOM element needed */}

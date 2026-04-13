@@ -7,7 +7,7 @@ export interface DeskTask {
   done: boolean
 }
 
-type NotebookTab = 'todo' | 'sticky' | 'freeform'
+type NotebookTab = 'todo' | 'freeform'
 
 interface Props {
   notes: string
@@ -40,7 +40,6 @@ function humanTitle(name: string) {
 
 const NOTEBOOK_TABS: Array<{ key: NotebookTab; label: string }> = [
   { key: 'todo', label: 'To-Do' },
-  { key: 'sticky', label: 'Sticky Notes' },
   { key: 'freeform', label: 'Freeform' },
 ]
 
@@ -154,41 +153,6 @@ export default function DeskNotebook({
                   {hasPinnedNote && (
                     <button type="button" className="desk-tool-link" onClick={onClearPin}>
                       Clear Rail Slip
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'sticky' && (
-              <div className="desk-notebook-section">
-                <div className="desk-notebook-section-head">
-                  <span className="section-label">Sticky Notes</span>
-                  <span className="desk-notebook-status">{hasPinnedNote ? 'Pinned to the rail' : 'Ready to pin'}</span>
-                </div>
-
-                <textarea
-                  value={noteDraft}
-                  onChange={(event) => setNoteDraft(event.target.value)}
-                  className="desk-notebook-textarea input-warm desk-notebook-textarea-compact"
-                  placeholder="Jot the quick reminder, quote, or cue you want to leave on the rail."
-                />
-
-                <div className="desk-notebook-actions">
-                  <button
-                    type="button"
-                    className="bookplate-action compact"
-                    onClick={() => onPin(noteDraft)}
-                    disabled={!noteDraft.trim()}
-                  >
-                    {hasPinnedNote ? 'Update Rail Slip' : 'Pin to Rail'}
-                  </button>
-                  <button type="button" className="bookplate-action compact" onClick={saveChanges}>
-                    Set Aside Note
-                  </button>
-                  {hasPinnedNote && (
-                    <button type="button" className="desk-tool-link" onClick={onClearPin}>
-                      Remove from Rail
                     </button>
                   )}
                 </div>
