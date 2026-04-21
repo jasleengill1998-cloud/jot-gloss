@@ -1279,11 +1279,10 @@ export default function App() {
 
   const addTodoTask = useCallback((text: string) => {
     setNotebookTasks((current) => {
-      const newTask = {
-        id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
-        text,
-        done: false,
-      }
+      const id = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+        ? crypto.randomUUID()
+        : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
+      const newTask = { id, text, done: false }
       const updated = [...current, newTask]
       void upsertDeskMetaFile(DESK_TASKS_FILE, serializeTaskChecklist(updated), 'Desk Tasks')
       return updated

@@ -29,6 +29,7 @@ const STATUS_CONFIG: Record<SyncStatusType, { dot: string; label: string; bg: st
   syncing: { dot: '#F0849C', label: 'Syncing\u2026',  bg: 'rgba(240,132,156,0.08)' },
   offline: { dot: '#C88898', label: 'Offline',        bg: 'rgba(200,136,152,0.08)' },
   error:   { dot: '#F0849C', label: 'Sync failed',   bg: 'rgba(240,132,156,0.08)' },
+  'auth-required': { dot: '#F0849C', label: 'Token needed', bg: 'rgba(240,132,156,0.08)' },
   idle:    { dot: '#C88898', label: 'Ready to sync',  bg: 'transparent' },
 }
 
@@ -96,7 +97,7 @@ export default function SyncStatus({ syncStatus, lastSynced, syncError, onSync }
         </div>
 
         {/* Error details */}
-        {syncStatus === 'error' && syncError && (
+        {(syncStatus === 'error' || syncStatus === 'auth-required') && syncError && (
           <div style={{
             fontFamily: "'Outfit', system-ui, sans-serif",
             fontSize: 10, color: '#F0849C', lineHeight: 1.3,

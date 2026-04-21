@@ -28,8 +28,11 @@ export function useStickyNotes() {
 
   const addNote = useCallback(() => {
     setNotes(current => {
+      const id = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+        ? `sn-${crypto.randomUUID()}`
+        : `sn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
       const next: StickyNoteData = {
-        id: `sn-${Date.now()}`,
+        id,
         text: '',
         colorIndex: current.length % 4,
         x: 120 + (current.length % 5) * 40,

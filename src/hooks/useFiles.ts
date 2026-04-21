@@ -26,7 +26,16 @@ function detectTypeFromContent(content: string): FileType {
 }
 
 function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  // Fallback for old runtimes: 16 bytes of getRandomValues hex.
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const buf = new Uint8Array(16)
+    crypto.getRandomValues(buf)
+    return Array.from(buf, b => b.toString(16).padStart(2, '0')).join('')
+  }
+  throw new Error('No secure random source available')
 }
 
 export function useFiles() {

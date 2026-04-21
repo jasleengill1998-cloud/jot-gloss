@@ -213,6 +213,14 @@ ${needsBabel ? '<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"
     window.parent.postMessage({ type: 'sb-state-save', state: state }, '*');
   };
 
+  // Allow the host to request printing from inside this sandboxed iframe,
+  // since allow-same-origin is no longer granted.
+  window.addEventListener('message', function(e) {
+    if (e && e.data && e.data.type === 'sb-print') {
+      try { window.focus(); window.print(); } catch (_) {}
+    }
+  });
+
   // Auto-persistence: wrap React.useState to track all state changes
   var _origUseState = React.useState;
   var _stateRegistry = {};
@@ -353,15 +361,29 @@ function JsxViewer({
   const [showSource, setShowSource] = useState(false)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Listen for state save messages from the sandbox iframe
+  // Listen for state save messages from the sandbox iframe.
+  // The iframe is a null-origin sandbox, so we can't compare event.origin
+  // to a URL. Instead, we verify the message came from THIS iframe's window
+  // and that the state payload is a well-formed plain object within limits.
   useEffect(() => {
+    const MAX_STATE_BYTES = 256 * 1024
+    const isPlainObject = (v: unknown): v is Record<string, unknown> =>
+      typeof v === 'object' && v !== null && !Array.isArray(v) &&
+      (Object.getPrototypeOf(v) === Object.prototype || Object.getPrototypeOf(v) === null)
+
     const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'sb-state-save' && e.data.state) {
-        if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
-        saveTimerRef.current = setTimeout(() => {
-          onPersistState?.(fileId, e.data.state as Record<string, unknown>)
-        }, 700)
-      }
+      if (!iframeRef.current || e.source !== iframeRef.current.contentWindow) return
+      const data = e.data
+      if (!data || typeof data !== 'object' || (data as { type?: unknown }).type !== 'sb-state-save') return
+      const state = (data as { state?: unknown }).state
+      if (!isPlainObject(state)) return
+      let serialized: string
+      try { serialized = JSON.stringify(state) } catch { return }
+      if (serialized.length > MAX_STATE_BYTES) return
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+      saveTimerRef.current = setTimeout(() => {
+        onPersistState?.(fileId, state)
+      }, 700)
     }
     window.addEventListener('message', handler)
     return () => {
@@ -381,7 +403,7 @@ function JsxViewer({
     <div className="flex flex-col gap-3 h-full">
       <iframe
         ref={iframeRef}
-        sandbox="allow-scripts allow-same-origin"
+        sandbox="allow-scripts"
         title="JSX Preview"
         className="flex-1 w-full min-h-[400px]"
         style={{ border: '1px solid rgba(184,149,106,0.18)', background: '#FFF8F2', borderRadius: 2 }}
@@ -415,7 +437,13 @@ table { border-collapse: collapse; } th { font-family: 'Cormorant Garamond', Geo
 hr { border: none; border-top: 1px solid rgba(184,149,106,0.18); }
 code { background: rgba(184,149,106,0.08); padding: 1px 5px; border-radius: 2px; font-size: 0.9em; }
 blockquote { border-left: 3px solid #C8A878; padding-left: 14px; color: rgba(90,62,75,0.7); font-style: italic; }
-</style>`
+</style><script data-jotgloss-print>
+window.addEventListener('message', function(e) {
+  if (e && e.data && e.data.type === 'sb-print') {
+    try { window.focus(); window.print(); } catch (_) {}
+  }
+});
+</script>`
 
 function injectBaseStyle(html: string): string {
   if (html.includes('<head>')) return html.replace('<head>', '<head>' + HTML_BASE_STYLE)
@@ -526,11 +554,8 @@ export default function FileViewer({
   const title = humanTitle(file.name)
 
   const handlePrint = () => {
-    const iframe = document.querySelector('iframe[title="JSX Preview"], iframe[title="HTML Preview"]') as HTMLIFrameElement
-    if (iframe?.contentWindow) {
-      iframe.contentWindow.focus()
-      iframe.contentWindow.print()
-    }
+    const iframe = document.querySelector('iframe[title="JSX Preview"], iframe[title="HTML Preview"]') as HTMLIFrameElement | null
+    iframe?.contentWindow?.postMessage({ type: 'sb-print' }, '*')
   }
 
   const handleFullscreen = () => {
