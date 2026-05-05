@@ -1,3 +1,0 @@
-TARGET: codex
-
-Hello from test

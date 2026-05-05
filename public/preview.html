@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!--
+  Jot Gloss — JSX preview page.
+
+  This page is intentionally hosted at its own URL so it can be loaded by the
+  main app via <iframe src="/preview.html" sandbox="allow-scripts">. Iframes
+  loaded from a URL (not srcdoc) get their own CSP from response headers and
+  do NOT inherit the parent document's CSP. That isolation is what allows the
+  main app to keep a strict CSP while this page can use 'unsafe-inline' and
+  'unsafe-eval' for the JSX runtime.
+
+  Combined with sandbox="allow-scripts" (no allow-same-origin), the iframe
+  runs in a unique opaque origin with no access to the main app's
+  localStorage, IndexedDB, cookies, or DOM.
+
+  Communication contract (postMessage):
+    Parent → child:
+      { type: 'sb-render', code, componentName, fallbacks, needsBabel, savedState }
+      { type: 'sb-print' }
+    Child → parent:
+      { type: 'sb-ready' }
+      { type: 'sb-state-save', state: object }
+      { type: 'sb-error', message: string }
+-->
+<html>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Jot Gloss preview</title>
+<style>
+  :root {
+    --sb-bg: #FFF8F2;
+    --sb-card: rgba(255,248,242,0.95);
+    --sb-text: #5A3E4B;
+    --sb-text-muted: rgba(90,62,75,0.5);
+    --sb-border: rgba(184,149,106,0.24);
+    --sb-accent: #C97C8A;
+    --sb-gold: #C8A878;
+    --sb-rose: rgba(201,124,138,0.35);
+    --sb-heading-font: 'Cormorant Garamond', Georgia, serif;
+    --sb-body-font: 'EB Garamond', 'Cormorant Garamond', Georgia, serif;
+    --sb-rule: rgba(184,149,106,0.18);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body { font-family: var(--sb-body-font); background: var(--sb-bg); color: var(--sb-text); padding: 20px; line-height: 1.6; font-size: 15px; -webkit-font-smoothing: antialiased; }
+  h1,h2,h3,h4,h5,h6 { font-family: var(--sb-heading-font); color: var(--sb-text); font-weight: 700; }
+  h1 { font-size: 26px; letter-spacing: 0.04em; }
+  h2 { font-size: 21px; }
+  h3 { font-size: 17px; }
+  p { line-height: 1.55; }
+  button { font-family: var(--sb-heading-font); cursor: pointer; border-radius: 2px; letter-spacing: 0.04em; }
+  hr { border: none; border-top: 1px solid var(--sb-rule); margin: 18px 0; }
+  a { color: var(--sb-accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th { font-family: var(--sb-heading-font); font-weight: 700; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sb-accent); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--sb-rule); }
+  td { padding: 7px 10px; border-bottom: 1px solid rgba(184,149,106,0.1); vertical-align: top; }
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 4px; }
+  code { font-size: 0.9em; background: rgba(184,149,106,0.08); padding: 1px 5px; border-radius: 2px; }
+  pre { background: rgba(184,149,106,0.06); padding: 14px; border-radius: 2px; border: 1px solid var(--sb-rule); overflow-x: auto; font-size: 13px; }
+  blockquote { border-left: 3px solid var(--sb-gold); padding-left: 14px; color: rgba(90,62,75,0.7); font-style: italic; margin: 14px 0; }
+  #loading{text-align:center;padding:40px;color:var(--sb-text-muted);font-size:14px;font-style:italic;font-family:var(--sb-body-font)}
+  #error{color:#8a4040;background:rgba(253,240,238,0.9);border:1px solid rgba(180,100,100,0.2);border-radius:2px;padding:12px;font-size:13px;margin-bottom:12px;white-space:pre-wrap;display:none;font-family:var(--sb-body-font)}
+  @media print { body { background: white; padding: 0; } @page { margin: 1cm; } }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="loading">Awaiting component…</div>
+<div id="error"></div>
+<div id="root"></div>
+
+<!--
+  React/ReactDOM are vendored locally at /vendor/ — no third-party code path.
+  Babel is too large to vendor; it is pinned on unpkg.
+  TODO at deploy time: download babel.min.js, compute `openssl dgst -sha384 -binary
+  babel.min.js | openssl base64 -A`, and add the integrity= hash here so a
+  compromised CDN cannot substitute the file.
+-->
+<script src="/vendor/react.production.min.js"></script>
+<script src="/vendor/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script>
+(function() {
+  var loadingEl = document.getElementById('loading');
+  var errorEl = document.getElementById('error');
+
+  function showError(msg) {
+    errorEl.style.display = 'block';
+    errorEl.textContent = msg;
+    loadingEl.style.display = 'none';
+    try { parent.postMessage({ type: 'sb-error', message: String(msg) }, '*'); } catch (_) {}
+  }
+
+  if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+    showError('Local React vendor failed to load.');
+    return;
+  }
+
+  // ── State persistence bridge ─────────────────────────────────────────
+  var __SB_STATE = null;
+  var _stateRegistry = {};
+  var _stateCounter = 0;
+  var _saveTimer = null;
+  var _origUseState = React.useState;
+
+  function _persistedUseState(initialValue) {
+    var myKey = '__s' + (_stateCounter++);
+    var init = (__SB_STATE && Object.prototype.hasOwnProperty.call(__SB_STATE, myKey))
+      ? __SB_STATE[myKey] : initialValue;
+    var result = _origUseState.call(React, init);
+    var val = result[0];
+    var origSetter = result[1];
+    _stateRegistry[myKey] = val;
+    var wrappedSetter = function(newVal) {
+      origSetter(function(prev) {
+        var resolved = typeof newVal === 'function' ? newVal(prev) : newVal;
+        _stateRegistry[myKey] = resolved;
+        if (_saveTimer) clearTimeout(_saveTimer);
+        _saveTimer = setTimeout(function() {
+          try { parent.postMessage({ type: 'sb-state-save', state: Object.assign({}, _stateRegistry) }, '*'); } catch (_) {}
+        }, 300);
+        return resolved;
+      });
+    };
+    return [val, wrappedSetter];
+  }
+
+  function fixNewlinesInStrings(src) {
+    var result = '';
+    var inStr = false;
+    var q = '';
+    var esc = false;
+    for (var i = 0; i < src.length; i++) {
+      var ch = src[i];
+      if (esc) { result += ch; esc = false; continue; }
+      if (ch === '\\') { result += ch; esc = true; continue; }
+      if (!inStr && (ch === '"' || ch === "'")) { inStr = true; q = ch; result += ch; continue; }
+      if (inStr && ch === q) { inStr = false; result += ch; continue; }
+      if (inStr && ch === '\n') { result += '\\n'; continue; }
+      if (inStr && ch === '\r') { result += '\\r'; continue; }
+      result += ch;
+    }
+    return result;
+  }
+
+  function createErrorBoundary() {
+    function ErrorBoundary(props) {
+      this.state = { hasError: false, error: null };
+      this.props = props;
+    }
+    ErrorBoundary.prototype = Object.create(React.Component.prototype);
+    ErrorBoundary.prototype.constructor = ErrorBoundary;
+    ErrorBoundary.getDerivedStateFromError = function(error) {
+      return { hasError: true, error: error };
+    };
+    ErrorBoundary.prototype.render = function() {
+      if (this.state.hasError) {
+        return React.createElement('div', {
+          style: { color: '#8a4040', background: '#fdf0ee', border: '1px solid rgba(180,100,100,0.3)',
+                   borderRadius: 4, padding: 12, fontSize: 13, whiteSpace: 'pre-wrap',
+                   fontFamily: "'Outfit', system-ui, sans-serif" }
+        }, 'Render error: ' + (this.state.error && this.state.error.message ? this.state.error.message : 'Unknown error'));
+      }
+      return this.props.children;
+    };
+    return ErrorBoundary;
+  }
+
+  // ── Identifier-allowlist guard ───────────────────────────────────────
+  // The previewer is sandboxed (no allow-same-origin), so even if an
+  // attacker gets code execution here they can't reach the parent's
+  // localStorage / IndexedDB / cookies. This is just a sanity check on
+  // the message contract.
+  var ID_RE = /^[A-Za-z_$][A-Za-z0-9_$]{0,127}$/;
+
+  var rootInstance = null;
+
+  function renderComponent(payload) {
+    try {
+      __SB_STATE = (payload.savedState && typeof payload.savedState === 'object' && !Array.isArray(payload.savedState))
+        ? payload.savedState : null;
+      _stateCounter = 0;
+      _stateRegistry = {};
+
+      if (typeof payload.code !== 'string' || payload.code.length === 0) {
+        showError('No code to render.');
+        return;
+      }
+      if (typeof payload.componentName !== 'string' || !ID_RE.test(payload.componentName)) {
+        showError('Invalid component name.');
+        return;
+      }
+      if (typeof payload.fallbacks !== 'string') payload.fallbacks = '';
+
+      var transformed = payload.code;
+      if (payload.needsBabel) {
+        if (typeof Babel === 'undefined') {
+          showError('Babel failed to load. Check your network and refresh.');
+          return;
+        }
+        try { transformed = Babel.transform(payload.code, { presets: ['react'] }).code; }
+        catch (e) { showError('Babel error: ' + (e && e.message ? e.message : e)); return; }
+      }
+      transformed = fixNewlinesInStrings(transformed);
+
+      var fn;
+      try {
+        fn = new Function(
+          'React','useState','useEffect','useRef','useMemo','useCallback','useReducer',
+          'useContext','createContext','Fragment','createElement','Children','cloneElement',
+          'memo','forwardRef',
+          transformed +
+          '\nif(typeof ' + payload.componentName + '==="function")return ' + payload.componentName + ';' +
+          '\n' + payload.fallbacks +
+          '\nreturn null;'
+        );
+      } catch (parseErr) {
+        showError('JavaScript parse error: ' + (parseErr.message || parseErr));
+        return;
+      }
+
+      var Component;
+      try {
+        Component = fn(
+          React, _persistedUseState, React.useEffect, React.useRef, React.useMemo,
+          React.useCallback, React.useReducer, React.useContext, React.createContext,
+          React.Fragment, React.createElement, React.Children, React.cloneElement,
+          React.memo, React.forwardRef
+        );
+      } catch (execErr) {
+        showError('Code execution error: ' + (execErr.message || execErr));
+        return;
+      }
+
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'none';
+
+      if (!Component) {
+        showError('No React component found. Make sure your file declares a PascalCase function.');
+        return;
+      }
+
+      var ErrorBoundary = createErrorBoundary();
+      var tree = React.createElement(ErrorBoundary, null, React.createElement(Component));
+      if (!rootInstance) {
+        rootInstance = ReactDOM.createRoot(document.getElementById('root'));
+      }
+      rootInstance.render(tree);
+    } catch (error) {
+      showError(error && error.message ? error.message : 'Preview failed to render.');
+    }
+  }
+
+  // Listen for instructions from the parent. The sandbox is null-origin,
+  // so origin-checking is meaningless; we trust that anything reaching
+  // window inside this isolated frame originates from our parent embed.
+  window.addEventListener('message', function(e) {
+    var data = e && e.data;
+    if (!data || typeof data !== 'object') return;
+    if (data.type === 'sb-render') {
+      renderComponent(data);
+    } else if (data.type === 'sb-print') {
+      try { window.focus(); window.print(); } catch (_) {}
+    }
+  });
+
+  // Tell the parent we're ready to receive a render.
+  try { parent.postMessage({ type: 'sb-ready' }, '*'); } catch (_) {}
+})();
+</script>
+</body>
+</html>

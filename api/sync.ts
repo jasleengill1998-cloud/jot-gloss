@@ -181,6 +181,51 @@ export default async function handler(req: Request): Promise<Response> {
       ? Math.min(Math.max(0, updatedAtRaw), now + MAX_FUTURE_SKEW_MS)
       : now
 
+    // Optimistic-concurrency check. The client sends the `updatedAt` it
+    // last observed in the cloud (or 0 if it never has). We refuse the
+    // write if the cloud has moved on since — protects against two
+    // devices clobbering each other and against a client racing an
+    // attacker push. Pass `force: true` to bypass (used by the explicit
+    // "Push to Cloud" admin button when the user wants their copy to win).
+    const baseUpdatedAtRaw = (body as { baseUpdatedAt?: unknown }).baseUpdatedAt
+    const force = (body as { force?: unknown }).force === true
+    const baseUpdatedAt = typeof baseUpdatedAtRaw === 'number' && Number.isFinite(baseUpdatedAtRaw)
+      ? Math.max(0, baseUpdatedAtRaw)
+      : null
+
+    if (!force) {
+      // Read current cloud updatedAt for compare-and-swap.
+      let currentUpdatedAt = 0
+      try {
+        const lr = await fetch(`${BLOB_BASE}?prefix=studybloom-sync%2F`, { headers: auth })
+        if (lr.ok) {
+          const ld = (await lr.json()) as { blobs?: { pathname: string; url: string; downloadUrl?: string }[] }
+          const b = ld.blobs?.find(x => x.pathname === BLOB_PATH)
+          if (b) {
+            const dr = await fetch(b.downloadUrl || b.url, { headers: auth })
+            if (dr.ok) {
+              const text = await dr.text()
+              try {
+                const parsed = JSON.parse(text) as { updatedAt?: unknown }
+                if (typeof parsed.updatedAt === 'number' && Number.isFinite(parsed.updatedAt)) {
+                  currentUpdatedAt = parsed.updatedAt
+                }
+              } catch { /* corrupt blob; treat as 0 */ }
+            }
+          }
+        }
+      } catch { /* upstream read failed; fall through and let the PUT be the source of truth */ }
+
+      // First-time push (no baseUpdatedAt) is allowed only if the cloud is empty.
+      if (baseUpdatedAt === null) {
+        if (currentUpdatedAt !== 0) {
+          return json({ error: 'Cloud has data; refresh before pushing.', currentUpdatedAt, code: 'STALE' }, 409)
+        }
+      } else if (baseUpdatedAt !== currentUpdatedAt) {
+        return json({ error: 'Cloud changed since you last synced.', currentUpdatedAt, code: 'STALE' }, 409)
+      }
+    }
+
     const payload = JSON.stringify({ files: cleanFiles, updatedAt })
 
     try {
@@ -200,7 +245,7 @@ export default async function handler(req: Request): Promise<Response> {
 
       if (!pr.ok) return json({ error: `Upstream put failed (${pr.status})` }, 500)
 
-      return json({ ok: true, updatedAt: now })
+      return json({ ok: true, updatedAt })
     } catch {
       return json({ error: 'Upstream error' }, 500)
     }

@@ -2,7 +2,8 @@ import { useState } from 'react'
 import type { StudyFile } from '../types'
 import {
   pullFromCloud, pushToCloud, mergeFiles,
-  SyncAuthError, getSyncToken, setSyncToken, clearSyncToken,
+  SyncAuthError, SyncConflictError,
+  getSyncToken, setSyncToken, clearSyncToken,
 } from '../utils/cloudSync'
 import * as db from '../db/indexeddb'
 
@@ -51,11 +52,16 @@ export default function SyncPanel({ files, classes, onRefresh, onClose }: Props)
     setBusy('push')
     setStatus({ tone: 'idle', message: 'Uploading your library...' })
     try {
-      const result = await pushToCloud(files)
+      // Manual "Push to Cloud" is an explicit "make this device the source
+      // of truth" action — bypass the optimistic-concurrency check.
+      const result = await pushToCloud(files, { force: true })
+      try { localStorage.setItem('studybloom-last-synced', String(result.updatedAt)) } catch { /* ignore */ }
       setStatus({ tone: 'success', message: `Uploaded ${files.length} files. Last sync: ${new Date(result.updatedAt).toLocaleTimeString()}` })
     } catch (e: unknown) {
       if (e instanceof SyncAuthError) {
         setStatus({ tone: 'error', message: 'Sync token rejected. Re-enter it above.' })
+      } else if (e instanceof SyncConflictError) {
+        setStatus({ tone: 'error', message: 'Cloud has newer data — pull first, or push again to overwrite.' })
       } else {
         setStatus({ tone: 'error', message: e instanceof Error ? e.message : 'Upload failed.' })
       }

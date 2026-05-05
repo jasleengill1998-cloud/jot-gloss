@@ -41,300 +41,9 @@ function preprocessCode(code: string): { processed: string; componentName: strin
   const fallbacks = allNames
     .filter(n => n !== componentName)
     .map(n => `if(typeof ${n}==="function")return ${n};`)
-    .join('\\n')
+    .join('\n')
 
   return { processed, componentName, fallbacks }
-}
-
-function encodeForScript(value: string): string {
-  return JSON.stringify(value).replace(/</g, '\\u003c')
-}
-
-function buildSandboxHtml(rawCode: string, componentName: string, fallbacks: string, needsBabel: boolean, savedState?: Record<string, unknown> | null): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<style>
-  :root {
-    --sb-bg: #FFF8F2;
-    --sb-card: rgba(255,248,242,0.95);
-    --sb-text: #5A3E4B;
-    --sb-text-muted: rgba(90,62,75,0.5);
-    --sb-border: rgba(184,149,106,0.24);
-    --sb-accent: #C97C8A;
-    --sb-gold: #C8A878;
-    --sb-rose: rgba(201,124,138,0.35);
-    --sb-heading-font: 'Cormorant Garamond', Georgia, serif;
-    --sb-body-font: 'EB Garamond', 'Cormorant Garamond', Georgia, serif;
-    --sb-rule: rgba(184,149,106,0.18);
-  }
-
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-  body {
-    font-family: var(--sb-body-font);
-    background: var(--sb-bg);
-    color: var(--sb-text);
-    padding: 20px;
-    line-height: 1.6;
-    font-size: 15px;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  h1,h2,h3,h4,h5,h6 {
-    font-family: var(--sb-heading-font);
-    color: var(--sb-text);
-    font-weight: 700;
-  }
-  h1 { font-size: 26px; letter-spacing: 0.04em; }
-  h2 { font-size: 21px; }
-  h3 { font-size: 17px; }
-
-  p { line-height: 1.55; }
-
-  button {
-    font-family: var(--sb-heading-font);
-    cursor: pointer;
-    border-radius: 2px;
-    letter-spacing: 0.04em;
-  }
-
-  hr { border: none; border-top: 1px solid var(--sb-rule); margin: 18px 0; }
-
-  a { color: var(--sb-accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-
-  table { border-collapse: collapse; width: 100%; font-size: 13px; }
-  th { font-family: var(--sb-heading-font); font-weight: 700; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sb-accent); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--sb-rule); }
-  td { padding: 7px 10px; border-bottom: 1px solid rgba(184,149,106,0.1); vertical-align: top; }
-
-  ul, ol { padding-left: 20px; }
-  li { margin-bottom: 4px; }
-
-  code { font-size: 0.9em; background: rgba(184,149,106,0.08); padding: 1px 5px; border-radius: 2px; }
-  pre { background: rgba(184,149,106,0.06); padding: 14px; border-radius: 2px; border: 1px solid var(--sb-rule); overflow-x: auto; font-size: 13px; }
-
-  blockquote { border-left: 3px solid var(--sb-gold); padding-left: 14px; color: rgba(90,62,75,0.7); font-style: italic; margin: 14px 0; }
-
-  #loading{text-align:center;padding:40px;color:var(--sb-text-muted);font-size:14px;font-style:italic;font-family:var(--sb-body-font)}
-  #error{color:#8a4040;background:rgba(253,240,238,0.9);border:1px solid rgba(180,100,100,0.2);border-radius:2px;padding:12px;font-size:13px;margin-bottom:12px;white-space:pre-wrap;display:none;font-family:var(--sb-body-font)}
-
-  @media print {
-    body { background: white; padding: 0; }
-    @page { margin: 1cm; }
-  }
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-</head>
-<body>
-<div id="loading">Loading component...</div>
-<div id="error"></div>
-<div id="root"></div>
-
-<script>
-setTimeout(function() {
-  if (typeof React === 'undefined') {
-    var el = document.getElementById('error');
-    el.style.display = 'block';
-    el.textContent = 'React CDN failed to load. Check internet connection and refresh.';
-    document.getElementById('loading').style.display = 'none';
-  }
-}, 8000);
-</script>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-${needsBabel ? '<script src="https://unpkg.com/@babel/standalone@7/babel.min.js" crossorigin></script>' : ''}
-<script>
-(function() {
-  var loadingEl = document.getElementById('loading');
-  var errorEl = document.getElementById('error');
-
-  function showError(msg) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = msg;
-    loadingEl.style.display = 'none';
-  }
-
-  if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
-    showError('React failed to load. Check your internet connection and refresh.');
-    return;
-  }
-
-  function fixNewlinesInStrings(src) {
-    var result = '';
-    var inStr = false;
-    var q = '';
-    var esc = false;
-    for (var i = 0; i < src.length; i++) {
-      var ch = src[i];
-      if (esc) { result += ch; esc = false; continue; }
-      if (ch === '\\\\') { result += ch; esc = true; continue; }
-      if (!inStr && (ch === '"' || ch === "'")) { inStr = true; q = ch; result += ch; continue; }
-      if (inStr && ch === q) { inStr = false; result += ch; continue; }
-      if (inStr && ch === '\\n') { result += '\\\\n'; continue; }
-      if (inStr && ch === '\\r') { result += '\\\\r'; continue; }
-      result += ch;
-    }
-    return result;
-  }
-
-  function createErrorBoundary() {
-    function ErrorBoundary(props) {
-      this.state = { hasError: false, error: null };
-      this.props = props;
-    }
-    ErrorBoundary.prototype = Object.create(React.Component.prototype);
-    ErrorBoundary.prototype.constructor = ErrorBoundary;
-    ErrorBoundary.getDerivedStateFromError = function(error) {
-      return { hasError: true, error: error };
-    };
-    ErrorBoundary.prototype.render = function() {
-      if (this.state.hasError) {
-        return React.createElement('div', {
-          style: { color: '#8a4040', background: '#fdf0ee', border: '1px solid rgba(180,100,100,0.3)',
-                   borderRadius: 4, padding: 12, fontSize: 13, whiteSpace: 'pre-wrap',
-                   fontFamily: "'Outfit', system-ui, sans-serif" }
-        }, 'Render error: ' + (this.state.error && this.state.error.message ? this.state.error.message : 'Unknown error'));
-      }
-      return this.props.children;
-    };
-    return ErrorBoundary;
-  }
-
-  // ═══ STATE PERSISTENCE BRIDGE ═══
-  // Provides __SB_STATE (previously saved state) and __SB_SAVE(state) to components.
-  // Components can call __SB_SAVE({ checked: [0,2,5], score: 3 }) to persist state.
-  // Also provides usePersistentState(key, defaultVal) — a drop-in useState replacement.
-  var __SB_STATE = ${savedState ? JSON.stringify(savedState) : 'null'};
-  window.__SB_STATE = __SB_STATE;
-  window.__SB_SAVE = function(state) {
-    window.parent.postMessage({ type: 'sb-state-save', state: state }, '*');
-  };
-
-  // Allow the host to request printing from inside this sandboxed iframe,
-  // since allow-same-origin is no longer granted.
-  window.addEventListener('message', function(e) {
-    if (e && e.data && e.data.type === 'sb-print') {
-      try { window.focus(); window.print(); } catch (_) {}
-    }
-  });
-
-  // Auto-persistence: wrap React.useState to track all state changes
-  var _origUseState = React.useState;
-  var _stateRegistry = {};
-  var _stateCounter = 0;
-  var _saveTimer = null;
-
-  function _persistedUseState(initialValue) {
-    var myKey = '__s' + (_stateCounter++);
-    // Restore from saved state if available
-    var init = (__SB_STATE && __SB_STATE.hasOwnProperty(myKey)) ? __SB_STATE[myKey] : initialValue;
-    var result = _origUseState.call(React, init);
-    var val = result[0];
-    var origSetter = result[1];
-
-    // Track current value
-    _stateRegistry[myKey] = val;
-
-    // Wrap setter to auto-save
-    var wrappedSetter = function(newVal) {
-      origSetter(function(prev) {
-        var resolved = typeof newVal === 'function' ? newVal(prev) : newVal;
-        _stateRegistry[myKey] = resolved;
-        // Debounce save — batch rapid state changes
-        if (_saveTimer) clearTimeout(_saveTimer);
-        _saveTimer = setTimeout(function() {
-          window.__SB_SAVE(Object.assign({}, _stateRegistry));
-        }, 300);
-        return resolved;
-      });
-    };
-
-    return [val, wrappedSetter];
-  }
-
-  // Reset counter before each render cycle
-  var _origCreateElement = React.createElement;
-  var _renderCount = 0;
-
-  try {
-    var code = ${encodeForScript(rawCode)};
-    var transformed = code;
-    ${needsBabel ? `
-    if (typeof Babel !== 'undefined') {
-      try { transformed = Babel.transform(code, { presets: ['react'] }).code; }
-      catch(e) { showError('Babel error: ' + e.message); return; }
-    } else {
-      showError('Babel failed to load. Check internet connection.');
-      return;
-    }` : ''}
-
-    transformed = fixNewlinesInStrings(transformed);
-
-    var runtime = React;
-    var fn;
-    try {
-      fn = new Function(
-        'React','useState','useEffect','useRef','useMemo','useCallback','useReducer',
-        'useContext','createContext','Fragment','createElement','Children','cloneElement',
-        'memo','forwardRef',
-        transformed +
-        '\\nif(typeof ${componentName}==="function")return ${componentName};' +
-        '\\n${fallbacks}' +
-        '\\nreturn null;'
-      );
-    } catch (parseErr) {
-      showError('JavaScript parse error: ' + (parseErr.message || parseErr));
-      console.error('Parse error in code:', parseErr);
-      return;
-    }
-
-    var Component;
-    try {
-      // Reset state counter for each component instantiation
-      _stateCounter = 0;
-      Component = fn(
-        runtime,
-        _persistedUseState,
-        runtime.useEffect,
-        runtime.useRef,
-        runtime.useMemo,
-        runtime.useCallback,
-        runtime.useReducer,
-        runtime.useContext,
-        runtime.createContext,
-        runtime.Fragment,
-        runtime.createElement,
-        runtime.Children,
-        runtime.cloneElement,
-        runtime.memo,
-        runtime.forwardRef
-      );
-    } catch (execErr) {
-      showError('Code execution error: ' + (execErr.message || execErr));
-      console.error('Execution error:', execErr);
-      return;
-    }
-
-    loadingEl.style.display = 'none';
-
-    if (Component) {
-      var ErrorBoundary = createErrorBoundary();
-      var wrapped = React.createElement(ErrorBoundary, null, React.createElement(Component));
-      ReactDOM.createRoot(document.getElementById('root')).render(wrapped);
-    } else {
-      showError('No React component found. Make sure your file exports or declares a PascalCase function (e.g. function MyComponent).');
-    }
-  } catch (error) {
-    showError(error && error.message ? error.message : 'Preview failed to render.');
-    console.error(error);
-  }
-})();
-</script>
-</body>
-</html>`
 }
 
 /* Human-readable title */
@@ -359,12 +68,14 @@ function JsxViewer({
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [showSource, setShowSource] = useState(false)
+  const [iframeReady, setIframeReady] = useState(false)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Listen for state save messages from the sandbox iframe.
-  // The iframe is a null-origin sandbox, so we can't compare event.origin
-  // to a URL. Instead, we verify the message came from THIS iframe's window
-  // and that the state payload is a well-formed plain object within limits.
+  // Listen for messages from the sandbox iframe. The iframe is a null-origin
+  // sandbox loaded from /preview.html, so origin checks against a URL are
+  // meaningless — instead we verify the message came from THIS iframe's
+  // window and that any state payload is a well-formed plain object within
+  // limits.
   useEffect(() => {
     const MAX_STATE_BYTES = 256 * 1024
     const isPlainObject = (v: unknown): v is Record<string, unknown> =>
@@ -374,7 +85,13 @@ function JsxViewer({
     const handler = (e: MessageEvent) => {
       if (!iframeRef.current || e.source !== iframeRef.current.contentWindow) return
       const data = e.data
-      if (!data || typeof data !== 'object' || (data as { type?: unknown }).type !== 'sb-state-save') return
+      if (!data || typeof data !== 'object') return
+      const t = (data as { type?: unknown }).type
+      if (t === 'sb-ready') {
+        setIframeReady(true)
+        return
+      }
+      if (t !== 'sb-state-save') return
       const state = (data as { state?: unknown }).state
       if (!isPlainObject(state)) return
       let serialized: string
@@ -392,17 +109,28 @@ function JsxViewer({
     }
   }, [fileId, onPersistState])
 
+  // When the iframe is ready and the code/state changes, post a render
+  // request. We never set srcdoc anymore — the iframe loads /preview.html
+  // and we communicate exclusively over postMessage.
   useEffect(() => {
-    if (!iframeRef.current) return
+    if (!iframeReady || !iframeRef.current?.contentWindow) return
     const { processed, componentName, fallbacks } = preprocessCode(code)
     const needsBabel = hasJsxSyntax(processed)
-    iframeRef.current.srcdoc = buildSandboxHtml(processed, componentName, fallbacks, needsBabel, savedState)
-  }, [code, savedState])
+    iframeRef.current.contentWindow.postMessage({
+      type: 'sb-render',
+      code: processed,
+      componentName,
+      fallbacks,
+      needsBabel,
+      savedState: savedState ?? null,
+    }, '*')
+  }, [code, savedState, iframeReady])
 
   return (
     <div className="flex flex-col gap-3 h-full">
       <iframe
         ref={iframeRef}
+        src="/preview.html"
         sandbox="allow-scripts"
         title="JSX Preview"
         className="flex-1 w-full min-h-[400px]"

@@ -10,6 +10,15 @@ export class SyncAuthError extends Error {
   }
 }
 
+export class SyncConflictError extends Error {
+  currentUpdatedAt: number
+  constructor(currentUpdatedAt: number, message = 'Cloud changed since last sync.') {
+    super(message)
+    this.name = 'SyncConflictError'
+    this.currentUpdatedAt = currentUpdatedAt
+  }
+}
+
 export interface CloudPayload {
   files: StudyFile[]
   updatedAt: number
@@ -81,6 +90,11 @@ function sanitizeCloudFiles(raw: unknown): StudyFile[] {
 async function handleNonOk(response: Response): Promise<never> {
   if (response.status === 401) throw new SyncAuthError()
   const body = await response.json().catch(() => ({}))
+  if (response.status === 409) {
+    const cur = (body as { currentUpdatedAt?: unknown }).currentUpdatedAt
+    const ts = typeof cur === 'number' && Number.isFinite(cur) ? cur : 0
+    throw new SyncConflictError(ts, (body as { error?: string }).error || 'Cloud changed since last sync.')
+  }
   throw new Error((body as { error?: string }).error || `Cloud sync failed (${response.status})`)
 }
 
@@ -101,15 +115,26 @@ export async function pullFromCloud(): Promise<CloudPayload> {
   }
 }
 
+export interface PushOptions {
+  /** updatedAt the client last observed in the cloud. Required unless `force`. */
+  baseUpdatedAt?: number
+  /** Bypass the optimistic-concurrency check. Use only for explicit "overwrite" actions. */
+  force?: boolean
+}
+
 /**
  * Push files JSON to the Vercel Blob cloud store via /api/sync.
+ * Throws SyncConflictError if the cloud has moved on since baseUpdatedAt.
  */
-export async function pushToCloud(files: StudyFile[]): Promise<{ updatedAt: number }> {
+export async function pushToCloud(files: StudyFile[], opts: PushOptions = {}): Promise<{ updatedAt: number }> {
   const now = Date.now()
+  const body: Record<string, unknown> = { files, updatedAt: now }
+  if (opts.force) body.force = true
+  else if (typeof opts.baseUpdatedAt === 'number') body.baseUpdatedAt = opts.baseUpdatedAt
   const response = await fetch(SYNC_API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify({ files, updatedAt: now }),
+    body: JSON.stringify(body),
   })
   if (!response.ok) return handleNonOk(response)
   const result = await response.json() as { updatedAt?: number }

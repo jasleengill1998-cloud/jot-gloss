@@ -1,5 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { pullFromCloud, pushToCloud, mergeFiles, SyncAuthError, getSyncToken } from '../utils/cloudSync'
+import {
+  pullFromCloud, pushToCloud, mergeFiles,
+  SyncAuthError, SyncConflictError, getSyncToken,
+} from '../utils/cloudSync'
 import * as db from '../db/indexeddb'
 import type { StudyFile } from '../types'
 
@@ -49,21 +52,38 @@ export function useSync(onFilesChanged: () => Promise<void>) {
     setSyncStatus('syncing')
     setSyncError(null)
 
-    try {
+    // One inner attempt: pull → merge → push with optimistic concurrency.
+    // Returns true on success. Throws on auth/network errors. Returns
+    // false if the push hit a 409 (caller may retry).
+    const attempt = async (): Promise<boolean> => {
       const cloudData = await pullFromCloud()
       const localFiles = await db.getAllFiles()
       const prevSynced = readLastSynced()
       const merged = mergeFiles(localFiles, cloudData.files, prevSynced)
-
       await db.replaceAllFiles(merged)
-      const result = await pushToCloud(merged)
+      try {
+        const result = await pushToCloud(merged, { baseUpdatedAt: cloudData.updatedAt })
+        writeLastSynced(result.updatedAt)
+        setLastSynced(result.updatedAt)
+        setSyncStatus('synced')
+        await onFilesChanged()
+        return true
+      } catch (e) {
+        if (e instanceof SyncConflictError) return false
+        throw e
+      }
+    }
 
-      const ts = result.updatedAt
-      writeLastSynced(ts)
-      setLastSynced(ts)
-      setSyncStatus('synced')
-
-      await onFilesChanged()
+    try {
+      // First try; if the cloud changed during our window, retry once.
+      const ok = await attempt()
+      if (!ok) {
+        const okRetry = await attempt()
+        if (!okRetry) {
+          setSyncStatus('error')
+          setSyncError('Cloud kept changing during sync — try again in a moment.')
+        }
+      }
     } catch (error) {
       if (error instanceof SyncAuthError) {
         setSyncStatus('auth-required')
@@ -89,7 +109,10 @@ export function useSync(onFilesChanged: () => Promise<void>) {
 
       try {
         const localFiles = await db.getAllFiles()
-        const result = await pushToCloud(localFiles)
+        // Background push uses the last-synced timestamp as its concurrency
+        // base. If the cloud has moved on, surface the conflict instead of
+        // overwriting — a manual sync will reconcile.
+        const result = await pushToCloud(localFiles, { baseUpdatedAt: readLastSynced() })
         writeLastSynced(result.updatedAt)
         setLastSynced(result.updatedAt)
         setSyncStatus('synced')
@@ -98,6 +121,9 @@ export function useSync(onFilesChanged: () => Promise<void>) {
         if (error instanceof SyncAuthError) {
           setSyncStatus('auth-required')
           setSyncError('Sync token rejected. Re-enter it in the Sync panel.')
+        } else if (error instanceof SyncConflictError) {
+          setSyncStatus('error')
+          setSyncError('Cloud changed since last sync — open the Sync panel to merge.')
         } else {
           console.warn('[sync] Background push failed:', error instanceof Error ? error.message : error)
         }

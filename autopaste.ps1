@@ -1,11 +1,26 @@
 # autopaste.ps1
-# Watches queue\next-task.txt for changes and pastes content into the correct agent window.
+# Watches queue\next-task.txt for changes and pastes content into the correct agent window
+# AFTER verifying the file's HMAC signature and getting an explicit user confirmation.
+#
 # Usage: Run from C:\Users\jasle\Desktop\jot-gloss in PowerShell. Stop with Ctrl+C.
+#
+# Required env var: JOTGLOSS_QUEUE_SECRET (min 16 chars). Must match the value
+# the watcher.cjs uses to sign next-task.txt, otherwise the task is rejected.
+#
+# Security notes:
+#   - Without HMAC verification, a stray edit to next-task.txt (or anything that
+#     ends up in the file via prompt-injection content) would be auto-pasted and
+#     submitted to the connected agent. The signature ensures the content came
+#     from the local watcher we trust.
+#   - Submission to the agent now requires typing Y for each task. No more
+#     fire-and-forget Enter presses.
 
 # ─── CONFIG ────────────────────────────────────────────────────────────────────
 $QueueFile    = "C:\Users\jasle\Desktop\jot-gloss\queue\next-task.txt"
+$SigFile      = "C:\Users\jasle\Desktop\jot-gloss\queue\next-task.sig"
 $LogFile      = "C:\Users\jasle\Desktop\jot-gloss\queue\log.txt"
 $PollInterval = 3   # seconds between checks
+$MaxBodyChars = 200000
 # ───────────────────────────────────────────────────────────────────────────────
 
 Add-Type -AssemblyName System.Windows.Forms
@@ -37,6 +52,46 @@ function Get-FileHash-Safe {
         }
     } catch { }
     return $null
+}
+
+function Get-HmacSha256Hex {
+    param(
+        [Parameter(Mandatory)] [string] $Content,
+        [Parameter(Mandatory)] [string] $Secret
+    )
+    $keyBytes  = [System.Text.Encoding]::UTF8.GetBytes($Secret)
+    $dataBytes = [System.Text.Encoding]::UTF8.GetBytes($Content)
+    $hmac      = [System.Security.Cryptography.HMACSHA256]::new($keyBytes)
+    try {
+        $bytes = $hmac.ComputeHash($dataBytes)
+        return ([System.BitConverter]::ToString($bytes)).Replace("-", "").ToLowerInvariant()
+    } finally {
+        $hmac.Dispose()
+    }
+}
+
+function Test-SignatureMatches {
+    param(
+        [Parameter(Mandatory)] [string] $Expected,
+        [Parameter(Mandatory)] [string] $Actual
+    )
+    if ($Expected.Length -ne $Actual.Length) { return $false }
+    $diff = 0
+    for ($i = 0; $i -lt $Expected.Length; $i++) {
+        $diff = $diff -bor ([int][char]$Expected[$i] -bxor [int][char]$Actual[$i])
+    }
+    return ($diff -eq 0)
+}
+
+function Confirm-Send {
+    param([string]$Target, [int]$BodyLength)
+    Write-Host ""
+    Write-Host "===== AUTOPASTE CONFIRMATION =====" -ForegroundColor Yellow
+    Write-Host ("Target window: {0}" -f $Target) -ForegroundColor Yellow
+    Write-Host ("Body length:   {0} chars" -f $BodyLength) -ForegroundColor Yellow
+    Write-Host "Type Y + Enter to send, anything else to skip." -ForegroundColor Yellow
+    $resp = Read-Host
+    return ($resp -match '^(?i)y(es)?$')
 }
 
 function Find-TargetWindow {
@@ -127,11 +182,26 @@ function Send-TextToWindow {
 }
 
 function Process-TaskFile {
-    param([string]$Path)
+    param([string]$Path, [string]$Secret)
 
     $rawContent = Get-Content -Path $Path -Raw -Encoding UTF8
     if ([string]::IsNullOrWhiteSpace($rawContent)) {
         Write-Log "Task file is empty — skipping." "WARN"
+        return
+    }
+    if ($rawContent.Length -gt $MaxBodyChars) {
+        Write-Log "Task file is too large ($($rawContent.Length) chars > $MaxBodyChars) — skipping." "ERROR"
+        return
+    }
+
+    if (-not (Test-Path $SigFile)) {
+        Write-Log "Missing $SigFile — refusing to paste an unsigned task." "ERROR"
+        return
+    }
+    $expected = (Get-Content -Path $SigFile -Raw -Encoding UTF8).Trim().ToLowerInvariant()
+    $actual   = Get-HmacSha256Hex -Content $rawContent -Secret $Secret
+    if (-not (Test-SignatureMatches -Expected $expected -Actual $actual)) {
+        Write-Log "HMAC mismatch — refusing to paste. Did the file get edited outside the watcher?" "ERROR"
         return
     }
 
@@ -153,9 +223,14 @@ function Process-TaskFile {
 
     Write-Log "Task detected. Target: '$target'. Body length: $($body.Length) chars."
 
+    if (-not (Confirm-Send -Target $target -BodyLength $body.Length)) {
+        Write-Log "User declined to send. Skipping." "INFO"
+        return
+    }
+
     $window = Find-TargetWindow -Target $target
     if (-not $window) {
-        Write-Log "Cannot paste — target window not found. Will retry on next file change." "ERROR"
+        Write-Log "Cannot paste — target window not found." "ERROR"
         return
     }
 
@@ -172,6 +247,12 @@ function Process-TaskFile {
 # ─── MAIN LOOP ─────────────────────────────────────────────────────────────────
 
 Ensure-QueueDir
+
+$Secret = $env:JOTGLOSS_QUEUE_SECRET
+if ([string]::IsNullOrEmpty($Secret) -or $Secret.Length -lt 16) {
+    Write-Log "Set JOTGLOSS_QUEUE_SECRET (min 16 chars) before running this script." "ERROR"
+    exit 1
+}
 
 Write-Log "=== autopaste.ps1 started ==="
 Write-Log "Watching: $QueueFile"
@@ -206,7 +287,7 @@ try {
             $lastModified = $currentModified
 
             try {
-                Process-TaskFile -Path $QueueFile
+                Process-TaskFile -Path $QueueFile -Secret $Secret
             } catch {
                 Write-Log "Unexpected error processing task: $_" "ERROR"
             }
