@@ -73,14 +73,19 @@
 
 <!--
   React/ReactDOM are vendored locally at /vendor/ — no third-party code path.
-  Babel is too large to vendor; it is pinned on unpkg.
-  TODO at deploy time: download babel.min.js, compute `openssl dgst -sha384 -binary
-  babel.min.js | openssl base64 -A`, and add the integrity= hash here so a
-  compromised CDN cannot substitute the file.
+  Babel is too large to vendor; it is pinned on unpkg with an SRI hash so a
+  compromised CDN cannot substitute the file. The hash was computed from
+  the exact tarball published as @babel/standalone@7.26.0:
+    curl -fsSL https://registry.npmjs.org/@babel/standalone/-/standalone-7.26.0.tgz \
+      | tar -xzO package/babel.min.js \
+      | openssl dgst -sha384 -binary | openssl base64 -A
 -->
 <script src="/vendor/react.production.min.js"></script>
 <script src="/vendor/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone@7.26.0/babel.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.0/babel.min.js"
+        integrity="sha384-gfoIoghgrQ+acOP1IAci7PIH0wjwxDVkjgSczIHAcAGEWKu6Ztq1HaNa41oW95ya"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
 
 <script>
 (function() {
