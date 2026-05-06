@@ -35,33 +35,74 @@ export default function BookplateLogo({ size = 48 }: Props) {
         <ellipse cx="40" cy="45" rx="32" ry="36"
           fill="#FFE8EE" opacity="0.3" />
 
-        {/* Floral crown above monogram — small rose with leaves */}
+        {/* Floral crown above monogram — heraldic stamp-rose with leaf sprigs */}
         <g transform="translate(40,22)">
-          {/* Central rose bloom */}
-          {[0, 60, 120, 180, 240, 300].map(a => (
-            <ellipse key={`o${a}`} cx={0} cy={0} rx={2} ry={4.5}
-              fill="#F0C0C8" opacity={0.6} transform={`rotate(${a}) translate(0,-2)`} />
-          ))}
-          {[30, 90, 150, 210, 270, 330].map(a => (
-            <ellipse key={`i${a}`} cx={0} cy={0} rx={1.5} ry={3.2}
-              fill="#E8A8B8" opacity={0.65} transform={`rotate(${a}) translate(0,-1.5)`} />
-          ))}
-          <circle r={2.2} fill="#F0849C" opacity={0.75} />
-          <circle r={1} fill="#FFD0D8" opacity={0.5} />
+          {/* Outer rose: five almond petals around the heart, stroked so the
+              silhouette reads as a flower instead of a cluster of dots. */}
+          <g>
+            {[0, 72, 144, 216, 288].map(a => (
+              <path
+                key={`petal-${a}`}
+                d="M 0 0 C -2.4 -1.6, -2.6 -5, 0 -6.4 C 2.6 -5, 2.4 -1.6, 0 0 Z"
+                fill="#E8A8B8"
+                stroke="#C97C8A"
+                strokeWidth="0.45"
+                strokeLinejoin="round"
+                opacity="0.92"
+                transform={`rotate(${a})`}
+              />
+            ))}
+          </g>
 
-          {/* Small leaves flanking */}
-          <path d="M -7,1 C -9,-2 -8,-5 -5,-6" stroke="#88B890" strokeWidth="0.6" fill="none" opacity="0.6" />
-          <ellipse cx={-7} cy={-2} rx={1.5} ry={3.5} fill="#90C898" opacity={0.45} transform="rotate(-25,-7,-2)" />
-          <path d="M 7,1 C 9,-2 8,-5 5,-6" stroke="#88B890" strokeWidth="0.6" fill="none" opacity="0.6" />
-          <ellipse cx={7} cy={-2} rx={1.5} ry={3.5} fill="#90C898" opacity={0.45} transform="rotate(25,7,-2)" />
+          {/* Inner ring offset 36° — gives the rose layered depth without
+              relying on dozens of confetti ellipses. */}
+          <g>
+            {[36, 108, 180, 252, 324].map(a => (
+              <path
+                key={`inner-${a}`}
+                d="M 0 0 C -1.5 -1, -1.6 -3.4, 0 -4.2 C 1.6 -3.4, 1.5 -1, 0 0 Z"
+                fill="#FFD0D8"
+                stroke="#C97C8A"
+                strokeWidth="0.35"
+                strokeLinejoin="round"
+                opacity="0.85"
+                transform={`rotate(${a})`}
+              />
+            ))}
+          </g>
 
-          {/* Tiny forget-me-nots */}
-          {[-11, 11].map(x => (
-            <g key={x} transform={`translate(${x},0)`} opacity="0.5">
-              {[0, 72, 144, 216, 288].map(a => (
-                <ellipse key={a} cx={0} cy={-0.8} rx={0.6} ry={0.9} fill="#C8B8E0" transform={`rotate(${a})`} />
-              ))}
-              <circle r={0.4} fill="#F0E0A0" opacity={0.8} />
+          {/* Heart of the rose: a coral button with a small highlight. */}
+          <circle r="1.4" fill="#C97C8A" />
+          <circle r="0.6" cy="-0.2" fill="#FFD0D8" opacity="0.85" />
+
+          {/* Leaf sprigs flanking the rose. Each leaf has a centre vein and
+              a curving stem — readable down to 32px instead of dissolving
+              into dots like the old forget-me-nots. */}
+          {[
+            { x: -7, sign: -1, leafRot: -28 },
+            { x: 7,  sign: 1,  leafRot: 28 },
+          ].map(({ x, sign, leafRot }) => (
+            <g key={`sprig-${x}`} opacity="0.78">
+              <path
+                d={`M ${0.6 * sign} 0.2 C ${3 * sign} -0.6, ${5 * sign} -2.2, ${x} ${-2}`}
+                stroke="#6E9A78"
+                strokeWidth="0.55"
+                fill="none"
+                strokeLinecap="round"
+              />
+              <g transform={`translate(${x} -2) rotate(${leafRot})`}>
+                <path
+                  d="M 0 0 C -1.4 -1.4, -1.4 -3.6, 0 -4.4 C 1.4 -3.6, 1.4 -1.4, 0 0 Z"
+                  fill="#9CC4A0"
+                  stroke="#6E9A78"
+                  strokeWidth="0.35"
+                  strokeLinejoin="round"
+                />
+                <line
+                  x1="0" y1="-0.2" x2="0" y2="-4"
+                  stroke="#6E9A78" strokeWidth="0.3" opacity="0.55"
+                />
+              </g>
             </g>
           ))}
         </g>
@@ -74,12 +115,21 @@ export default function BookplateLogo({ size = 48 }: Props) {
           JG
         </text>
 
-        {/* Ornamental flourish below monogram */}
-        <g transform="translate(40,62)" opacity="0.4">
-          <line x1="-14" y1="0" x2="14" y2="0" stroke="#C8A878" strokeWidth="0.5" />
-          <circle cx="0" cy="0" r="1.2" fill="#C8A878" />
-          <circle cx="-8" cy="0" r="0.6" fill="#C8A878" opacity="0.7" />
-          <circle cx="8" cy="0" r="0.6" fill="#C8A878" opacity="0.7" />
+        {/* Ornamental fillet below monogram — diamond centre + hairline rules
+            with chevron flicks at the ends, echoing DiamondDivider. The old
+            three-circle pattern read as confetti at small sizes. */}
+        <g transform="translate(40,62)" opacity="0.55">
+          <line x1="-12" y1="0" x2="-3" y2="0" stroke="#C8A878" strokeWidth="0.5" />
+          <line x1="12"  y1="0" x2="3"  y2="0" stroke="#C8A878" strokeWidth="0.5" />
+          <path d="M 0 -2 L 2 0 L 0 2 L -2 0 Z" fill="#C8A878" />
+          <path d="M 0 -2 L 2 0 L 0 2 L -2 0 Z" fill="none"
+            stroke="#5A3E4B" strokeWidth="0.3" opacity="0.45" />
+          <path d="M -13 -1.2 L -12 0 L -13 1.2"
+            stroke="#C8A878" strokeWidth="0.5" fill="none"
+            strokeLinejoin="round" strokeLinecap="round" />
+          <path d="M 13 -1.2 L 12 0 L 13 1.2"
+            stroke="#C8A878" strokeWidth="0.5" fill="none"
+            strokeLinejoin="round" strokeLinecap="round" />
         </g>
 
         {/* Tiny label */}
