@@ -66,17 +66,46 @@ const INNER_FILL: Record<ArchVariant, string> = {
 }
 
 function RoseBud({ x, y, r, rotation = 0 }: { x: number; y: number; r: number; rotation?: number }) {
+  // Petal silhouettes drawn as stroked teardrops so the bloom still reads
+  // at small r values (CornerBotanical calls down to r ~= 1.6 on sidebar).
+  // Bare filled ellipses at that scale degraded into pink confetti.
+  const outerPetal =
+    `M 0 0` +
+    ` C ${-0.55 * r} ${-0.28 * r}, ${-0.6 * r} ${-0.86 * r}, 0 ${-1.05 * r}` +
+    ` C ${0.6 * r} ${-0.86 * r}, ${0.55 * r} ${-0.28 * r}, 0 0 Z`
+  const innerPetal =
+    `M 0 0` +
+    ` C ${-0.34 * r} ${-0.18 * r}, ${-0.36 * r} ${-0.55 * r}, 0 ${-0.7 * r}` +
+    ` C ${0.36 * r} ${-0.55 * r}, ${0.34 * r} ${-0.18 * r}, 0 0 Z`
   return (
     <g transform={`translate(${x} ${y}) rotate(${rotation})`}>
-      {/* Outer petals — 6 layered ellipses */}
+      {/* Outer ring — six layered petals around the heart */}
       {[0, 60, 120, 180, 240, 300].map(a => (
-        <ellipse key={`o${a}`} cx={0} cy={0} rx={r * 0.45} ry={r} fill="rgba(240,192,200,0.7)" opacity={0.6} transform={`rotate(${a}) translate(0,${-r * 0.35})`} />
+        <path
+          key={`o${a}`}
+          d={outerPetal}
+          fill="rgba(240,192,200,0.7)"
+          stroke="rgba(201,124,138,0.55)"
+          strokeWidth={Math.max(0.18, 0.08 * r)}
+          strokeLinejoin="round"
+          opacity={0.6}
+          transform={`rotate(${a})`}
+        />
       ))}
-      {/* Inner petals — tighter ring */}
+      {/* Inner ring — offset 30° so petals interlock visibly */}
       {[30, 90, 150, 210, 270, 330].map(a => (
-        <ellipse key={`i${a}`} cx={0} cy={0} rx={r * 0.35} ry={r * 0.7} fill="rgba(232,168,184,0.65)" opacity={0.65} transform={`rotate(${a}) translate(0,${-r * 0.25})`} />
+        <path
+          key={`i${a}`}
+          d={innerPetal}
+          fill="rgba(232,168,184,0.65)"
+          stroke="rgba(201,124,138,0.5)"
+          strokeWidth={Math.max(0.14, 0.06 * r)}
+          strokeLinejoin="round"
+          opacity={0.65}
+          transform={`rotate(${a})`}
+        />
       ))}
-      {/* Center */}
+      {/* Heart of the rose — coral button with a paler highlight */}
       <circle r={r * 0.42} fill="rgba(240,132,156,0.7)" />
       <circle r={r * 0.22} fill="rgba(255,208,216,0.5)" />
     </g>
@@ -84,10 +113,25 @@ function RoseBud({ x, y, r, rotation = 0 }: { x: number; y: number; r: number; r
 }
 
 function ForgetMeNot({ x, y, r }: { x: number; y: number; r: number }) {
+  // Five stroked petals instead of five bare ellipses. At sidebar scale the
+  // ellipse version became sub-pixel smudges; the stroked teardrop holds
+  // a recognisable five-petal silhouette down to ~6px wide.
+  const petal =
+    `M 0 0` +
+    ` C ${-0.34 * r} ${-0.18 * r}, ${-0.42 * r} ${-0.7 * r}, 0 ${-0.92 * r}` +
+    ` C ${0.42 * r} ${-0.7 * r}, ${0.34 * r} ${-0.18 * r}, 0 0 Z`
   return (
     <g transform={`translate(${x} ${y})`} opacity={0.55}>
       {[0, 72, 144, 216, 288].map(a => (
-        <ellipse key={a} cx={0} cy={-r * 0.5} rx={r * 0.4} ry={r * 0.6} fill="rgba(180,168,224,0.7)" transform={`rotate(${a})`} />
+        <path
+          key={a}
+          d={petal}
+          fill="rgba(180,168,224,0.7)"
+          stroke="rgba(120,108,168,0.55)"
+          strokeWidth={Math.max(0.12, 0.06 * r)}
+          strokeLinejoin="round"
+          transform={`rotate(${a})`}
+        />
       ))}
       <circle r={r * 0.25} fill="rgba(240,224,160,0.8)" />
     </g>
